@@ -12,6 +12,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "gyms")
@@ -36,6 +38,17 @@ public class Gym {
 	@Column
 	private Integer totalRatings;
 	
+	@Column
+	private String Address;
+	    
+	@Column
+    private String City;
+	
+	@Column(name = "phone_number")
+    @Size(min = 10, max = 10, message = "Phone number must be exactly 10 digits")
+	@Pattern(regexp = "\\d{10}", message = "Phone number must contain only digits")
+    private String phoneNumber;
+
 	@ManyToMany
 	@JoinTable(name="gym_workouuts",joinColumns=@JoinColumn(name="gym_id"),inverseJoinColumns=@JoinColumn(name="workout_id"))
 	private List<Workout> gymWorkouts;
@@ -166,8 +179,36 @@ public class Gym {
 		this.ratingss = ratingss;
 	}
 
-	
+	public String getAddress() {
+		return Address;
+	}
 
-	
+	public void setAddress(String address) {
+		Address = address;
+	}
+
+	public String getCity() {
+		return City;
+	}
+
+	public void setCity(String city) {
+		City = city;
+	}
+
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	public void setAverageRating(Double averageRating) {
+		this.averageRating = averageRating;
+	}
+
+	public void setTotalRatings(Integer totalRatings) {
+		this.totalRatings = totalRatings;
+	}
 	
 }

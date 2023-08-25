@@ -10,6 +10,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
@@ -66,6 +69,17 @@ public class User implements UserDetails  {
     
     @Column
     private Date resetTokenExpiryDate;
+    
+    @Column
+    private String Address;
+    
+    @Column
+    private String City;
+    
+    @Column(name = "phone_number")
+    @Size(min = 10, max = 10, message = "Phone number must be exactly 10 digits")
+    @Pattern(regexp = "\\d{10}", message = "Phone number must contain only digits")
+    private String phoneNumber;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -161,6 +175,30 @@ public class User implements UserDetails  {
 
 	public void setResetTokenExpiryDate(Date resetTokenExpiryDate) {
 		this.resetTokenExpiryDate = resetTokenExpiryDate;
+	}
+
+	public String getAddress() {
+		return Address;
+	}
+
+	public void setAddress(String address) {
+		Address = address;
+	}
+
+	public String getCity() {
+		return City;
+	}
+
+	public void setCity(String city) {
+		City = city;
+	}
+
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
 	}
     
     

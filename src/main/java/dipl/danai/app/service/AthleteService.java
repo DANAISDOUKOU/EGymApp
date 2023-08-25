@@ -17,10 +17,12 @@ public class AthleteService {
 			athlete.setAthlete_name(value);
 		}else if(field.equals("athlete_surname")) {
 			athlete.setAthlete_surname(value);
-		}else if(field.equals("Phone")) {
-			athlete.setAthlete_surname(value);
+		}else if(field.equals("PhoneNumber")) {
+			athlete.setPhoneNumber(value);
 		}else if(field.equals("Address")) {
-			athlete.setAthlete_surname(value);
+			athlete.setAddress(value);
+		}else if(field.equals("City")) {
+			athlete.setCity(value);
 		}
 		athleteRepository.save(athlete);
 	}

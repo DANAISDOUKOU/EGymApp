@@ -19,6 +19,9 @@
         <label>Search by best rating:</label>
         <input type="number" name="bestRating" placeholder="Enter best rating...">
         <br>
+        <label>Search by City:</label>
+        <input type="text" name="city" placeholder="Enter gym city...">
+        <br>
         <button type="submit">Search</button>
     </form>
 	<div th:each="gym : ${gyms}">

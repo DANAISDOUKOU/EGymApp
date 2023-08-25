@@ -253,9 +253,10 @@ public class GymController {
 	public String searchGyms(@RequestParam(required = false) String name,
             @RequestParam(required = false) String address,
             @RequestParam(required = false) String workoutType,
-            @RequestParam(required = false) Integer bestRating, Model model) {
+            @RequestParam(required = false) Integer bestRating,
+            @RequestParam(required = false) String city, Model model) {
 	        List<Gym> gyms =new ArrayList<Gym>();
-	        List<Gym> searchResults = gymService.searchGyms(name, address, workoutType, bestRating);
+	        List<Gym> searchResults = gymService.searchGyms(name, address, workoutType, bestRating,city);
 	        gyms.addAll(searchResults);
 	        model.addAttribute("gyms", gyms);
 	        return "gym/list";

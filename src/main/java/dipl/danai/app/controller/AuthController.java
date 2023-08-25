@@ -68,9 +68,9 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
     
-    String query=("INSERT INTO athletes(athlete_id,athlete_name,athlete_surname,email)"+"VALUES(?,?,?,?)");
-    String query2=("INSERT INTO gyms(gym_id,gym_name,gym_surname,email)"+"VALUES(?,?,?,?)");
-    String query3=("INSERT INTO instructors(instructor_id,instructor_name,instructor_surname,email)"+"VALUES(?,?,?,?)");
+    String query=("INSERT INTO athletes(athlete_id,athlete_name,athlete_surname,email,Address,City,phone_number)"+"VALUES(?,?,?,?,?,?,?)");
+    String query2=("INSERT INTO gyms(gym_id,gym_name,gym_surname,email,Address,City,phone_number)"+"VALUES(?,?,?,?,?,?,?)");
+    String query3=("INSERT INTO instructors(instructor_id,instructor_name,instructor_surname,email,Address,City,phone_number)"+"VALUES(?,?,?,?,?,?,?)");
   
     @GetMapping("/login")
     public String login(){
@@ -103,13 +103,18 @@ public class AuthController {
         String name=user.getFirstName();
         String surname=user.getLastName();
         String email=user.getEmail();
-        
+        String city=user.getCity();
+        String address=user.getAddress();
+        String phoneNumber=user.getPhoneNumber();
         if(user.getRole()==Role.ATHLETE){
         	PreparedStatement pstmt = dataSource.getConnection().prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
                 pstmt.setLong(1, id);
                 pstmt.setString(2, name);
                 pstmt.setString(3,surname);
                 pstmt.setString(4,email);
+                pstmt.setString(5,address);
+                pstmt.setString(6,city);
+                pstmt.setString(7,phoneNumber);
                 pstmt.executeUpdate();
         	
         	}
@@ -119,6 +124,9 @@ public class AuthController {
                 pstmt.setString(2, name);
                 pstmt.setString(3,surname);
                 pstmt.setString(4,email);
+                pstmt.setString(5,address);
+                pstmt.setString(6,city);
+                pstmt.setString(7,phoneNumber);
                 pstmt.executeUpdate();	
         	}
         		
@@ -128,7 +136,9 @@ public class AuthController {
                 pstmt.setString(2, name);
                 pstmt.setString(3,surname);
                 pstmt.setString(4,email);
-
+                pstmt.setString(5,address);
+                pstmt.setString(6,city);
+                pstmt.setString(7,phoneNumber);
                 pstmt.executeUpdate();  	
         }		
         return "auth/login";
@@ -198,55 +208,128 @@ public class AuthController {
 		return "profile";
 	}
 	
-	//Add for address and for phone
-	  @GetMapping("/forgotPassword")
-	    public String showForgotPasswordPage(Model model) {
-	        return "forgotPassword";
-	    }
-	  
-	  @PostMapping("/forgotPassword")
-	  public String forgotPassword(@RequestParam("email") String email, Model model) {
-
-		  String resetToken =userService.generateResetToken();
-	      User user = userRepo.findByEmail(email);
-	      if (user != null) {
-	    	  Date expiryDate = userService.calculateExpiryDate();
-	    	  user.setResetToken(resetToken);
-	    	  user.setResetTokenExpiryDate(expiryDate);
-	          userRepo.save(user);
-	          String resetLink = "http://localhost:8080/resetPassword?token=" + resetToken;
-	          String emailContent = "Click the following link to reset your password: " + resetLink;
-	          emailService.sendEmail(email, "Password Reset", emailContent);
-	      }
-	      return "forgot_password_success_page";
-	  }
-	  
-	  @GetMapping("/resetPassword")
-	  public String showResetPasswordPage(@RequestParam("token") String resetToken, Model model) {
-	      User user =userService.validateResetToken(resetToken); 
-	      if (user != null) {
-	          model.addAttribute("resetToken", resetToken);
-	          return "resetPassword";
-	      } else {
-	          return "invalidResetToken";
-	      }
-	  }
-
-	  @PostMapping("/resetPassword")
-	  public String resetPassword(
-	          @RequestParam("token") String resetToken,
-	          @RequestParam("password") String newPassword,
-	          Model model) {
-	      User user = userService.validateResetToken(resetToken); 
-	      if (user != null) {
-	          user.setPassword(passwordEncoder.encode(newPassword));
-	          userRepo.save(user);
-	          return "passwordResetSuccess";
-	      } else {
-	          return "invalidResetToken";
-	      }
-	  }
-	  
+	@GetMapping(value= {"/updateProfileCity"})
+	public String getProfileCity(Authentication authentication,Model model) {
+		String email=authentication.getName();
+		User user=userRepo.findByEmail(email);
+		model.addAttribute("user", user);
+		return "updateProfileCity";
+	}
 	
+	@PostMapping(value= {"/updateProfileCity"})
+	public String setProfileCity(Authentication authentication,Model model,@RequestParam(value="City") String name) {
+		String email=authentication.getName();
+		User user=userRepo.findByEmail(email);
+		userService.setValue(name, "City",user);
+		if(user.getRole()==Role.GYM) {
+			Gym gym=gymRepo.findByEmail(user.getEmail());
+			gymService.setValue(name,"City",gym);
+		}else if(user.getRole()==Role.ATHLETE) {
+			Athletes athlete=athleteRepo.findByEmail(email);
+			athleteService.setValue(name, "City", athlete);
+		}else if(user.getRole()==Role.INSTRUCTOR) {
+			Instructor instructor=instructorRepo.findByEmail(email);
+			instructorService.setValue(name,"City",instructor);
+		}
+		model.addAttribute("user",user);
+		return "profile";
+	}
+	
+	@GetMapping(value= {"/updateProfileAddress"})
+	public String getProfileAddress(Authentication authentication,Model model) {
+		String email=authentication.getName();
+		User user=userRepo.findByEmail(email);
+		model.addAttribute("user", user);
+		return "updateProfileAddress";
+	}
+	
+	@PostMapping(value= {"/updateProfileAddress"})
+	public String setProfileAddress(Authentication authentication,Model model,@RequestParam(value="Address") String name) {
+		String email=authentication.getName();
+		User user=userRepo.findByEmail(email);
+		userService.setValue(name, "Address",user);
+		if(user.getRole()==Role.GYM) {
+			Gym gym=gymRepo.findByEmail(user.getEmail());
+			gymService.setValue(name,"Address",gym);
+		}else if(user.getRole()==Role.ATHLETE) {
+			Athletes athlete=athleteRepo.findByEmail(email);
+			athleteService.setValue(name, "Address", athlete);
+		}else if(user.getRole()==Role.INSTRUCTOR) {
+			Instructor instructor=instructorRepo.findByEmail(email);
+			instructorService.setValue(name,"Address",instructor);
+		}
+		model.addAttribute("user",user);
+		return "profile";
+	}
+	
+	@GetMapping(value= {"/updateProfilePhone"})
+	public String getProfilePhoneNumber(Authentication authentication,Model model) {
+		String email=authentication.getName();
+		User user=userRepo.findByEmail(email);
+		model.addAttribute("user", user);
+		return "updateProfilePhone";
+	}
+	
+	@PostMapping(value= {"/updateProfilePhone"})
+	public String setProfilePhoneNumber(Authentication authentication,Model model,@RequestParam(value="phoneNumber") String name) {
+		String email=authentication.getName();
+		User user=userRepo.findByEmail(email);
+		userService.setValue(name, "PhoneNumber",user);
+		if(user.getRole()==Role.GYM) {
+			Gym gym=gymRepo.findByEmail(user.getEmail());
+			gymService.setValue(name,"PhoneNumber",gym);
+		}else if(user.getRole()==Role.ATHLETE) {
+			Athletes athlete=athleteRepo.findByEmail(email);
+			athleteService.setValue(name, "PhoneNumber", athlete);
+		}else if(user.getRole()==Role.INSTRUCTOR) {
+			Instructor instructor=instructorRepo.findByEmail(email);
+			instructorService.setValue(name,"PhoneNumber",instructor);
+		}
+		model.addAttribute("user",user);
+		return "profile";
+	}
 
+	@GetMapping("/forgotPassword")
+	public String showForgotPasswordPage(Model model) {
+		return "forgotPassword";
+	}
+	  
+	@PostMapping("/forgotPassword")
+	public String forgotPassword(@RequestParam("email") String email, Model model) {
+		String resetToken =userService.generateResetToken();
+	    User user = userRepo.findByEmail(email);
+	    if (user != null) {
+	    	Date expiryDate = userService.calculateExpiryDate();
+	    	user.setResetToken(resetToken);
+	    	user.setResetTokenExpiryDate(expiryDate);
+	        userRepo.save(user);
+	        String resetLink = "http://localhost:8080/resetPassword?token=" + resetToken;
+	        String emailContent = "Click the following link to reset your password: " + resetLink;
+	        emailService.sendEmail(email, "Password Reset", emailContent);
+	    }
+	   return "forgot_password_success_page";
+	}
+	  
+	@GetMapping("/resetPassword")
+	public String showResetPasswordPage(@RequestParam("token") String resetToken, Model model) {
+		User user =userService.validateResetToken(resetToken); 
+	    if (user != null) {
+	    	model.addAttribute("resetToken", resetToken);
+	        return "resetPassword";
+	    } else {
+	        return "invalidResetToken";
+	    }
+	}
+
+	@PostMapping("/resetPassword")
+	public String resetPassword(@RequestParam("token") String resetToken,@RequestParam("password") String newPassword,Model model) {
+	    User user = userService.validateResetToken(resetToken); 
+	    if (user != null) {
+	        user.setPassword(passwordEncoder.encode(newPassword));
+	        userRepo.save(user);
+	        return "passwordResetSuccess";
+	    } else {
+	        return "invalidResetToken";
+	    }
+	}
 }

@@ -99,10 +99,12 @@ public class GymService {
 			gym.setGym_name(value);
 		}else if(field.equals("gym_surname")) {
 			gym.setGym_surname(value);
-		}else if(field.equals("Phone")) {
-			gym.setGym_surname(value);
+		}else if(field.equals("PhoneNumber")) {
+			gym.setPhoneNumber(value);
 		}else if(field.equals("Address")) {
-			gym.setGym_surname(value);
+			gym.setAddress(value);
+		}else if(field.equals("City")) {
+			gym.setCity(value);
 		}
 		gymRepository.save(gym);
 	}
@@ -115,7 +117,7 @@ public class GymService {
 		instructors.add(instructor);
 	}
 
-	public List<Gym> searchGyms(String name, String address, String workoutType, Integer bestRating) {
+	public List<Gym> searchGyms(String name, String address, String workoutType, Integer bestRating, String city) {
 		 List<Gym> allGyms = gymRepository.findAll(); 
 	   
 		 List<Gym> searchResults = allGyms.stream()
@@ -125,6 +127,7 @@ public class GymService {
 	                //.filter(gym -> (address == null || gym.getAddress().contains(address)))
 	                //.filter(gym -> (workoutType == null || gym.getGymWorkouts().stream()
                    // .anyMatch(workout -> workout.getName().contains(workoutType))))
+	                .filter(gym -> (city==null|| city.trim().isEmpty()||gym.getCity().trim().equalsIgnoreCase(city.trim())))
 	                .filter(gym -> (bestRating == null || gym.getAverageRating() >= bestRating))
 	                .collect(Collectors.toList());
 		

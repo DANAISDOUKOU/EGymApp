@@ -4,8 +4,8 @@
 <title>Update the profile phone</title>
 </head>
 <body>
-			<form th:action="@{/updateProfilePhone}" th:object="${user}" method="post">
-		<input type="text" th:name="phone" /> <br/><br/>
-		<button type="submit">Update</button>
+	<form th:action="@{/updateProfilePhone}" th:object="${user}" method="post">
+		<input type="text" th:name="phoneNumber" /> <br/><br/>
+	<button type="submit">Update</button>
 </body>
 </html>

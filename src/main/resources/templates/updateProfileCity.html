@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Update the profile address</title>
+</head>
+<body>
+		<form th:action="@{/updateProfileCity}" th:object="${user}" method="post">
+		<input type="text" th:name="City" /> <br/><br/>
+		<button type="submit">Update</button>
+</body>
+</html>

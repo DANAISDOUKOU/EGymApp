@@ -32,10 +32,12 @@ public class InstructorService{
 			instructor.setInstructor_name(value);
 		}else if(field.equals("instructor_surname")) {
 			instructor.setInstructor_surname(value);
-		}else if(field.equals("Phone")) {
-			instructor.setInstructor_surname(value);
+		}else if(field.equals("PhoneNumber")) {
+			instructor.setPhoneNumber(value);
 		}else if(field.equals("Address")) {
-			instructor.setInstructor_surname(value);
+			instructor.setAddress(value);
+		}else if(field.equals("City")) {
+			instructor.setCity(value);
 		}
 		instructorRepository.save(instructor);
 	}

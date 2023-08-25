@@ -12,6 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name="athletes")
@@ -40,93 +42,108 @@ public class Athletes {
 	@Column 
 	private String email;
 	
-	/*
-	 * @Column private Date joining_date;
-	 * 
-	 * @Column private Date end_of_memembership_date;
-	 */
+	 @Column
+	 private String Address;
+	    
+	 @Column
+	 private String City;
+	    
+	 @Column(name = "phone_number")
+	 @Size(min = 10, max = 10, message = "Phone number must be exactly 10 digits")
+	 @Pattern(regexp = "\\d{10}", message = "Phone number must contain only digits")
+	 private String phoneNumber;
 	
-	@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-	@JoinTable(name="athletes_memberships",joinColumns=@JoinColumn(name="athlete_id"),inverseJoinColumns=@JoinColumn(name="membership_type_id"))
-	private Set<MembershipType> memberships;
+	 @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+	 @JoinTable(name="athletes_memberships",joinColumns=@JoinColumn(name="athlete_id"),inverseJoinColumns=@JoinColumn(name="membership_type_id"))
+	 private Set<MembershipType> memberships;
 
-	public Long getAthlete_id() {
+	 public Long getAthlete_id() {
 		return athlete_id;
+	 }
+
+	 public void setAthlete_id(Long athlete_id) {
+		 this.athlete_id = athlete_id;
+	 }
+
+	 public String getAthlete_name() {
+		 return athlete_name;
+	 }
+
+	 public void setAthlete_name(String athlete_name) {
+		 this.athlete_name = athlete_name;
+	 }
+
+	 public String getAthlete_surname() {
+		 return athlete_surname;
+	 }
+
+	 public void setAthlete_surname(String athlete_surname) {
+		 this.athlete_surname = athlete_surname;
+	 }
+
+	 public List<ClassOfSchedule> getClasses() {
+		 return classes;
+	 }
+
+	 public void setClasses(List<ClassOfSchedule> classes) {
+		 this.classes = classes;
+	 }
+
+	 public Set<Gym> getGyms() {
+		 return gyms;
+	 }
+
+	 public void setGyms(Set<Gym> gyms) {
+		 this.gyms = gyms;
+	 }
+
+	 public String getContact() {
+		 return contact;
+	 }
+
+	 public void setContact(String contact) {
+		 this.contact = contact;
+	 }
+
+	 public String getEmail() {
+		 return email;
+	 }
+
+	 public void setEmail(String email) {
+		 this.email = email;
+	 }
+
+	 public Set<MembershipType> getMemberships() {
+		 return memberships;
+	 }
+
+	 public void setMemberships(Set<MembershipType> memberships) {
+		 this.memberships = memberships;
+	 }
+
+	public String getAddress() {
+		return Address;
 	}
 
-	public void setAthlete_id(Long athlete_id) {
-		this.athlete_id = athlete_id;
+	public void setAddress(String address) {
+		Address = address;
 	}
 
-
-	public String getAthlete_name() {
-		return athlete_name;
+	public String getCity() {
+		return City;
 	}
 
-	public void setAthlete_name(String athlete_name) {
-		this.athlete_name = athlete_name;
+	public void setCity(String city) {
+		City = city;
 	}
 
-	public String getAthlete_surname() {
-		return athlete_surname;
+	public String getPhoneNumber() {
+		return phoneNumber;
 	}
 
-	public void setAthlete_surname(String athlete_surname) {
-		this.athlete_surname = athlete_surname;
-	}
-
-	public List<ClassOfSchedule> getClasses() {
-		return classes;
-	}
-
-	public void setClasses(List<ClassOfSchedule> classes) {
-		this.classes = classes;
-	}
-
-	public Set<Gym> getGyms() {
-		return gyms;
-	}
-
-	public void setGyms(Set<Gym> gyms) {
-		this.gyms = gyms;
-	}
-
-	public String getContact() {
-		return contact;
-	}
-
-	public void setContact(String contact) {
-		this.contact = contact;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	/*
-	 * public Date getJoining_date() { return joining_date; }
-	 * 
-	 * public void setJoining_date(Date joining_date) { this.joining_date =
-	 * joining_date; }
-	 * 
-	 * public Date getEnd_of_memembership_date() { return end_of_memembership_date;
-	 * }
-	 * 
-	 * public void setEnd_of_memembership_date(Date end_of_memembership_date) {
-	 * this.end_of_memembership_date = end_of_memembership_date; }
-	 */
-
-	public Set<MembershipType> getMemberships() {
-		return memberships;
-	}
-
-	public void setMemberships(Set<MembershipType> memberships) {
-		this.memberships = memberships;
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
 	}
 	
-	
+	 
 }

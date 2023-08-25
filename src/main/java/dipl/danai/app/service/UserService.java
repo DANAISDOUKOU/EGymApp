@@ -24,15 +24,12 @@ public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
- 
     public void saveUser(User user) {
         String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         userRepository.save(user);
-
     }
 
- 
     public List<Object> isUserPresent(User user) {
         boolean userExists = false;
         String message = null;
@@ -41,9 +38,6 @@ public class UserService implements UserDetailsService {
             userExists = true;
             message = "Email Already Present!";
         }
-      
-        
-        System.out.println("existingUserEmail.isPresent() - "+existingUserEmail!=null);
         return Arrays.asList(userExists, message);
     }
 
@@ -61,10 +55,12 @@ public class UserService implements UserDetailsService {
 			user.setFirstName(value);
 		}else if(field.equals("lastName")) {
 			user.setLastName(value);
-		}else if(field.equals("Phone")) {
-			user.setLastName(value);
+		}else if(field.equals("PhoneNumber")) {
+			user.setPhoneNumber(value);
 		}else if(field.equals("Address")) {
-			user.setLastName(value);
+			user.setAddress(value);
+		}else if(field.equals("City")) {
+			user.setCity(value);
 		}
 		userRepository.save(user);
 	}
@@ -73,23 +69,21 @@ public class UserService implements UserDetailsService {
 		   return UUID.randomUUID().toString();
 	 }
 	  
-	  public User validateResetToken(String resetToken) {
-		    User user = userRepository.findByResetToken(resetToken);
-		    if (user != null && !isTokenExpired(user.getResetTokenExpiryDate())) {
-		        return user;
-		    }
-		    
-		    
-		    return null;
+	 public User validateResetToken(String resetToken) {
+	    User user = userRepository.findByResetToken(resetToken);
+	    if (user != null && !isTokenExpired(user.getResetTokenExpiryDate())) {
+	        return user;
+	    }
+	    return null;
+	  }
+	  
+	 public boolean isTokenExpired(Date expiryDate) {
+		 return expiryDate.before(new Date());
+	 }
+	  
+	 public Date calculateExpiryDate() {
+		 Calendar calendar = Calendar.getInstance();
+		 calendar.add(Calendar.HOUR, 1); 
+		 return calendar.getTime();
 	}
-	  
-	  public boolean isTokenExpired(Date expiryDate) {
-		  return expiryDate.before(new Date());
-		}
-	  
-	  public Date calculateExpiryDate() {
-		    Calendar calendar = Calendar.getInstance();
-		    calendar.add(Calendar.HOUR, 1); 
-		    return calendar.getTime();
-		}
 }

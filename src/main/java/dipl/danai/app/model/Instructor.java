@@ -14,6 +14,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name="instructors")
@@ -31,6 +33,17 @@ public class Instructor {
 	
 	@Column 
 	private String email;
+	
+	@Column
+	private String Address;
+	    
+	@Column
+	private String City;
+	    
+	@Column(name = "phone_number")
+	@Size(min = 10, max = 10, message = "Phone number must be exactly 10 digits")
+	@Pattern(regexp = "\\d{10}", message = "Phone number must contain only digits")
+	private String phoneNumber;
 
 	@ManyToMany(mappedBy="gymInstructors")
 	private Set<Gym> gyms;
@@ -87,6 +100,28 @@ public class Instructor {
 		this.email = email;
 	}
 
-	
+	public String getAddress() {
+		return Address;
+	}
+
+	public void setAddress(String address) {
+		Address = address;
+	}
+
+	public String getCity() {
+		return City;
+	}
+
+	public void setCity(String city) {
+		City = city;
+	}
+
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
 	
 }
