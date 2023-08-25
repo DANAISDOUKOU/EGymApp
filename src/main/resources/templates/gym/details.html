@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+<title>gymDetails</title>
+</head>
+ <style>
+        .canceled-text {
+        color: red;
+    }
+ </style>
+<body>
+    <h1 th:text="${gym.gym_name}"></h1>
+    <h2>Fitness Programs:</h2>
+    <div th:if="${not alreadyMember}">
+     <form th:action="@{/gym/subscribe}" method="post">
+    	<h1>Do you want to be a member?</h1>
+        <input type="hidden" name="gymId" th:value="${gym.gym_id}" />
+        <button type="submit">Subscribe</button>
+    </form>
+    </div>
+    <div th:if="${not hasAlreadyMembershipType and alreadyMember}">
+     <form th:action="@{/gym/selectMembership}" method="post">
+    	<h1>Do you want a specific membershipType?</h1>
+    	<input type="hidden" name="gymId" th:value="${gym.gym_id}" />
+    	<ul>
+	    	<li th:each="membership :${memberships}">
+	    		<input type="hidden" name="membershipId" th:value="${membership.getMembership_type_id}"/>
+	    		<button type="submit" th:text="${membership.getMembership_type_name}"></button>
+    		</li>
+    	</ul>
+    </form>
+    </div>
+     <div th:if="${existingMembership != null}">
+     	<h1> Your existing membership type:</h1>
+     	<input type="hidden" name="gymId" th:value="${gym.gym_id}" />
+     	<p th:text="${existingMembership.membership_type_name}"+"-"+"${existingMembership.membership_period}"></p>
+     </div> 
+        <div th:if="${not #lists.isEmpty(programList)}">
+	    <li th:each="program: ${programList}">
+	        <span th:text="${program.work_out_date}"></span>
+			 <ul>
+	             <th:block th:each="classOfSchedule: ${workoutList.get(program.work_out_date)}">
+	             	<td th:text="${classOfSchedule.time.getTime_start()} +' - '+${classOfSchedule.time.getTime_end()}"></td>
+					<td><a th:href="@{/workout/{workoutId}/class/{classOfScheduleId}/schedule/{scheduleId}(workoutId=${classOfSchedule.workout.workoutId}, classOfScheduleId=${classOfSchedule.classOfScheduleId}, scheduleId=${program.schedule_id})}"
+       					th:text="${classOfSchedule.workout.getName()}">Details</a>
+					</td>
+	        	</th:block>
+	        </ul>	
+	    </li>
+	 </div>
+	 <form th:action="@{/rate-gym/{gymId}(gymId=${gym.gym_id})}" method="post">
+    	<input type="number" name="rating" min="1" max="5" required />
+    	<button type="submit">Rate Gym</button>
+	</form>
+    </ul>
+	<a th:href="@{http://localhost:8080/athlete/history(gymId=${gym.gym_id})}">History of Classes</a>
+	
+</body>
+</html>

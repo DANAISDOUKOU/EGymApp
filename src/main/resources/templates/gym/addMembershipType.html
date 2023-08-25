@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title> Add Membership Type</title>
+</head>
+<body>
+<h3>Select a membership</h3>
+
+<form th:action="@{/gym/addMembershipType}" method="post" th:object="${selectedMembership}">
+    <select name="membership_type_id">
+        <option th:each="membership : ${memberships}"
+                th:value="${membership.membership_type_id}"
+                th:text="${membership.membership_type_name}">Membership</option>
+    </select>
+    <p th:if="${selectedMembership != null}">
+        Membership Amount: <span th:text="${selectedMembership.membership_amount}"></span><br>
+        Membership Duration: <span th:text="${selectedMembership.membership_period}"></span>
+    </p>
+    <button type="submit">Select membership</button>
+</form>
+	<button onclick="window.location.href='/gym/createMembershipType'" type="button">Create Membership Type</button></body>
+</html>

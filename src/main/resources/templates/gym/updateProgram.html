@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Update the Program</title>
+</head>
+<style>
+        .canceled-text {
+        color: red;
+    }
+ </style>
+<body>
+	<form th:action="@{/gym/updateProgram}" th:object="${workout}" method="post">
+	<p>This is the Program: </p>
+ 	<li th:each="program: ${programList}">
+		<span th:text="${program.work_out_date}"></span>
+	     	<ul>
+	        <th:block th:each="classOfSchedule: ${workoutList.get(program.work_out_date)}">
+	         <tr>
+	         	<td th:text="${classOfSchedule.time.getTime_start()} +' - '+${classOfSchedule.time.getTime_end()}"></td>
+	           	<td th:text="${classOfSchedule.workout.getName()}"></td>
+				<a th:href="@{http://localhost:8080/gym/modifyClass(classId=${classOfSchedule.classOfScheduleId},gymId=${gym.getGym_id()},scheduleId=${program.getSchedule_id})}">Modify</a>
+	        	<span th:if="${classOfSchedule.is_canceled}" class="canceled-text">(CANCELED)</span>
+	         </tr>
+	         <br>
+	        </th:block>
+	        </ul>
+			<a th:href="@{http://localhost:8080/gym/addClass(programId=${program.schedule_id})}">Add a new Class</a>
+			<a th:href="@{http://localhost:8080/gym/deleteClass(programId=${program.schedule_id})}">Delete a class</a>			
+	    </li> 
+</form>
+</body>
+</html>

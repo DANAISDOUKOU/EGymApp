@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Class Schedule Details</title>
+</head>
+<body>
+    <h1>Class Schedule Details</h1>
+    <p>Workout: <span th:text="${classSchedule.workout.name}"></span></p>
+    <p>Time: <span th:text="${classSchedule.time.time_start} + ' - ' + ${classSchedule.time.time_end}"></span></p>
+    <p>Instructor: <span th:text="${classSchedule.instructor.instructor_name}"></span></p>
+    <p>Room: <span th:text="${classSchedule.room.roomName}"></span></p>
+    <p>Capacity: <span th:text="${classSchedule.capacity}"></span></p>
+    <p>Participants: <span th:each="participant : ${classSchedule.participants}"
+                          th:text="${participant.athlete_name+' '+participant.athlete_surname + ', '}"></span></p>
+
+
+	<form th:action="@{/gym/add-participant}" method="post" th:object="${classSchedule}">
+        <input type="hidden" name="classOfScheduleId" th:value="${classSchedule.classOfScheduleId}" />
+         <input type="hidden" name="gymId" th:value="${gym.gym_id}" />
+          <h3>Available Athletes:</h3>
+        	<ul>
+            <li th:each="athlete : ${availableAthletes}">
+              <input type="checkbox" name="selectedAthletes" th:value="${athlete.athlete_id}" />
+               <span th:text="${athlete.athlete_name + ' ' + athlete.athlete_surname}"></span>
+            </li>
+        </ul>
+        <button type="submit">Add Participant</button>
+    </form>
+
+    <!-- Remove Participant Button -->
+    <form th:action="@{/gym/remove-participant}" method="post" th:object="${classSchedule}">
+        <input type="hidden" name="classOfScheduleId" th:value="${classSchedule.classOfScheduleId} " />
+         <input type="hidden" name="gymId" th:value="${gym.gym_id}" />
+         <ul>
+            <li th:each="participant : ${classSchedule.participants}">
+                <input type="checkbox" name="removedParticipants" th:value="${participant.athlete_id}" />
+                <span th:text="${participant.athlete_name + ' ' + participant.athlete_surname}"></span>
+            </li>
+        </ul>
+        <button type="submit">Remove Participant</button>
+    </form>
+</body>
+</html>

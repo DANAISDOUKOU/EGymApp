@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>GYM Workouts</title>
+</head>
+<body>
+  <h3> Type Of Workouts </h3>
+  <ul>
+	  <li th:each="workoutGym : ${workoutGyms}">
+	  	<span th:text="${workoutGym.name}"></span>
+	  </li>
+</ul>	
+  
+  <form action="/addWorkoutsToGym" method="post">
+    <ul>
+      <li th:each="workout : ${workouts}">
+        <input type="checkbox" th:value="${workout.workoutId}" name="selectedWorkouts"> <!-- Add checkbox for each workout -->
+        <span th:text="${workout.name}"></span> <!-- Display workout name -->
+      </li>
+    </ul>
+    
+    <input type="submit" value="Add Selected Workouts"> <!-- Button to add selected workouts -->
+  </form>
+  
+
+  <button  onclick="window.location.href='http://localhost:8080/gym/createClass'" type="button">Create a new Workout for Gym</button><br/><br/>
+</body>
+</html>

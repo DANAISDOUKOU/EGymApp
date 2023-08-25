@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><html>
+<head>
+<title>Program</title>
+
+</head>
+<body>
+ <style>
+        .canceled-text {
+        color: red;
+    }
+ </style>
+ <form th:action="@{program}" th:object="${gym}" method="post">
+	<p>This is the Program: </p>
+
+	<div th:if="${rooms.isEmpty()}">
+		<p>Rooms are empty</p>
+		<button onclick="window.location.href='http://localhost:8080/gym/createRoom'" type="button">Create Room</button>
+	</div>
+	
+	<div th:if="${not #lists.isEmpty(programList) and not rooms.isEmpty()}">
+	    <li th:each="program: ${programList}">
+	        <span th:text="${program.work_out_date}"></span>
+	        <ul>
+	             <th:block th:each="classOfSchedule: ${workoutList.get(program.work_out_date)}">
+	            <tr>
+	            	<td th:text="${classOfSchedule.time.getTime_start()} +' - '+${classOfSchedule.time.getTime_end()}"></td>
+	            	<a th:href="@{'/gym/class-schedule-details/' + ${classOfSchedule.classOfScheduleId}}"
+                            th:text="${classOfSchedule.workout.getName()}"></a>
+	              <span th:if="${classOfSchedule.is_canceled}" class="canceled-text">(CANCELED)</span>
+	              </tr>
+	               <br>
+	        </th:block>
+	        </ul>
+	    </li>
+		<button onclick="window.location.href='http://localhost:8080/gym/updateProgram'" type="button">Update the Existing Program</button>
+		 <button onclick="window.location.href='http://localhost:8080/gym/deleteProgram'" type="button">Delete the Existing Program</button>
+	 </div>
+	 <button onclick="window.location.href='http://localhost:8080/gym/createProgram'" type="button">Create a new Program</button>
+	<!-- <button onclick="window.location.href='http://localhost:8080/gym/deleteProgram'" type="button">Delete the Existing Program</button> -->
+</form>
+</body>
+</html>

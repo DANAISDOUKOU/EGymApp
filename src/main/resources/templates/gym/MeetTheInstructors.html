@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>GYM Instructors</title>
+</head>
+<body>
+ 	<h3> Instructors <h3>
+  <ul>
+	  <li th:each="instructorGym : ${instructorsGyms}">
+	  	<span th:text="${instructorGym.instructor_name}"></span>
+	  </li>
+	   <form action="/addInstrucotrToGym" method="post">
+    <ul>
+      <li th:each="instructor : ${instructors}">
+        <input type="checkbox" th:value="${instructor.instructor_id}" name="selectedInstructors">
+        <span th:text="${instructor.instructor_name}"></span> 
+      </li>
+    </ul>
+     <input type="submit" value="Add Selected Instructors">
+ </body>
+</html>
