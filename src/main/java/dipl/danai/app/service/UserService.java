@@ -10,7 +10,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -65,4 +68,28 @@ public class UserService implements UserDetailsService {
 		}
 		userRepository.save(user);
 	}
+	
+	 public String generateResetToken() {
+		   return UUID.randomUUID().toString();
+	 }
+	  
+	  public User validateResetToken(String resetToken) {
+		    User user = userRepository.findByResetToken(resetToken);
+		    if (user != null && !isTokenExpired(user.getResetTokenExpiryDate())) {
+		        return user;
+		    }
+		    
+		    
+		    return null;
+	}
+	  
+	  public boolean isTokenExpired(Date expiryDate) {
+		  return expiryDate.before(new Date());
+		}
+	  
+	  public Date calculateExpiryDate() {
+		    Calendar calendar = Calendar.getInstance();
+		    calendar.add(Calendar.HOUR, 1); 
+		    return calendar.getTime();
+		}
 }

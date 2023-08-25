@@ -207,10 +207,10 @@ public class AuthController {
 	  @PostMapping("/forgotPassword")
 	  public String forgotPassword(@RequestParam("email") String email, Model model) {
 
-		  String resetToken = generateResetToken();
+		  String resetToken =userService.generateResetToken();
 	      User user = userRepo.findByEmail(email);
 	      if (user != null) {
-	    	  Date expiryDate = calculateExpiryDate();
+	    	  Date expiryDate = userService.calculateExpiryDate();
 	    	  user.setResetToken(resetToken);
 	    	  user.setResetTokenExpiryDate(expiryDate);
 	          userRepo.save(user);
@@ -223,8 +223,7 @@ public class AuthController {
 	  
 	  @GetMapping("/resetPassword")
 	  public String showResetPasswordPage(@RequestParam("token") String resetToken, Model model) {
-	      // Validate reset token and check if it's not expired
-	      User user = validateResetToken(resetToken); // You need to implement this
+	      User user =userService.validateResetToken(resetToken); 
 	      if (user != null) {
 	          model.addAttribute("resetToken", resetToken);
 	          return "resetPassword";
@@ -238,7 +237,7 @@ public class AuthController {
 	          @RequestParam("token") String resetToken,
 	          @RequestParam("password") String newPassword,
 	          Model model) {
-	      User user = validateResetToken(resetToken); // You need to implement this
+	      User user = userService.validateResetToken(resetToken); 
 	      if (user != null) {
 	          user.setPassword(passwordEncoder.encode(newPassword));
 	          userRepo.save(user);
@@ -248,28 +247,6 @@ public class AuthController {
 	      }
 	  }
 	  
-	  private String generateResetToken() {
-		    return UUID.randomUUID().toString();
-	  }
-	  
-	  private User validateResetToken(String resetToken) {
-		    User user = userRepo.findByResetToken(resetToken);
-		    if (user != null && !isTokenExpired(user.getResetTokenExpiryDate())) {
-		        return user;
-		    }
-		    
-		    
-		    return null;
-	}
-	  
-	  private boolean isTokenExpired(Date expiryDate) {
-		  return expiryDate.before(new Date());
-		}
-	  
-	  private Date calculateExpiryDate() {
-		    Calendar calendar = Calendar.getInstance();
-		    calendar.add(Calendar.HOUR, 1); // Token expires in 1 hour
-		    return calendar.getTime();
-		}
+	
 
 }
