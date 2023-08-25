@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"com.example.demo"},{"l":"dipl.danai.app"},{"l":"dipl.danai.app.config"},{"l":"dipl.danai.app.controller"},{"l":"dipl.danai.app.model"},{"l":"dipl.danai.app.repository"},{"l":"dipl.danai.app.service"}]
