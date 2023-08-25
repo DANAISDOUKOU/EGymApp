@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+<title>Create a Class</title>
+</head>
+<body>
+	<form th:action="@{createClass}" th:object="${workout}" method="post">
+    <h3>Create a class</h3>
+    <input type="text" th:field="*{name}"  placeholder="Name"/>  <br/><br/>
+    <input type="text" th:field="*{description}"  placeholder="Description"/>  <br/><br/>
+    
+    <button type="submit">Create Class</button> 
+    <span th:utext="${successMessage}"></span>
+    <div th:if="${bindingResult!=null && bindingResult.getAllErrors()!=null}">
+      <ul th:each="data : ${bindingResult.getAllErrors()}">
+        <li th:text="${data.getObjectName() + ' :: ' + data.getDefaultMessage()}"></li>
+      </ul>
+    </div>
+    <button onclick="window.location.href='http://localhost:8080/gym/createProgram'" type="button">Go back to Schedule</button>
+</form>
+
+</body>
+</html>

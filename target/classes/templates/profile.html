@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<title>User Profile</title>
+</head>
+<body>
+    <p>Email: <span th:text="${user.email}"></span></p>
+    <p>Name: <span th:text="${user.firstName}"></span></p>
+    <button onclick="window.location.href='http://localhost:8080/updateProfileName'">Modify Name</button>
+    <p>Surname: <span th:text="${user.lastName}"></span></p>
+    <button onclick="window.location.href='http://localhost:8080/updateProfileSurname'">Modify Surname</button>
+    <p>Phone: <span th:text="${phone}"></span></p>
+    <button onclick="window.location.href='http://localhost:8080/updateProfilePhone'">Modify Phone</button>
+    <p>Address: <span th:text="${address}"></span></p>
+    <button onclick="window.location.href='http://localhost:8080/gym/updateProfileAddress'">Modify Address</button>
+
+    <div id="profile-form" style="display: none;">
+		<form action="/updateProfile?field=field_value&value=value_here" method="POST">
+            <input id="profile-input" type="text" name="value" placeholder="" required>
+            <button type="submit">Save</button>
+        </form>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Membership Types</title>
+</head>
+<body>
+	<h1>This is your Membership Types</h1>
+	<div th:if="${membershipList != null}">
+		<ul>
+			<li th:each="membership:${membershipList}">
+				<span th:text="${membership.membership_type_name}"></span>
+				<span th:text="${membership.membership_period}"></span>
+				<span th:text="${membership.membership_amount}"></span>
+			</li>
+		</ul>
+	</div>
+	<button onclick="window.location.href='http://localhost:8080/gym/addMembershipType'" type="button">Add a Membership</button>
+	<button onclick="window.location.href='http://localhost:8080/gym/deleteMembershipType'" type="button">Delete Membership</button>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+<title>All the Avaliable Gyms</title>
+</head>
+<body>
+	<h1>Available Gyms</h1>
+	  <form th:action="@{/gym/search}" method="get">
+        <label>Search by gym name:</label>
+        <input type="text" name="name" placeholder="Enter gym name...">
+        <br>
+        <label>Search by address:</label>
+        <input type="text" name="address" placeholder="Enter gym address...">
+        <br>
+        <label>Search by workout type:</label>
+        <input type="text" name="workoutType" placeholder="Enter workout type...">
+        <br>
+        <label>Search by best rating:</label>
+        <input type="number" name="bestRating" placeholder="Enter best rating...">
+        <br>
+        <button type="submit">Search</button>
+    </form>
+	<div th:each="gym : ${gyms}">
+    <form th:action="@{'/gym/' + ${gym.gym_id}}" method="get">
+        <button type="submit" th:text="${gym.gym_name}"></button><br>
+    </form>
+</div>
+</body>

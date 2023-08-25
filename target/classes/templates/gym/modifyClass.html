@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Modify Class</title>
+</head>
+<body>
+    <h1>Modify Class</h1>
+    <p>Class ID: <span th:text="${classOfSchedule.classOfScheduleId}"></span></p>
+    <p>Time: <span th:text="${classOfSchedule.time.getTime_start()} +' - '+ ${classOfSchedule.time.getTime_end()}"></span></p>
+    <p>Workout: <span th:text="${classOfSchedule.workout.getName()}"></span></p>
+    <p>Instructor:<span th:text="${classOfSchedule.instructor.getInstructor_name()}"></span> </p>
+    <p> Room: <span th:text="${classOfSchedule.room.getRoomName()}"></span></p>
+    <th:block th:if="${not classOfSchedule.is_canceled}">
+	    <form th:action="@{/gym/performModification}" method="post">
+	         <input type="hidden" name="classId" th:value="${classOfSchedule.classOfScheduleId}" />s
+	        <label for="timeStart">Time Start:</label>
+	        <input type="text" id="timeStart" name="timeStart" th:value="${classOfSchedule.time.getTime_start()}" />
+	        <label for="timeEnd">Time End:</label>
+	        <input type="text" id="timeEnd" name="timeEnd" th:value="${classOfSchedule.time.getTime_end()}" />
+	
+	        <label for="workoutSelect">Workout:</label>
+	        <select id="workoutSelect" name="workoutId">
+	            <option th:each="workout : ${workouts}" th:value="${workout.workoutId}" th:text="${workout.name}"></option>
+	        </select>
+	
+	        <label for="instructorSelect">Instructor:</label>
+	        <select id="instructorSelect" name="instructorId">
+	            <option th:each="instructor : ${instructors}" th:value="${instructor.instructor_id}" th:text="${instructor.instructor_name}"></option>
+	        </select>
+	
+	        <label for="roomSelect">Room:</label>
+	        <select id="roomSelect" name="roomId">
+	            <option th:each="room : ${rooms}" th:value="${room.roomId}" th:text="${room.roomName}"></option>
+	        </select>
+	       
+	        <button type="submit">Save Changes</button>
+	    </form>
+	     <form th:action="@{/gym/cancelClassOccurrence}" method="post">
+	     	<input type="hidden" name="classId" th:value="${classOfSchedule.classOfScheduleId}" />
+	        <input type="hidden" name="classOccurrenceId" th:value="${classOccurrenceId}" />
+	        <input type="hidden" name="scheduleId" th:value="${scheduleId}" />
+	        <button type="submit">Cancel Occurrence</button>
+	    </form>
+	  </th:block>
+	  
+	  <th:block th:if="${classOfSchedule.is_canceled}">
+	  <form th:action="@{/gym/uncancelClassOccurrence}" method="post">
+            <input type="hidden" name="classId" th:value="${classOfSchedule.classOfScheduleId}" />
+	        <input type="hidden" name="classOccurrenceId" th:value="${classOccurrenceId}" />
+	        <input type="hidden" name="scheduleId" th:value="${scheduleId}" />
+            <button type="submit">Restore Occurrence</button>
+        </form>
+    </th:block>
+</body>
+</html>

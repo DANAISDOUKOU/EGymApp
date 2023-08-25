@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Create a Fitness Program</title>
+</head>
+<body>
+	<form th:action="@{/gym/deleteClass}" method="post">
+    <input type="hidden" name="programId" th:value="${program.schedule_id}" />
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Workout</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            <th:block th:each="classOfSchedule: ${workoutList}">
+                <tr>
+                    <td th:text="${classOfSchedule.time.getTime_start()} + ' - ' + ${classOfSchedule.time.getTime_end()}"></td>
+                    <td th:text="${classOfSchedule.workout.getName()}"></td>
+                    <td>
+                        <input type="checkbox" name="selectedClasses" th:value="${classOfSchedule.classOfScheduleId}" />
+                    </td>
+                </tr>
+            </th:block>
+        </tbody>
+    </table>
+    
+    <button type="submit">Delete Selected Classes</button>
+</form>
+
+</body>
+</html>	 	
+	  

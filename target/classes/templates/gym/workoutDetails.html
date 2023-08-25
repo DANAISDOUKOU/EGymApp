@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Workout Details</title>
+</head>
+<body>
+    <h1>Workout Details</h1>
+    
+    <td th:text="${classOfSchedule.time.getTime_start()} +' - '+${classOfSchedule.time.getTime_end()}"></td>
+    <h2 th:text="${classOfSchedule.workout.getName()}"></h2>
+    <p th:text="${workout.description}"></p>
+    <h2>Positions remaining:</h2>
+    <td th:text="${classOfSchedule.capacity - classOfSchedule.participants.size()}"></td>
+	<form th:action="@{/gym/participate}" method="post">
+       	<input type="hidden" name="classOfScheduleId" th:value="${classOfSchedule.classOfScheduleId}" />
+      	<span th:if="${classOfSchedule.is_canceled}" class="canceled-text">(CANCELED)</span>
+       	<td th:if="${not classOfSchedule.is_canceled}">
+    	<div th:if="${not alreadySelected and not allPositionsReserved}">
+    		<button type="submit" th:text="'Reserve a position'" th:disabled="${alreadySelected}"></button>
+		</div>
+	</td>	
+   	</form>
+   
+    <div th:if="${alreadySelected}">
+    <p>You have already reserved a position.</p>
+    <form th:action="@{/gym/cancelPosition}" method="post">
+        <input type="hidden" name="classOfScheduleId" th:value="${classOfSchedule.classOfScheduleId}" />
+        <td th:if="${not classOfSchedule.is_canceled}">
+      		<button type="submit">Cancel Reservation</button>
+        </td>
+    </form>
+    </div>
+    <div th:if="${isInWaitingList}">
+    	<p>Your position in the waiting list: <span th:text="${position}"></span></p>
+	</div>
+    <form th:action="@{/gym/joinWaitingList}" method="post">
+    	<div th:if="${not alreadySelected and allPositionsReserved and not isInWaitingList}">
+    		<input type="hidden" name="classOfScheduleId" th:value="${classOfSchedule.classOfScheduleId}" />
+    		<button type="submit">Join Waiting List</button>
+		</div>
+	</form>
+</body>
+</html>

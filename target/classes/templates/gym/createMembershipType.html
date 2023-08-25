@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Create Membership Type</title>
+</head>
+<body>
+	<form th:action="@{/gym/createMembershipType}" th:object="${membership}" method="post">
+    <h3>Create a class</h3>
+    <input type="text" th:field="*{membership_type_name}"  placeholder="membership_type_name"/>  <br/><br/>
+    <input type="text" th:field="*{membership_period}"  placeholder="membership_period"/>  <br/><br/>
+    <input type="number" th:field="*{membership_amount}"  placeholder="membership_amount"/>  <br/><br/>
+    
+    
+    <button type="submit">Create Membership Type</button> 
+      <span th:utext="${successMessage}"></span>
+    <div th:if="${bindingResult!=null && bindingResult.getAllErrors()!=null}">
+      <ul th:each="data : ${bindingResult.getAllErrors()}">
+        <li th:text="${data.getObjectName() + ' :: ' + data.getDefaultMessage()}"></li>
+      </ul>
+    </div>
+     <button onclick="window.location.href='http://localhost:8080/gym/membershipTypes'" type="button">Go back to Memberships</button>
+</form>
+</body>
+</html>

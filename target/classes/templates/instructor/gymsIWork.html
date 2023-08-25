@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Member of Gyms</title>
+</head>
+<body>
+  <h1>Gyms That I Work To</h1>
+  <ul>
+   <div th:each="gym : ${gyms}">
+    <form th:action="@{'/gym/instructor' + ${gym.gym_id}}" method="get">
+        <button type="submit" th:text="${gym.gym_name}"></button><br>
+    </form>
+    </li>
+  </ul>
+</body>
+</html>
