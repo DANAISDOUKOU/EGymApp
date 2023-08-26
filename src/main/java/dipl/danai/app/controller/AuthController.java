@@ -5,10 +5,6 @@ import dipl.danai.app.model.Gym;
 import dipl.danai.app.model.Instructor;
 import dipl.danai.app.model.Role;
 import dipl.danai.app.model.User;
-import dipl.danai.app.repository.AthleteRepository;
-import dipl.danai.app.repository.GymRepository;
-import dipl.danai.app.repository.InstructorRepository;
-import dipl.danai.app.repository.UserRepository;
 import dipl.danai.app.service.AthleteService;
 import dipl.danai.app.service.EmailService;
 import dipl.danai.app.service.GymService;
@@ -28,10 +24,8 @@ import javax.validation.Valid;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Controller
 public class AuthController {
@@ -39,28 +33,16 @@ public class AuthController {
     private UserService userService;
    
     @Autowired
-    private DataSource dataSource;
+    private DataSource dataSource;  
     
-    @Autowired 
-    private UserRepository userRepo;
-    
-    @Autowired 
-    private GymRepository gymRepo;
-   
     @Autowired
     private GymService gymService;
     
     @Autowired 
     private AthleteService athleteService;
     
-    @Autowired
-    private AthleteRepository athleteRepo;
-    
     @Autowired 
     private InstructorService instructorService;
-    
-    @Autowired
-    private InstructorRepository instructorRepo;
     
     @Autowired 
     private EmailService emailService;
@@ -147,7 +129,7 @@ public class AuthController {
 	@GetMapping(value= {"/profile"})
 	public String showProfile(Authentication authentication,Model model) {
 		String email=authentication.getName();
-		User user=userRepo.findByEmail(email);
+		User user=userService.getUser(email);
 		model.addAttribute("user",user);
 		return "profile";
 	}
@@ -156,7 +138,7 @@ public class AuthController {
 	@GetMapping(value= {"/updateProfileName"})
 	public String getProfileName(Authentication authentication,Model model) {
 		String email=authentication.getName();
-		User user=userRepo.findByEmail(email);
+		User user=userService.getUser(email);
 		model.addAttribute("user", user);
 		return "updateProfileName";
 	}
@@ -164,16 +146,16 @@ public class AuthController {
 	@PostMapping(value= {"/updateProfileName"})
 	public String setProfileName(Authentication authentication,Model model,@RequestParam(value="name") String name) {
 		String email=authentication.getName();
-		User user=userRepo.findByEmail(email);
+		User user=userService.getUser(email);
 		userService.setValue(name, "firstName",user);
 		if(user.getRole()==Role.GYM) {
-			Gym gym=gymRepo.findByEmail(user.getEmail());
+			Gym gym=gymService.getGymByEmail(user.getEmail());
 			gymService.setValue(name,"gym_name",gym);
 		}else if(user.getRole()==Role.ATHLETE) {
-			Athletes athlete=athleteRepo.findByEmail(email);
+			Athletes athlete=athleteService.getAthlete(email);
 			athleteService.setValue(name, "athlete_name", athlete);
 		}else if(user.getRole()==Role.INSTRUCTOR) {
-			Instructor instructor=instructorRepo.findByEmail(email);
+			Instructor instructor=instructorService.getInstructor(email);
 			instructorService.setValue(name,"instructor_name",instructor);
 		}
 		model.addAttribute("user",user);
@@ -183,7 +165,7 @@ public class AuthController {
 	@GetMapping(value= {"/updateProfileSurname"})
 	public String getProfileSurname(Authentication authentication,Model model) {
 		String email=authentication.getName();
-		User user=userRepo.findByEmail(email);
+		User user=userService.getUser(email);
 		model.addAttribute("user", user);
 		return "updateProfileSurname";
 	}
@@ -192,16 +174,16 @@ public class AuthController {
 	public String setProfileSurname(Authentication authentication,Model model,@RequestParam(value="name") String name) {
 		System.out.println("I am here");
 		String email=authentication.getName();
-		User user=userRepo.findByEmail(email);
+		User user=userService.getUser(email);
 		userService.setValue(name, "lastName",user);
 		if(user.getRole()==Role.GYM) {
-			Gym gym=gymRepo.findByEmail(user.getEmail());
+			Gym gym=gymService.getGymByEmail(user.getEmail());
 			gymService.setValue(name,"gym_surname",gym);
 		}else if(user.getRole()==Role.ATHLETE) {
-			Athletes athlete=athleteRepo.findByEmail(email);
+			Athletes athlete=athleteService.getAthlete(email);
 			athleteService.setValue(name, "athlete_surname", athlete);
 		}else if(user.getRole()==Role.INSTRUCTOR) {
-			Instructor instructor=instructorRepo.findByEmail(email);
+			Instructor instructor=instructorService.getInstructor(email);
 			instructorService.setValue(name,"instructor_surname",instructor);
 		}
 		model.addAttribute("user",user);
@@ -211,7 +193,7 @@ public class AuthController {
 	@GetMapping(value= {"/updateProfileCity"})
 	public String getProfileCity(Authentication authentication,Model model) {
 		String email=authentication.getName();
-		User user=userRepo.findByEmail(email);
+		User user=userService.getUser(email);
 		model.addAttribute("user", user);
 		return "updateProfileCity";
 	}
@@ -219,16 +201,16 @@ public class AuthController {
 	@PostMapping(value= {"/updateProfileCity"})
 	public String setProfileCity(Authentication authentication,Model model,@RequestParam(value="City") String name) {
 		String email=authentication.getName();
-		User user=userRepo.findByEmail(email);
+		User user=userService.getUser(email);
 		userService.setValue(name, "City",user);
 		if(user.getRole()==Role.GYM) {
-			Gym gym=gymRepo.findByEmail(user.getEmail());
+			Gym gym=gymService.getGymByEmail(user.getEmail());
 			gymService.setValue(name,"City",gym);
 		}else if(user.getRole()==Role.ATHLETE) {
-			Athletes athlete=athleteRepo.findByEmail(email);
+			Athletes athlete=athleteService.getAthlete(email);
 			athleteService.setValue(name, "City", athlete);
 		}else if(user.getRole()==Role.INSTRUCTOR) {
-			Instructor instructor=instructorRepo.findByEmail(email);
+			Instructor instructor=instructorService.getInstructor(email);
 			instructorService.setValue(name,"City",instructor);
 		}
 		model.addAttribute("user",user);
@@ -238,7 +220,7 @@ public class AuthController {
 	@GetMapping(value= {"/updateProfileAddress"})
 	public String getProfileAddress(Authentication authentication,Model model) {
 		String email=authentication.getName();
-		User user=userRepo.findByEmail(email);
+		User user=userService.getUser(email);
 		model.addAttribute("user", user);
 		return "updateProfileAddress";
 	}
@@ -246,16 +228,16 @@ public class AuthController {
 	@PostMapping(value= {"/updateProfileAddress"})
 	public String setProfileAddress(Authentication authentication,Model model,@RequestParam(value="Address") String name) {
 		String email=authentication.getName();
-		User user=userRepo.findByEmail(email);
+		User user=userService.getUser(email);
 		userService.setValue(name, "Address",user);
 		if(user.getRole()==Role.GYM) {
-			Gym gym=gymRepo.findByEmail(user.getEmail());
+			Gym gym=gymService.getGymByEmail(user.getEmail());
 			gymService.setValue(name,"Address",gym);
 		}else if(user.getRole()==Role.ATHLETE) {
-			Athletes athlete=athleteRepo.findByEmail(email);
+			Athletes athlete=athleteService.getAthlete(email);
 			athleteService.setValue(name, "Address", athlete);
 		}else if(user.getRole()==Role.INSTRUCTOR) {
-			Instructor instructor=instructorRepo.findByEmail(email);
+			Instructor instructor=instructorService.getInstructor(email);
 			instructorService.setValue(name,"Address",instructor);
 		}
 		model.addAttribute("user",user);
@@ -265,7 +247,7 @@ public class AuthController {
 	@GetMapping(value= {"/updateProfilePhone"})
 	public String getProfilePhoneNumber(Authentication authentication,Model model) {
 		String email=authentication.getName();
-		User user=userRepo.findByEmail(email);
+		User user=userService.getUser(email);
 		model.addAttribute("user", user);
 		return "updateProfilePhone";
 	}
@@ -273,16 +255,16 @@ public class AuthController {
 	@PostMapping(value= {"/updateProfilePhone"})
 	public String setProfilePhoneNumber(Authentication authentication,Model model,@RequestParam(value="phoneNumber") String name) {
 		String email=authentication.getName();
-		User user=userRepo.findByEmail(email);
+		User user=userService.getUser(email);
 		userService.setValue(name, "PhoneNumber",user);
 		if(user.getRole()==Role.GYM) {
-			Gym gym=gymRepo.findByEmail(user.getEmail());
+			Gym gym=gymService.getGymByEmail(user.getEmail());
 			gymService.setValue(name,"PhoneNumber",gym);
 		}else if(user.getRole()==Role.ATHLETE) {
-			Athletes athlete=athleteRepo.findByEmail(email);
+			Athletes athlete=athleteService.getAthlete(email);
 			athleteService.setValue(name, "PhoneNumber", athlete);
 		}else if(user.getRole()==Role.INSTRUCTOR) {
-			Instructor instructor=instructorRepo.findByEmail(email);
+			Instructor instructor=instructorService.getInstructor(email);
 			instructorService.setValue(name,"PhoneNumber",instructor);
 		}
 		model.addAttribute("user",user);
@@ -297,12 +279,12 @@ public class AuthController {
 	@PostMapping("/forgotPassword")
 	public String forgotPassword(@RequestParam("email") String email, Model model) {
 		String resetToken =userService.generateResetToken();
-	    User user = userRepo.findByEmail(email);
+	    User user = userService.getUser(email);
 	    if (user != null) {
 	    	Date expiryDate = userService.calculateExpiryDate();
 	    	user.setResetToken(resetToken);
 	    	user.setResetTokenExpiryDate(expiryDate);
-	        userRepo.save(user);
+	    	userService.updateSaveUser(user);
 	        String resetLink = "http://localhost:8080/resetPassword?token=" + resetToken;
 	        String emailContent = "Click the following link to reset your password: " + resetLink;
 	        emailService.sendEmail(email, "Password Reset", emailContent);
@@ -326,7 +308,7 @@ public class AuthController {
 	    User user = userService.validateResetToken(resetToken); 
 	    if (user != null) {
 	        user.setPassword(passwordEncoder.encode(newPassword));
-	        userRepo.save(user);
+	    	userService.updateSaveUser(user);
 	        return "passwordResetSuccess";
 	    } else {
 	        return "invalidResetToken";

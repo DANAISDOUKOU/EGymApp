@@ -20,7 +20,6 @@ public class ScheduleService {
 
 	
 	public void saveClass(ClassOfSchedule class1) {
-		
 		classes.add(class1);
 	}
 	
@@ -31,10 +30,8 @@ public class ScheduleService {
 		classes=new ArrayList<>();
 		
 	}
-	public boolean isRoomOccupied(Room selectedRoom, Time valueOf, Time valueOf2) {
-		for(ClassOfSchedule c: classes) {
-			System.out.println(c.getTime().getTime_start()+" "+valueOf+" end "+c.getTime().getTime_end()+" "+valueOf2+" ");
-			System.out.println(c.getRoom().getRoomId()+" "+selectedRoom.getRoomId());
+	public boolean isRoomOccupied(Room selectedRoom, Time valueOf, Time valueOf2,Schedule schedule) {
+		for(ClassOfSchedule c: schedule.getScheduleClasses()) {
 			if(c.getTime().getTime_start().equals(valueOf)&&c.getTime().getTime_end().equals(valueOf2)&&c.getRoom().getRoomId().equals(selectedRoom.getRoomId())){
 				return true;
 			}
@@ -42,11 +39,8 @@ public class ScheduleService {
 		return false;
 	}
 
-	public boolean isInstructorOccupied(Instructor selectedInstructor, Time valueOf, Time valueOf2) {
-		for(ClassOfSchedule c: classes) {
-			System.out.println("Instructorrrr");
-			System.out.println(c.getTime().getTime_start()+" "+valueOf+" end "+c.getTime().getTime_end()+" "+valueOf2+" ");
-			System.out.println(c.getInstructor().getInstructor_id()+" "+selectedInstructor.getInstructor_id());
+	public boolean isInstructorOccupied(Instructor selectedInstructor, Time valueOf, Time valueOf2,Schedule schedule) {
+		for(ClassOfSchedule c: schedule.getScheduleClasses()) {
 			if(c.getTime().getTime_start().equals(valueOf)&&c.getTime().getTime_end().equals(valueOf2) && c.getInstructor().getInstructor_id().equals(selectedInstructor.getInstructor_id())) {
 				return true;
 			}
@@ -54,4 +48,12 @@ public class ScheduleService {
 		return false;
 	}
 
+	public Schedule getScheduleById(Long id) {
+		Schedule schedule=scheduleRepository.findById(id).orElse(null);
+		return schedule;
+	}
+	
+	public void saveUpdatedSchedule(Schedule schedule) {
+		scheduleRepository.save(schedule);
+	}
 }

@@ -1,21 +1,16 @@
 package dipl.danai.app.controller;
 
 import java.sql.SQLException;
-
 import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import dipl.danai.app.model.Gym;
 import dipl.danai.app.model.Workout;
-import dipl.danai.app.repository.GymRepository;
-import dipl.danai.app.repository.WorkoutRepository;
 import dipl.danai.app.service.GymService;
 import dipl.danai.app.service.WorkoutService;
 
@@ -25,11 +20,7 @@ public class WorkoutController {
 	@Autowired
 	WorkoutService workoutService;
 	@Autowired
-	WorkoutRepository workoutRepository;
-	@Autowired
 	GymService gymService;
-	@Autowired
-	GymRepository gymRepository;
 	
 	 @GetMapping(value = {"/gym/createClass"})
 	 public String createClass(Model model) {
@@ -39,7 +30,7 @@ public class WorkoutController {
 	 
 	 @PostMapping(value = {"/gym/createClass"})
 	 public String createClassWorkout(Authentication authentication,Model model, @Valid Workout workout, BindingResult bindingResult) throws SQLException{
-	     Gym gym=gymRepository.findByEmail(authentication.getName()); 
+	     Gym gym=gymService.getGymByEmail(authentication.getName()); 
 		 workoutService.saveWorkout(workout);
 	     gymService.addWorkout(workout);
 	     gymService.saveGym(gym);

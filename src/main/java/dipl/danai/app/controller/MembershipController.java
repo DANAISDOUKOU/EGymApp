@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import dipl.danai.app.model.Gym;
 import dipl.danai.app.model.MembershipType;
-import dipl.danai.app.repository.GymRepository;
-import dipl.danai.app.repository.MembershipTypeRepository;
 import dipl.danai.app.service.GymService;
 import dipl.danai.app.service.MembershipTypeService;
 
@@ -24,18 +22,12 @@ public class MembershipController {
 	MembershipTypeService membershipTypeService;
 	
 	@Autowired
-	GymRepository gymRepo;
-	
-	@Autowired
-	MembershipTypeRepository membershipTypeRepo;
-	
-	@Autowired
 	GymService gymService;
 	
 	@GetMapping("/gym/addMembershipType")
 	public String addMembershipType(Authentication authentication,Model model) {
-		Gym gym = gymRepo.findByEmail(authentication.getName());
-		model.addAttribute("memberships", membershipTypeRepo.findAll());
+		Gym gym = gymService.getGymByEmail(authentication.getName());
+		model.addAttribute("memberships", membershipTypeService.findAll());
 		model.addAttribute("selectedMembership", new MembershipType());
 		model.addAttribute("gym", gym);
 		return "gym/addMembershipType";
@@ -43,14 +35,14 @@ public class MembershipController {
 	
 	@PostMapping("/gym/addMembershipType")
 	public String addMembershipType(Authentication authentication,@ModelAttribute("selectedMembership") MembershipType selectedMembership, Model model) {
-		MembershipType membershipType = membershipTypeRepo.findById(selectedMembership.getMembership_type_id()).orElse(null);
-		Gym gym = gymRepo.findByEmail(authentication.getName());
+		MembershipType membershipType = membershipTypeService.findMembershiById(selectedMembership.getMembership_type_id());
+		Gym gym = gymService.getGymByEmail(authentication.getName());
 		if (membershipType != null) {
 	        selectedMembership.setMembership_amount(membershipType.getMembership_amount());
 	        selectedMembership.setMembership_period(membershipType.getMembership_period());
 	    }
 	    model.addAttribute("gym",gym);
-	    model.addAttribute("memberships", membershipTypeRepo.findAll());
+	    model.addAttribute("memberships", membershipTypeService.findAll());
 	    model.addAttribute("selectedMembership", selectedMembership);
 	    gymService.addMembershipToGym(gym.getGym_id(), selectedMembership);
 	    return "gym/addMembershipType";

@@ -1,11 +1,8 @@
 package dipl.danai.app.controller;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -13,37 +10,31 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import dipl.danai.app.model.Athletes;
 import dipl.danai.app.model.ClassOfSchedule;
 import dipl.danai.app.model.ClassRating;
 import dipl.danai.app.model.Gym;
 import dipl.danai.app.model.Instructor;
-import dipl.danai.app.model.Schedule;
-import dipl.danai.app.repository.AthleteRepository;
-import dipl.danai.app.repository.ClassOfScheduleRepository;
-import dipl.danai.app.repository.ClassRatingRepository;
-import dipl.danai.app.repository.GymRepository;
-import dipl.danai.app.repository.InstructorRepository;
+import dipl.danai.app.service.AthleteService;
+import dipl.danai.app.service.ClassOfScheduleService;
+import dipl.danai.app.service.ClassRatingService;
+import dipl.danai.app.service.GymService;
 
 @Controller
 public class AthelteController {
 	
 	@Autowired
-	private AthleteRepository athleteRepository;
+	private AthleteService athleteService;
 	
 	@Autowired
-	private GymRepository gymRepository;
+	private GymService gymService;
 	
 	@Autowired 
-	private ClassOfScheduleRepository classOfScheduleRepository;
+	private ClassOfScheduleService classOfScheduleService;
 	
 	@Autowired
-	private ClassRatingRepository classRatingRepo;
-	
-	@Autowired
-	private InstructorRepository instructorRepository;
-	
+	private ClassRatingService classRatingService;
+		
     @GetMapping(value = {"/athlete/dashboard"})
     public String athletePage(){
         return "athlete/dashboard";
@@ -52,7 +43,7 @@ public class AthelteController {
 	
 	@GetMapping(value={"/athlete/seeAllGyms"})
 	public String seeAllGyms(Authentication authentication,Model model) {
-		List<Gym> gyms=gymRepository.findAll();
+		List<Gym> gyms=gymService.getGyms();
 		model.addAttribute("gyms",gyms);
 		return "athlete/seeAllGyms";
 	}
@@ -60,7 +51,7 @@ public class AthelteController {
 	@GetMapping(value={"/athlete/GymsThatIAmMember"})
 	public String seeGymsThatIamMember(Authentication authentication,Model model) {
 		 String athleteEmail = authentication.getName();
-		 Athletes athlete = athleteRepository.findByEmail(athleteEmail);
+		 Athletes athlete = athleteService.getAthlete(athleteEmail);
 		 Set<Gym> gyms = athlete.getGyms();
 		 model.addAttribute("gyms", gyms);
 		 return "athlete/gymsThatIAmMember";
@@ -68,9 +59,9 @@ public class AthelteController {
 	
 	@GetMapping("/athlete/history")
 	public String viewAttendanceHistory(Model model, Authentication authentication, @RequestParam(name = "gymId") Long gymId) {
-	    Athletes athlete = athleteRepository.findByEmail(authentication.getName());
-	    Gym gym = gymRepository.findById(gymId).orElse(null);
-	    List<ClassOfSchedule> attendedClasses = athleteRepository.findAttendedClassesByParticipantsContaining(athlete);    
+	    Athletes athlete = athleteService.getAthlete(authentication.getName());
+	    Gym gym = gymService.getGymById(gymId);
+	    List<ClassOfSchedule> attendedClasses = athleteService.findClasses(athlete);    
 	    List<ClassOfSchedule> attendedClassesInGym = attendedClasses.stream()
 	            .filter(classOfSchedule -> classOfSchedule.getSchedules().stream()
 	                    .anyMatch(schedule -> schedule.getGyms().contains(gym)))
@@ -84,9 +75,9 @@ public class AthelteController {
 	public String rateClass(@RequestParam Long classOfScheduleId, @RequestParam Long gymId,
 	                        @RequestParam double instructorRating, @RequestParam double accuracyRating,
 	                        @RequestParam double crowdingRating, Authentication authentication) {
-	    Athletes athlete = athleteRepository.findByEmail(authentication.getName());
-	    Gym gym = gymRepository.findById(gymId).orElse(null);
-	    ClassOfSchedule classOfSchedule = classOfScheduleRepository.findById(classOfScheduleId).orElse(null);
+	    Athletes athlete = athleteService.getAthlete(authentication.getName());
+	    Gym gym = gymService.getGymById(gymId);
+	    ClassOfSchedule classOfSchedule = classOfScheduleService.getClassOfScheduleById(classOfScheduleId);
 	    Instructor instructor=classOfSchedule.getInstructor();
 	    ClassRating classRating = new ClassRating();
 	    classRating.setGym(gym);
@@ -96,7 +87,7 @@ public class AthelteController {
 	    classRating.setAccuracyRating(accuracyRating);
 	    classRating.setCrowdingRating(crowdingRating);
 	    classRating.setInstructor(instructor);
-	    classRatingRepo.save(classRating);
+	    classRatingService.saveClassRating(classRating);
 	    
 	    return "redirect:/athlete/history";
 	}

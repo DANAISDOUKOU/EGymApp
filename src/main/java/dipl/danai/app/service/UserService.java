@@ -86,4 +86,13 @@ public class UserService implements UserDetailsService {
 		 calendar.add(Calendar.HOUR, 1); 
 		 return calendar.getTime();
 	}
+	 
+	 public User getUser(String email) {
+		 User user=userRepository.findByEmail(email);
+		 return user;
+	 }
+	 
+	 public void updateSaveUser(User user) {
+		 userRepository.save(user);
+	 }
 }

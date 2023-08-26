@@ -23,5 +23,10 @@ public class MembershipTypeService  {
 		return memberships;
 	}
 	
+	public MembershipType findMembershiById(Long id) {
+		MembershipType membership=membershipRepository.findById(id).orElse(null);
+		return membership;
+	}
+	
 
 }

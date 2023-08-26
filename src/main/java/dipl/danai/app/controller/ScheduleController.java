@@ -42,6 +42,7 @@ import dipl.danai.app.repository.RoomRepository;
 import dipl.danai.app.repository.ScheduleRepository;
 import dipl.danai.app.repository.WaitingListEntryRepository;
 import dipl.danai.app.repository.WorkoutRepository;
+import dipl.danai.app.service.AthleteService;
 import dipl.danai.app.service.ClassOfScheduleService;
 import dipl.danai.app.service.EmailService;
 import dipl.danai.app.service.GymService;
@@ -53,21 +54,10 @@ import dipl.danai.app.service.WorkoutService;
 @Controller
 @RequestMapping("/gym")
 public class ScheduleController {
-	
-	@Autowired
-	WorkoutRepository workoutRepository;
-	
-	@Autowired
-	GymRepository gymRepository;
-	
-	@Autowired
-	InstructorRepository instructorRepository;
-	
+		
 	@Autowired 
 	ScheduleService scheduleService;
-	@Autowired
-	ScheduleRepository scheduleRepo;
-	
+
 	@Autowired
 	InstructorService instructorService;
 	
@@ -81,17 +71,10 @@ public class ScheduleController {
 	WorkoutService workoutService;
 	
 	@Autowired
+	AthleteService athleteService;
+	@Autowired
 	ClassOfScheduleService classOfScheduleService;
-	@Autowired
-	RoomRepository roomRepository;
-	@Autowired
-	ClassOfScheduleRepository classOfScheduleRepository;
-	@Autowired
-	AthleteRepository athleteRepository;
-	@Autowired
-	ClassOccurrenceRepository classOccurrenceRepository;
-	@Autowired
-	WaitingListEntryRepository waitingListEntryRepository;
+	
 	@Autowired
 	EmailService emailService;
 	
@@ -100,7 +83,7 @@ public class ScheduleController {
 Model model,Authentication authentication) {
 		session.setAttribute("callAddClass",request.getHeader("Referer"));
 		String email=authentication.getName();
-		Gym gym=gymRepository.findByEmail(email);
+		Gym gym=gymService.getGymByEmail(email);
 		String referer = request.getHeader("Referer");
 		model.addAttribute("referer", referer);
 		model.addAttribute("workouts",gym.getGymWorkouts());
@@ -124,12 +107,12 @@ Model model,Authentication authentication) {
 		session.removeAttribute("previousUrl");
 		Times time=new Times();
 		String email=authentication.getName();
-		Gym gym=gymRepository.findByEmail(email);
+		Gym gym=gymService.getGymByEmail(email);
 		model.addAttribute("workouts",gym.getGymWorkouts() );
 		model.addAttribute("instructors",gym.getGymInstructors());
-		Room selectedRoom = roomRepository.findByNameAndGymId(name,gym.getGym_id());
-		Workout w=workoutRepository.findByName(workout);
-		Instructor i=instructorRepository.findByName(instructor);
+		Room selectedRoom = gymService.getRoomByName(name,gym.getGym_id());
+		Workout w=workoutService.getByName(workout);
+		Instructor i=instructorService.getByName(instructor);
 		ClassOfSchedule c=new ClassOfSchedule();
 		c.setRoom(selectedRoom);
 		c.setWorkout(w);
@@ -140,12 +123,12 @@ Model model,Authentication authentication) {
 		c.setInstructor(i);
 		c.setCapacity(capacity);
 		classOfScheduleService.save(c);
-		if (scheduleService.isRoomOccupied(selectedRoom, Time.valueOf(start_time + ":00"), Time.valueOf(end_time + ":00"))) {
+		if (scheduleService.isRoomOccupied(selectedRoom, Time.valueOf(start_time + ":00"), Time.valueOf(end_time + ":00"),schedule)) {
 			 gym = selectedRoom.getGym();
 			 bindingResult.rejectValue("gyms", "error.gyms", "The selected room at " + gym.getGym_name() + " is already occupied at this time.");
 	    }
-	    Instructor selectedInstructor = instructorRepository.findByName(instructor);
-	    if (scheduleService.isInstructorOccupied(selectedInstructor, Time.valueOf(start_time + ":00"), Time.valueOf(end_time + ":00"))) {
+	    Instructor selectedInstructor = instructorService.getByName(instructor);
+	    if (scheduleService.isInstructorOccupied(selectedInstructor, Time.valueOf(start_time + ":00"), Time.valueOf(end_time + ":00"),schedule)) {
 			bindingResult.rejectValue("gyms", "error.gyms", "The selected instructor at " + gym.getGym_name() + " is already occupied at this time.");
 	    }
 		scheduleService.saveClass(c);
@@ -153,13 +136,11 @@ Model model,Authentication authentication) {
 		instructorService.saveInstructors(i);
 		model.addAttribute("successMessage", "Class added to FitnessProgram!");
 		if(previousUrl.equals("http://localhost:8080/gym/updateProgram")) {
-			System.out.println("ahhahaha");
-			System.out.println(programId);
-			Schedule schedulee=scheduleRepo.findById(programId).orElse(null);
+			Schedule schedulee=scheduleService.getScheduleById(programId);
 			List<ClassOfSchedule> classes=schedulee.getScheduleClasses();
 			classes.add(c);
-			schedule.setScheduleClasses(classes);
-			scheduleRepo.save(schedulee);
+			schedulee.setScheduleClasses(classes);
+			scheduleService.saveUpdatedSchedule(schedule);
 		}
 		if (bindingResult.hasErrors()) {
 	        model.addAttribute("workouts", gym.getGymWorkouts() );
@@ -181,7 +162,7 @@ Model model,Authentication authentication) {
 			Authentication authentication, 
 			BindingResult bindingResult,
 			@RequestParam(value="date") java.sql.Date startDate)throws SQLException, ParseException {
-		Gym gym=gymRepository.findByEmail(authentication.getName());
+		Gym gym=gymService.getGymByEmail(authentication.getName());
 		schedule.setWork_out_date(startDate);
 		scheduleService.saveSchedule(schedule);
 		gymService.saveProgram(schedule);
@@ -200,8 +181,8 @@ Model model,Authentication authentication) {
 	@Transactional
 	public String participateteInClass(@RequestParam("classOfScheduleId") Long classOfScheduleId,Authentication authentication,HttpServletRequest request,Model model) {
 		String previousPageUrl = request.getHeader("Referer");
-		Athletes a=athleteRepository.findByEmail(authentication.getName());
-		ClassOfSchedule classOfSchedule=classOfScheduleRepository.findById(classOfScheduleId).orElse(null);
+		Athletes a=athleteService.getAthlete(authentication.getName());
+		ClassOfSchedule classOfSchedule=classOfScheduleService.getClassOfScheduleById(classOfScheduleId);
 		if (authentication.getAuthorities().stream()
 		        .anyMatch(auth -> auth.getAuthority().equals("ATHLETE"))) {
 			if (classOfSchedule != null && classOfSchedule.getParticipants().size() < classOfSchedule.getCapacity()) {
@@ -220,20 +201,19 @@ Model model,Authentication authentication) {
 	 @Transactional
 	 public String cancelPosition(@RequestParam("classOfScheduleId") Long classOfScheduleId, Authentication authentication, Model model,HttpServletRequest request) {
 		String previousPageUrl = request.getHeader("Referer");
-		Athletes a=athleteRepository.findByEmail(authentication.getName());
-		ClassOfSchedule classOfSchedule=classOfScheduleRepository.findById(classOfScheduleId).orElse(null);
+		Athletes a=athleteService.getAthlete(authentication.getName());
+		ClassOfSchedule classOfSchedule=classOfScheduleService.getClassOfScheduleById(classOfScheduleId);
 		if (authentication.getAuthorities().stream()
 			.anyMatch(auth -> auth.getAuthority().equals("ATHLETE"))) {
 			if (classOfSchedule != null) {
 				if(classOfSchedule.getParticipants().contains(a)) {
 					classOfScheduleService.removeParticipant(a, classOfSchedule);
 					classOfScheduleService.save(classOfSchedule);
-					
-					List<WaitingListEntry> waitingListEntries = waitingListEntryRepository.findByClassOfSchedule(classOfSchedule);
+					List<WaitingListEntry> waitingListEntries = classOfScheduleService.getlist(classOfSchedule);
 					if (!waitingListEntries.isEmpty()) {
 			            WaitingListEntry firstInWaitingList = waitingListEntries.get(0);
 			            classOfSchedule.getParticipants().add(firstInWaitingList.getAthlete());
-			            waitingListEntryRepository.delete(firstInWaitingList);
+			            classOfScheduleService.deleteFromWaitingList(firstInWaitingList);
 			            String notificationContent = "You have been moved from the waiting list to participants for the class: " +classOfSchedule.getTime().getTime_start()+" - "+classOfSchedule.getTime().getTime_end()+" "+ classOfSchedule.getWorkout().getName();
 	                    emailService.sendEmail(firstInWaitingList.getAthlete().getEmail(), "Class Notification", notificationContent);
 			        }
@@ -253,14 +233,14 @@ Model model,Authentication authentication) {
                  .map(GrantedAuthority::getAuthority)
                  .orElse("");
 		 if("GYM".equals(role)) {
-			gym=gymRepository.findByEmail(authentication.getName());
+			gym=gymService.getGymByEmail(authentication.getName());
 		 }else {
-			gym=gymRepository.findById(gymId).orElse(null);
+			gym=gymService.getGymById(gymId);
 		 }
 		 ClassOfSchedule classSchedule = classOfScheduleService.getClassScheduleDetails(classOfScheduleId);
 	        model.addAttribute("classSchedule", classSchedule);
 	        model.addAttribute("gym",gym);
-	        Set<Athletes> availableAthletes = gymRepository.findMembers(gym.getGym_id());
+	        Set<Athletes> availableAthletes = gymService.findMembers(gym.getGym_id());
 		 	List<Athletes> participants=classSchedule.getParticipants();
 		 	availableAthletes = availableAthletes.stream()
 		            .filter(athlete -> !participants.contains(athlete))
@@ -277,14 +257,14 @@ Model model,Authentication authentication) {
                  .findFirst()
                  .map(GrantedAuthority::getAuthority)
                  .orElse("");
-	    ClassOfSchedule c=classOfScheduleRepository.findById(classOfScheduleId).orElse(null);
+		 ClassOfSchedule classOfSchedule=classOfScheduleService.getClassOfScheduleById(classOfScheduleId);
 		 if(selectedAthleteIds!=null) {
 			 for(Long athleteId:selectedAthleteIds) {
-				 Athletes athlete=athleteRepository.findById(athleteId).orElse(null);
-				 classOfScheduleService.addParicipant(athlete,c);
+				 Athletes athlete=athleteService.getById(athleteId);
+				 classOfScheduleService.addParicipant(athlete,classOfSchedule);
 			 }
 		 }
-		 classOfScheduleService.save(c);
+		 classOfScheduleService.save(classOfSchedule);
 		 if("INSTRUCTOR".equals(role)) {
 		 		return "redirect:/gym/class-schedule-details/" + classOfScheduleId+"?gymId="+gymId;
 		 	}else {
@@ -312,7 +292,7 @@ Model model,Authentication authentication) {
 	 
 	 @GetMapping("/deleteClass")
 	 public String showDeleteClassPage(@RequestParam(value = "programId") Long programId,Model model) {
-		 Schedule schedule = scheduleRepo.findById(programId).orElse(null);
+		 Schedule schedule = scheduleService.getScheduleById(programId);
 		List<ClassOfSchedule> workoutList = schedule.getScheduleClasses();
 		 model.addAttribute("program", schedule);
 		 model.addAttribute("workoutList", workoutList);
@@ -323,7 +303,7 @@ Model model,Authentication authentication) {
 	 public String deleteSelectedClasses(@RequestParam(value = "programId") Long programId,
 	                                     @RequestParam(value = "selectedClasses", required = false) List<Long> selectedClassIds,
 	                                     HttpSession session) {
-		Schedule schedule = scheduleRepo.findById(programId).orElse(null);
+		Schedule schedule = scheduleService.getScheduleById(programId);
 		List<ClassOfSchedule> workoutList = schedule.getScheduleClasses();
 	    if (selectedClassIds != null) {
 	        for (Long classId : selectedClassIds) {
@@ -331,20 +311,19 @@ Model model,Authentication authentication) {
 	         }
 	     }
 	    schedule.setScheduleClasses(workoutList);
-	    scheduleRepo.save(schedule);
-	     String previousUrl = (String) session.getAttribute("callAddClass");
-	     return "gym/deleteClass";
+	    scheduleService.saveUpdatedSchedule(schedule);
+	    return "gym/deleteClass";
 	 }
 	 
 	 @GetMapping("/modifyClass")
 	 public String modifyClass(@RequestParam("classId") Long classId, Model model,Authentication authentication,@RequestParam(value="gymId",required=false) Long gymId,@RequestParam(value="scheduleId",required=false) Long scheduleId ) {
-	    ClassOfSchedule classOfSchedule=classOfScheduleRepository.findById(classId).orElse(null);
-	    Gym gym=gymRepository.findById(gymId).orElse(null);
+		ClassOfSchedule classOfSchedule=classOfScheduleService.getClassOfScheduleById(classId);
+	    Gym gym=gymService.getGymById(gymId);
 	    model.addAttribute("classOfSchedule", classOfSchedule);
 	    model.addAttribute("workouts",gym.getGymWorkouts());
 	    model.addAttribute("instructors",gym.getGymInstructors());
 	    model.addAttribute("rooms",gym.getRooms());
-	    ClassOccurrence classOccurrence=classOccurrenceRepository.findByScheduleScheduleIdAndClassOfScheduleClassOfScheduleId(gymId, classId);
+	    ClassOccurrence classOccurrence=classOfScheduleService.getClassOccurrence(scheduleId, classId);
 	    model.addAttribute("classOccurrence",classOccurrence);
 	    model.addAttribute("scheduleId",scheduleId);
 	    return "gym/modifyClass";
@@ -358,23 +337,23 @@ Model model,Authentication authentication) {
 	            @RequestParam("workoutId") Long workoutId,
 	            @RequestParam("instructorId") Long instructorId,
 	            @RequestParam("roomId") Long roomId,
+	            @RequestParam("scheduleId") Long scheduleId,
 	            @RequestParam(value = "canceled", required = false, defaultValue = "false") boolean canceled,
 	            Model model,
 	            HttpServletRequest request) {
 		 	String referringPageUrl = request.getHeader("referer");
-	        ClassOfSchedule classOfSchedule = classOfScheduleRepository.findById(classId).orElse(null);
-	        ClassOfSchedule originalClassOfSchedule=classOfSchedule;
+			ClassOfSchedule classOfSchedule=classOfScheduleService.getClassOfScheduleById(classId);
 	        if (classOfSchedule != null) {
 	            classOfSchedule.getTime().setTime_start(timeStart);
 	            classOfSchedule.getTime().setTime_end(timeEnd);
-	            Workout workout = workoutRepository.findById(workoutId).orElse(null);
+	            Workout workout = workoutService.findById(workoutId);
 	            if (workout != null) {
 	                classOfSchedule.setWorkout(workout);
 	            }
 	            if (!instructorId.equals(classOfSchedule.getInstructor().getInstructor_id())) {
-	                Instructor instructor = instructorRepository.findById(instructorId).orElse(null);
+	                Instructor instructor = instructorService.getById(instructorId);
 	                if (instructor != null) {
-	                    if (scheduleService.isInstructorOccupied(instructor, timeStart, timeEnd)) {
+	                    if (scheduleService.isInstructorOccupied(instructor, timeStart, timeEnd,scheduleService.getScheduleById(scheduleId))) {
 	                        model.addAttribute("instructorError", "The selected instructor is already occupied at this time.");
 	                        return "redirect:" + referringPageUrl;
 	                    }
@@ -382,9 +361,9 @@ Model model,Authentication authentication) {
 	                }
 	            }
 	            if (!roomId.equals(classOfSchedule.getRoom().getRoomId())) {
-	                Room room = roomRepository.findById(roomId).orElse(null);
+	                Room room =gymService.getRoomById(roomId);
 	                if (room != null) {
-	                    if (scheduleService.isRoomOccupied(room, timeStart, timeEnd)) {
+	                    if (scheduleService.isRoomOccupied(room, timeStart, timeEnd,scheduleService.getScheduleById(scheduleId))) {
 	                        model.addAttribute("roomError", "The selected room is already occupied at this time.");
 	                        return "redirect:" + referringPageUrl;
 	                    }
@@ -392,7 +371,7 @@ Model model,Authentication authentication) {
 	                }
 	            }
 	           
-	            classOfScheduleRepository.save(classOfSchedule);
+	            classOfScheduleService.save(classOfSchedule);
 	            for (Athletes participant : classOfSchedule.getParticipants()) {
 	                String emailContent = "Class modification notification:\n\n"
 	                        + "Class details after modification:\n"  + classOfSchedule.getTime().getTime_start()+" - "+classOfSchedule.getTime().getTime_end()+" \nWorkout: "+classOfSchedule.getWorkout().getName()+" \n Instructor:" + classOfSchedule.getInstructor().getInstructor_name()+"\nRoom: "+classOfSchedule.getRoom().getRoomName()+"\n\n";
@@ -412,10 +391,10 @@ Model model,Authentication authentication) {
 		 String referringPageUrl = request.getHeader("referer");
 	 
 	   ClassOccurrence classOcc=new  ClassOccurrence ();
-	   classOcc.setSchedule(scheduleRepo.findById(scheduleId).orElse(null));
-	   classOcc.setClassOfSchedule(classOfScheduleRepository.findById(classId).orElse(null));
+	   classOcc.setSchedule(scheduleService.getScheduleById(scheduleId));
+	   classOcc.setClassOfSchedule(classOfScheduleService.getClassOfScheduleById(classId));
 	   classOcc.setCanceled(true);
-	   classOccurrenceRepository.save(classOcc);
+	   classOfScheduleService.saveClassOccurrence(classOcc);
 	     
 	     return "redirect:" + referringPageUrl;
 	 }
@@ -423,14 +402,14 @@ Model model,Authentication authentication) {
 	 @PostMapping("/uncancelClassOccurrence")
 	 public String uncancelClassOccurrence(@RequestParam Long classId, @RequestParam("scheduleId") Long scheduleId,@RequestParam(value="classOccurrenceId",required=false) Long classOccurrenceId,HttpServletRequest request) {
 		 String referringPageUrl = request.getHeader("referer"); 
-		 ClassOccurrence classOccurrence = classOccurrenceRepository.findByScheduleScheduleIdAndClassOfScheduleClassOfScheduleId(scheduleId, classId);
-		 List<ClassOccurrence> occurrences=classOccurrenceRepository.findAll();
-		 ClassOfSchedule classOfSchedule = classOfScheduleRepository.findById(classId).orElse(null);
+		 ClassOccurrence classOccurrence = classOfScheduleService.getClassOccurrence(scheduleId, classId);
+		 List<ClassOccurrence> occurrences=classOfScheduleService.findAll();
+		 ClassOfSchedule classOfSchedule = classOfScheduleService.getClassOfScheduleById(classId);
 	        if (classOccurrence != null) {
 	        	occurrences.remove(classOccurrence);
-	        	 classOccurrenceRepository.delete(classOccurrence);
+	        	classOfScheduleService.deleteOccurrence(classOccurrence);
 	            classOfSchedule.setIs_canceled(false);
-	            classOfScheduleRepository.save(classOfSchedule);
+	            classOfScheduleService.save(classOfSchedule);
 	        }
 	        return "redirect:" + referringPageUrl;	 
 	  }
@@ -438,15 +417,15 @@ Model model,Authentication authentication) {
 	 @PostMapping("/joinWaitingList")
 	 @Transactional
 	 public String joinWaitingList(@RequestParam("classOfScheduleId") Long classOfScheduleId, Authentication authentication, Model model, HttpServletRequest request) {
-		Athletes a=athleteRepository.findByEmail(authentication.getName());
-		ClassOfSchedule classOfSchedule=classOfScheduleRepository.findById(classOfScheduleId).orElse(null);	
+		Athletes a=athleteService.getAthlete(authentication.getName());
+		ClassOfSchedule classOfSchedule=classOfScheduleService.getClassOfScheduleById(classOfScheduleId);
 		if (authentication.getAuthorities().stream().anyMatch(auth -> auth.getAuthority().equals("ATHLETE"))) {
 			if (classOfSchedule != null) {
 		        WaitingListEntry entry = new WaitingListEntry();
 		        entry.setClassOfSchedule(classOfSchedule);
 		        entry.setAthlete(a);
 		        entry.setJoinedAt(LocalDateTime.now());
-		        waitingListEntryRepository.save(entry);
+		        classOfScheduleService.saveWaitingListEntry(entry);
 		        model.addAttribute("isInWaitingList", true);
 		    }
 		}

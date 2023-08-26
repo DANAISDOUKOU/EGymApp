@@ -42,6 +42,34 @@ public class InstructorService{
 		instructorRepository.save(instructor);
 	}
 	
+	public Instructor getInstructor(String email) {
+		Instructor instructor=instructorRepository.findByEmail(email);
+		return instructor;
+	}
+	
+	public List<Instructor> findAll(){
+		List<Instructor> instructors=instructorRepository.findAll();
+		return instructors;
+	}
+	
+	public Instructor getById(Long id) {
+		Instructor instructor=instructorRepository.findById(id).orElse(null);
+		return instructor;
+	}
+	
+	public Instructor getByEmail(String email) {
+	    Instructor instructor = instructorRepository.findByEmail(email);
+		return instructor;
+	}
+	
+	public List<ClassOfSchedule> getClassesByGym(Long instructorId,Long gymId) {
+	    List<ClassOfSchedule> classes = instructorRepository.findClassesByInstructorAndGym(instructorId, gymId);
+	    return classes;
+	}
+
+	public Instructor getByName(String instructor) {
+		return instructorRepository.findByName(instructor);
+	}
 	
 	 
 }

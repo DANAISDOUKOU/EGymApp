@@ -18,4 +18,13 @@ public class WorkoutService{
 		var workouts=(List<Workout>) workoutRepository.findAll();
 		return workouts;
 	}
+	
+	public Workout findById(Long id) {
+		Workout workout = workoutRepository.findById(id).orElse(null);
+		return workout;
+	}
+	
+	public Workout getByName(String workout) {
+		return workoutRepository.findByName(workout);
+	}
 }

@@ -134,5 +134,41 @@ public class GymService {
 	   return searchResults;
 	}
 	
+	public List<Gym> getGyms(){
+		List<Gym> gyms=gymRepository.findAll();
+		return gyms;
+	}
 	
+	public Gym getGymById(Long id) {
+		 Gym gym = gymRepository.findById(id).orElse(null);
+		 return gym;
+	}
+	
+	public Gym getGymByEmail(String email) {
+		Gym gym=gymRepository.findByEmail(email);
+		return gym;
+
+	}
+	
+	public Set<Athletes> findMembers(Long id){
+		Set<Athletes> members=gymRepository.findMembers(id);
+		return members;
+	}
+	
+	public void saveUpdatedGym(Gym gym) {
+		gymRepository.save(gym);
+	}
+	
+	public MembershipType findExistingMembership(Long gymId,Long athleteId) {
+		 MembershipType existingMembership=gymRepository.findExistingMebership(gymId,athleteId);
+		 return existingMembership;
+	}
+	
+	public Room getRoomByName(String name,Long gymId) {
+		return  roomRepository.findByNameAndGymId(name,gymId);
+	}
+	
+	public Room getRoomById(Long id) {
+		return  roomRepository.findById(id).orElse(null);
+	}
 }
