@@ -19,8 +19,8 @@
         <tbody>
             <tr th:each="attendedClass : ${attendedClasses}">
 				<td>
-    				<span th:text="${attendedClass.time.getTime_start()}"></span> - 
-    				<span th:text="${attendedClass.time.getTime_end()}"></span>
+    				<span th:text="${attendedClass.time_start}"></span> - 
+    				<span th:text="${attendedClass.time_end}"></span>
 				</td>
                 <td th:text="${attendedClass.workout.name}"></td>
                 <td th:text="${attendedClass.instructor.instructor_name}"></td>

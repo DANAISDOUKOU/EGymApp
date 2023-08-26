@@ -5,18 +5,23 @@
 </head>
 <body>
     <h1>Modify Class</h1>
+    <p>Date: <span th:text="${schedule.work_out_date}"><span></p>
     <p>Class ID: <span th:text="${classOfSchedule.classOfScheduleId}"></span></p>
-    <p>Time: <span th:text="${classOfSchedule.time.getTime_start()} +' - '+ ${classOfSchedule.time.getTime_end()}"></span></p>
+    <p>Time: <span th:text="${classOfSchedule.time_start} +' - '+ ${classOfSchedule.time_end}"></span></p>
     <p>Workout: <span th:text="${classOfSchedule.workout.getName()}"></span></p>
-    <p>Instructor:<span th:text="${classOfSchedule.instructor.getInstructor_name()}"></span> </p>
-    <p> Room: <span th:text="${classOfSchedule.room.getRoomName()}"></span></p>
+  	<span th:text="${instructorError}"></span>
+	<span th:text="${roomError}"></span>
+
+    
     <th:block th:if="${not classOfSchedule.is_canceled}">
 	    <form th:action="@{/gym/performModification}" method="post">
-	         <input type="hidden" name="classId" th:value="${classOfSchedule.classOfScheduleId}" />s
+	        <input type="hidden" name="classId" th:value="${classOfSchedule.classOfScheduleId}" />
+	        <input type="hidden" name="scheduleId" th:value="${schedule.schedule_id}" />
+	        <input type="hidden" name="gymId" th:value="${gymId}" />
 	        <label for="timeStart">Time Start:</label>
-	        <input type="text" id="timeStart" name="timeStart" th:value="${classOfSchedule.time.getTime_start()}" />
+	        <input type="text" id="timeStart" name="timeStart" th:value="${classOfSchedule.time_start}" />
 	        <label for="timeEnd">Time End:</label>
-	        <input type="text" id="timeEnd" name="timeEnd" th:value="${classOfSchedule.time.getTime_end()}" />
+	        <input type="text" id="timeEnd" name="timeEnd" th:value="${classOfSchedule.time_end}" />
 	
 	        <label for="workoutSelect">Workout:</label>
 	        <select id="workoutSelect" name="workoutId">

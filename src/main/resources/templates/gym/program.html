@@ -24,7 +24,7 @@
 	        <ul>
 	             <th:block th:each="classOfSchedule: ${workoutList.get(program.work_out_date)}">
 	            <tr>
-	            	<td th:text="${classOfSchedule.time.getTime_start()} +' - '+${classOfSchedule.time.getTime_end()}"></td>
+	            	<td th:text="${classOfSchedule.time_start} +' - '+${classOfSchedule.time_end}"></td>
 	            	<a th:href="@{'/gym/class-schedule-details/' + ${classOfSchedule.classOfScheduleId}}"
                             th:text="${classOfSchedule.workout.getName()}"></a>
 	              <span th:if="${classOfSchedule.is_canceled}" class="canceled-text">(CANCELED)</span>

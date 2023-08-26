@@ -1,5 +1,6 @@
 package dipl.danai.app.model;
 
+import java.sql.Time;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -31,9 +32,11 @@ public class ClassOfSchedule {
 	@JoinColumn(name="workout_id")
 	private Workout workout;
 	
-	@ManyToOne
-	@JoinColumn(name="time_id")
-	private Times time;
+	@Column
+	private Time time_start;
+	    
+	@Column
+	private Time time_end;
 	
 	@ManyToOne
 	@JoinColumn(name="instructor_id")
@@ -62,14 +65,6 @@ public class ClassOfSchedule {
 
 	public void setWorkout(Workout workout) {
 		this.workout = workout;
-	}
-
-	public Times getTime() {
-		return time;
-	}
-
-	public void setTime(Times time) {
-		this.time = time;
 	}
 
 	public Instructor getInstructor() {
@@ -128,6 +123,20 @@ public class ClassOfSchedule {
 		this.is_canceled = is_canceled;
 	}
 	
-	
+	public Time getTime_start() {
+	    return time_start;
+	}
+
+	public void setTime_start(Time time_start) {
+	    this.time_start = time_start;
+	}
+
+	public Time getTime_end() {
+	    return time_end;
+	}
+
+	public void setTime_end(Time time_end) {
+	    this.time_end = time_end;
+	}	
 	
 }

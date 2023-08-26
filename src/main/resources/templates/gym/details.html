@@ -41,7 +41,7 @@
 	        <span th:text="${program.work_out_date}"></span>
 			 <ul>
 	             <th:block th:each="classOfSchedule: ${workoutList.get(program.work_out_date)}">
-	             	<td th:text="${classOfSchedule.time.getTime_start()} +' - '+${classOfSchedule.time.getTime_end()}"></td>
+	             	<td th:text="${classOfSchedule.time_start} +' - '+${classOfSchedule.time_end}"></td>
 					<td><a th:href="@{/workout/{workoutId}/class/{classOfScheduleId}/schedule/{scheduleId}(workoutId=${classOfSchedule.workout.workoutId}, classOfScheduleId=${classOfSchedule.classOfScheduleId}, scheduleId=${program.schedule_id})}"
        					th:text="${classOfSchedule.workout.getName()}">Details</a>
 					</td>

@@ -30,25 +30,14 @@ import dipl.danai.app.model.ClassOfSchedule;
 import dipl.danai.app.model.Gym;
 import dipl.danai.app.model.Instructor;
 import dipl.danai.app.model.Room;
-import dipl.danai.app.model.Times;
 import dipl.danai.app.model.WaitingListEntry;
 import dipl.danai.app.model.Workout;
-import dipl.danai.app.repository.AthleteRepository;
-import dipl.danai.app.repository.ClassOccurrenceRepository;
-import dipl.danai.app.repository.ClassOfScheduleRepository;
-import dipl.danai.app.repository.GymRepository;
-import dipl.danai.app.repository.InstructorRepository;
-import dipl.danai.app.repository.RoomRepository;
-import dipl.danai.app.repository.ScheduleRepository;
-import dipl.danai.app.repository.WaitingListEntryRepository;
-import dipl.danai.app.repository.WorkoutRepository;
 import dipl.danai.app.service.AthleteService;
 import dipl.danai.app.service.ClassOfScheduleService;
 import dipl.danai.app.service.EmailService;
 import dipl.danai.app.service.GymService;
 import dipl.danai.app.service.InstructorService;
 import dipl.danai.app.service.ScheduleService;
-import dipl.danai.app.service.TimeService;
 import dipl.danai.app.service.WorkoutService;
 
 @Controller
@@ -60,9 +49,6 @@ public class ScheduleController {
 
 	@Autowired
 	InstructorService instructorService;
-	
-	@Autowired
-	TimeService timeService;
 	
 	@Autowired
 	GymService gymService;
@@ -102,35 +88,48 @@ Model model,Authentication authentication) {
 			@RequestParam(value="capacity") int capacity,
 			@RequestParam(value = "programId", required = false) Long programId,
 			HttpSession session,
-			BindingResult bindingResult)throws SQLException {
+			BindingResult bindingResult)throws SQLException{
 		String previousUrl=(String) session.getAttribute("callAddClass");
 		session.removeAttribute("previousUrl");
-		Times time=new Times();
 		String email=authentication.getName();
 		Gym gym=gymService.getGymByEmail(email);
-		model.addAttribute("workouts",gym.getGymWorkouts() );
-		model.addAttribute("instructors",gym.getGymInstructors());
+		//model.addAttribute("workouts",gym.getGymWorkouts() );
+		//model.addAttribute("instructors",gym.getGymInstructors());
 		Room selectedRoom = gymService.getRoomByName(name,gym.getGym_id());
+		System.out.println("ROMMMMMMM "+selectedRoom.getRoomName());
 		Workout w=workoutService.getByName(workout);
+		System.out.println("Workoutttt  "+w.getName());
 		Instructor i=instructorService.getByName(instructor);
 		ClassOfSchedule c=new ClassOfSchedule();
 		c.setRoom(selectedRoom);
+		System.out.println("ROMMMMMMM "+selectedRoom.getRoomName());
 		c.setWorkout(w);
-		time.setTime_start(Time.valueOf(start_time+":00"));
-		time.setTime_end(Time.valueOf(end_time+":00"));
-		Times tim=timeService.saveTime(time);
-		c.setTime(tim);
+		
+		c.setTime_start(Time.valueOf(start_time+":00"));
+		c.setTime_end(Time.valueOf(end_time+":00"));
 		c.setInstructor(i);
 		c.setCapacity(capacity);
 		classOfScheduleService.save(c);
-		if (scheduleService.isRoomOccupied(selectedRoom, Time.valueOf(start_time + ":00"), Time.valueOf(end_time + ":00"),schedule)) {
-			 gym = selectedRoom.getGym();
-			 bindingResult.rejectValue("gyms", "error.gyms", "The selected room at " + gym.getGym_name() + " is already occupied at this time.");
-	    }
-	    Instructor selectedInstructor = instructorService.getByName(instructor);
-	    if (scheduleService.isInstructorOccupied(selectedInstructor, Time.valueOf(start_time + ":00"), Time.valueOf(end_time + ":00"),schedule)) {
-			bindingResult.rejectValue("gyms", "error.gyms", "The selected instructor at " + gym.getGym_name() + " is already occupied at this time.");
-	    }
+		if(programId!=null) {
+			Schedule schedulee=scheduleService.getScheduleById(programId);
+			if (scheduleService.isRoomOccupied(selectedRoom, Time.valueOf(start_time + ":00"), Time.valueOf(end_time + ":00"),schedulee)) {
+				 gym = selectedRoom.getGym();
+				 bindingResult.rejectValue("gyms", "error.gyms", "The selected room at " + gym.getGym_name() + " is already occupied at this time.");
+		    }
+		    Instructor selectedInstructor = instructorService.getByName(instructor);
+		    if (scheduleService.isInstructorOccupied(selectedInstructor, Time.valueOf(start_time + ":00"), Time.valueOf(end_time + ":00"),schedulee)) {
+				bindingResult.rejectValue("gyms", "error.gyms", "The selected instructor at " + gym.getGym_name() + " is already occupied at this time.");
+		    }
+		}else {
+			if (scheduleService.isRoomOccupiedInClasses(selectedRoom, Time.valueOf(start_time + ":00"), Time.valueOf(end_time + ":00"))) {
+				 gym = selectedRoom.getGym();
+				 bindingResult.rejectValue("gyms", "error.gyms", "The selected room at " + gym.getGym_name() + " is already occupied at this time.");
+		    }
+		    Instructor selectedInstructor = instructorService.getByName(instructor);
+		    if (scheduleService.isInstructorOccupiedInClasses(selectedInstructor, Time.valueOf(start_time + ":00"), Time.valueOf(end_time + ":00"))) {
+				bindingResult.rejectValue("gyms", "error.gyms", "The selected instructor at " + gym.getGym_name() + " is already occupied at this time.");
+		    }
+		}
 		scheduleService.saveClass(c);
 		instructorService.saveClass(c);
 		instructorService.saveInstructors(i);
@@ -140,9 +139,10 @@ Model model,Authentication authentication) {
 			List<ClassOfSchedule> classes=schedulee.getScheduleClasses();
 			classes.add(c);
 			schedulee.setScheduleClasses(classes);
-			scheduleService.saveUpdatedSchedule(schedule);
+			scheduleService.saveUpdatedSchedule(schedulee);
 		}
 		if (bindingResult.hasErrors()) {
+			System.out.println("hereee");
 	        model.addAttribute("workouts", gym.getGymWorkouts() );
 	        model.addAttribute("instructors",gym.getGymInstructors());
 	        model.addAttribute("rooms", gym.getRooms());
@@ -214,7 +214,7 @@ Model model,Authentication authentication) {
 			            WaitingListEntry firstInWaitingList = waitingListEntries.get(0);
 			            classOfSchedule.getParticipants().add(firstInWaitingList.getAthlete());
 			            classOfScheduleService.deleteFromWaitingList(firstInWaitingList);
-			            String notificationContent = "You have been moved from the waiting list to participants for the class: " +classOfSchedule.getTime().getTime_start()+" - "+classOfSchedule.getTime().getTime_end()+" "+ classOfSchedule.getWorkout().getName();
+			            String notificationContent = "You have been moved from the waiting list to participants for the class: " +classOfSchedule.getTime_start()+" - "+classOfSchedule.getTime_end()+" "+ classOfSchedule.getWorkout().getName();
 	                    emailService.sendEmail(firstInWaitingList.getAthlete().getEmail(), "Class Notification", notificationContent);
 			        }
 				}
@@ -302,7 +302,8 @@ Model model,Authentication authentication) {
 	 @PostMapping("/deleteClass")
 	 public String deleteSelectedClasses(@RequestParam(value = "programId") Long programId,
 	                                     @RequestParam(value = "selectedClasses", required = false) List<Long> selectedClassIds,
-	                                     HttpSession session) {
+	                                     HttpServletRequest request) {
+		String previousPageUrl = request.getHeader("Referer");
 		Schedule schedule = scheduleService.getScheduleById(programId);
 		List<ClassOfSchedule> workoutList = schedule.getScheduleClasses();
 	    if (selectedClassIds != null) {
@@ -312,20 +313,28 @@ Model model,Authentication authentication) {
 	     }
 	    schedule.setScheduleClasses(workoutList);
 	    scheduleService.saveUpdatedSchedule(schedule);
-	    return "gym/deleteClass";
+	    return "redirect:" + previousPageUrl;
 	 }
 	 
 	 @GetMapping("/modifyClass")
-	 public String modifyClass(@RequestParam("classId") Long classId, Model model,Authentication authentication,@RequestParam(value="gymId",required=false) Long gymId,@RequestParam(value="scheduleId",required=false) Long scheduleId ) {
+	 public String modifyClass(@RequestParam("classId") Long classId, Model model,Authentication authentication,@RequestParam(value="gymId",required=false) Long gymId,@RequestParam(value="roomError",required=false) String roomError,@RequestParam(value="instructorError",required=false) String instructorError,@RequestParam(value="scheduleId",required=false) Long scheduleId, HttpSession session ) {
 		ClassOfSchedule classOfSchedule=classOfScheduleService.getClassOfScheduleById(classId);
 	    Gym gym=gymService.getGymById(gymId);
+	    Schedule schedule=scheduleService.getScheduleById(scheduleId);
 	    model.addAttribute("classOfSchedule", classOfSchedule);
 	    model.addAttribute("workouts",gym.getGymWorkouts());
 	    model.addAttribute("instructors",gym.getGymInstructors());
 	    model.addAttribute("rooms",gym.getRooms());
 	    ClassOccurrence classOccurrence=classOfScheduleService.getClassOccurrence(scheduleId, classId);
 	    model.addAttribute("classOccurrence",classOccurrence);
-	    model.addAttribute("scheduleId",scheduleId);
+	    model.addAttribute("schedule",schedule);
+	    if (instructorError != null && !instructorError.isEmpty()) {
+	        model.addAttribute("instructorError", instructorError);
+	    }
+	    if (roomError != null && !roomError.isEmpty()) {
+	        model.addAttribute("roomError", roomError);
+	    }
+	    model.addAttribute("gymId", gymId);
 	    return "gym/modifyClass";
 	 }
 	 
@@ -338,43 +347,45 @@ Model model,Authentication authentication) {
 	            @RequestParam("instructorId") Long instructorId,
 	            @RequestParam("roomId") Long roomId,
 	            @RequestParam("scheduleId") Long scheduleId,
+	            @RequestParam("gymId") Long gymId,
 	            @RequestParam(value = "canceled", required = false, defaultValue = "false") boolean canceled,
 	            Model model,
 	            HttpServletRequest request) {
 		 	String referringPageUrl = request.getHeader("referer");
 			ClassOfSchedule classOfSchedule=classOfScheduleService.getClassOfScheduleById(classId);
 	        if (classOfSchedule != null) {
-	            classOfSchedule.getTime().setTime_start(timeStart);
-	            classOfSchedule.getTime().setTime_end(timeEnd);
-	            Workout workout = workoutService.findById(workoutId);
-	            if (workout != null) {
-	                classOfSchedule.setWorkout(workout);
-	            }
-	            if (!instructorId.equals(classOfSchedule.getInstructor().getInstructor_id())) {
-	                Instructor instructor = instructorService.getById(instructorId);
+	            if (instructorId.equals(classOfSchedule.getInstructor().getInstructor_id())) {
+	            	Instructor instructor = instructorService.getById(instructorId);
 	                if (instructor != null) {
 	                    if (scheduleService.isInstructorOccupied(instructor, timeStart, timeEnd,scheduleService.getScheduleById(scheduleId))) {
-	                        model.addAttribute("instructorError", "The selected instructor is already occupied at this time.");
-	                        return "redirect:" + referringPageUrl;
+	                    	String instructorError="The selected instructor is already occupied at this time.";
+	                    	model.addAttribute("instructorError", instructorError);
+	                        return "redirect:/gym/modifyClass?classId=" + classId +"&gymId="+gymId+ "&scheduleId=" + scheduleId+"&instructorError="+instructorError;
 	                    }
 	                    classOfSchedule.setInstructor(instructor);
 	                }
 	            }
-	            if (!roomId.equals(classOfSchedule.getRoom().getRoomId())) {
+	            if (roomId.equals(classOfSchedule.getRoom().getRoomId())) {
 	                Room room =gymService.getRoomById(roomId);
 	                if (room != null) {
 	                    if (scheduleService.isRoomOccupied(room, timeStart, timeEnd,scheduleService.getScheduleById(scheduleId))) {
-	                        model.addAttribute("roomError", "The selected room is already occupied at this time.");
-	                        return "redirect:" + referringPageUrl;
+	                    	String roomError= "The selected room is already occupied at this time.";
+	                        model.addAttribute("roomError",roomError);
+	                        return "redirect:/gym/modifyClass?classId=" + classId +"&gymId="+gymId+ "&scheduleId=" + scheduleId+"&roomError="+roomError;
 	                    }
 	                    classOfSchedule.setRoom(room);
 	                }
 	            }
-	           
+	            classOfSchedule.setTime_start(timeStart);
+	            classOfSchedule.setTime_end(timeEnd);
+	            Workout workout = workoutService.findById(workoutId);
+	            if (workout != null) {
+	                classOfSchedule.setWorkout(workout);
+	            }
 	            classOfScheduleService.save(classOfSchedule);
 	            for (Athletes participant : classOfSchedule.getParticipants()) {
 	                String emailContent = "Class modification notification:\n\n"
-	                        + "Class details after modification:\n"  + classOfSchedule.getTime().getTime_start()+" - "+classOfSchedule.getTime().getTime_end()+" \nWorkout: "+classOfSchedule.getWorkout().getName()+" \n Instructor:" + classOfSchedule.getInstructor().getInstructor_name()+"\nRoom: "+classOfSchedule.getRoom().getRoomName()+"\n\n";
+	                        + "Class details after modification:\n"  + classOfSchedule.getTime_start()+" - "+classOfSchedule.getTime_end()+" \nWorkout: "+classOfSchedule.getWorkout().getName()+" \n Instructor:" + classOfSchedule.getInstructor().getInstructor_name()+"\nRoom: "+classOfSchedule.getRoom().getRoomName()+"\n\n";
 	                emailService.sendEmail(participant.getEmail(), "Class Modification Notification", emailContent);
 	            }
 	        }

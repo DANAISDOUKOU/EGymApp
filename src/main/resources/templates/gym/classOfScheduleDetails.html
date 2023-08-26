@@ -7,7 +7,7 @@
 <body>
     <h1>Class Schedule Details</h1>
     <p>Workout: <span th:text="${classSchedule.workout.name}"></span></p>
-    <p>Time: <span th:text="${classSchedule.time.time_start} + ' - ' + ${classSchedule.time.time_end}"></span></p>
+    <p>Time: <span th:text="${classSchedule.time_start} + ' - ' + ${classSchedule.time_end}"></span></p>
     <p>Instructor: <span th:text="${classSchedule.instructor.instructor_name}"></span></p>
     <p>Room: <span th:text="${classSchedule.room.roomName}"></span></p>
     <p>Capacity: <span th:text="${classSchedule.capacity}"></span></p>

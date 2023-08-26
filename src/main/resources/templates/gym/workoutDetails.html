@@ -6,7 +6,7 @@
 <body>
     <h1>Workout Details</h1>
     
-    <td th:text="${classOfSchedule.time.getTime_start()} +' - '+${classOfSchedule.time.getTime_end()}"></td>
+    <td th:text="${classOfSchedule.time_start} +' - '+${classOfSchedule.time_end}"></td>
     <h2 th:text="${classOfSchedule.workout.getName()}"></h2>
     <p th:text="${workout.description}"></p>
     <h2>Positions remaining:</h2>

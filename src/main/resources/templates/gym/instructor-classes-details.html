@@ -17,8 +17,8 @@
         <table>
             <tbody>
                 <tr th:each="class : ${entry.value}">
-                    <td th:text="${class.time.time_start}"></td>
-                    <td th:text="${class.time.time_end}"></td>
+                    <td th:text="${class.time_start}"></td>
+                    <td th:text="${class.time_end}"></td>
                     <td>
                         <a th:href="@{'/gym/class-schedule-details/' + ${class.classOfScheduleId}(gymId=${gymId})}">
                             <span th:text="${class.workout.name}"></span>

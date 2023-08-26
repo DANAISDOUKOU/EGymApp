@@ -23,16 +23,15 @@ public class ScheduleService {
 		classes.add(class1);
 	}
 	
-
 	public void saveSchedule(Schedule program) {
 		program.setScheduleClasses(classes);
 		scheduleRepository.save(program);
 		classes=new ArrayList<>();
-		
 	}
+	
 	public boolean isRoomOccupied(Room selectedRoom, Time valueOf, Time valueOf2,Schedule schedule) {
 		for(ClassOfSchedule c: schedule.getScheduleClasses()) {
-			if(c.getTime().getTime_start().equals(valueOf)&&c.getTime().getTime_end().equals(valueOf2)&&c.getRoom().getRoomId().equals(selectedRoom.getRoomId())){
+			if(c.getTime_start().equals(valueOf)&&c.getTime_end().equals(valueOf2)&&c.getRoom().getRoomId().equals(selectedRoom.getRoomId())){
 				return true;
 			}
 		}
@@ -41,7 +40,7 @@ public class ScheduleService {
 
 	public boolean isInstructorOccupied(Instructor selectedInstructor, Time valueOf, Time valueOf2,Schedule schedule) {
 		for(ClassOfSchedule c: schedule.getScheduleClasses()) {
-			if(c.getTime().getTime_start().equals(valueOf)&&c.getTime().getTime_end().equals(valueOf2) && c.getInstructor().getInstructor_id().equals(selectedInstructor.getInstructor_id())) {
+			if(c.getTime_start().equals(valueOf)&&c.getTime_end().equals(valueOf2) && c.getInstructor().getInstructor_id().equals(selectedInstructor.getInstructor_id())) {
 				return true;
 			}
 		}
@@ -55,5 +54,23 @@ public class ScheduleService {
 	
 	public void saveUpdatedSchedule(Schedule schedule) {
 		scheduleRepository.save(schedule);
+	}
+	
+	public boolean isRoomOccupiedInClasses(Room selectedRoom, Time valueOf, Time valueOf2) {
+		for(ClassOfSchedule c: classes) {
+			if(c.getTime_start().equals(valueOf)&&c.getTime_end().equals(valueOf2)&&c.getRoom().getRoomId().equals(selectedRoom.getRoomId())){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isInstructorOccupiedInClasses(Instructor selectedInstructor, Time valueOf, Time valueOf2) {
+		for(ClassOfSchedule c: classes) {
+			if(c.getTime_start().equals(valueOf)&&c.getTime_end().equals(valueOf2) && c.getInstructor().getInstructor_id().equals(selectedInstructor.getInstructor_id())) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

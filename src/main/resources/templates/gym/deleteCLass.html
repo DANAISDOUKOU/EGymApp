@@ -18,7 +18,7 @@
         <tbody>
             <th:block th:each="classOfSchedule: ${workoutList}">
                 <tr>
-                    <td th:text="${classOfSchedule.time.getTime_start()} + ' - ' + ${classOfSchedule.time.getTime_end()}"></td>
+                    <td th:text="${classOfSchedule.time_start} + ' - ' + ${classOfSchedule.time_end}"></td>
                     <td th:text="${classOfSchedule.workout.getName()}"></td>
                     <td>
                         <input type="checkbox" name="selectedClasses" th:value="${classOfSchedule.classOfScheduleId}" />
