@@ -93,18 +93,13 @@ Model model,Authentication authentication) {
 		session.removeAttribute("previousUrl");
 		String email=authentication.getName();
 		Gym gym=gymService.getGymByEmail(email);
-		//model.addAttribute("workouts",gym.getGymWorkouts() );
-		//model.addAttribute("instructors",gym.getGymInstructors());
 		Room selectedRoom = gymService.getRoomByName(name,gym.getGym_id());
-		System.out.println("ROMMMMMMM "+selectedRoom.getRoomName());
 		Workout w=workoutService.getByName(workout);
 		System.out.println("Workoutttt  "+w.getName());
 		Instructor i=instructorService.getByName(instructor);
 		ClassOfSchedule c=new ClassOfSchedule();
 		c.setRoom(selectedRoom);
-		System.out.println("ROMMMMMMM "+selectedRoom.getRoomName());
 		c.setWorkout(w);
-		
 		c.setTime_start(Time.valueOf(start_time+":00"));
 		c.setTime_end(Time.valueOf(end_time+":00"));
 		c.setInstructor(i);
@@ -389,7 +384,6 @@ Model model,Authentication authentication) {
 	                emailService.sendEmail(participant.getEmail(), "Class Modification Notification", emailContent);
 	            }
 	        }
-
 	        return "redirect:" + referringPageUrl;
 	    }
 	 

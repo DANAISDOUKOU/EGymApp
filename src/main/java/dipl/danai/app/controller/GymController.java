@@ -1,11 +1,13 @@
 package dipl.danai.app.controller;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -23,6 +25,7 @@ import dipl.danai.app.model.Athletes;
 import dipl.danai.app.model.ClassOfSchedule;
 import dipl.danai.app.model.Gym;
 import dipl.danai.app.model.Instructor;
+import dipl.danai.app.model.Membership;
 import dipl.danai.app.model.MembershipType;
 import dipl.danai.app.model.Room;
 import dipl.danai.app.model.Schedule;
@@ -32,7 +35,7 @@ import dipl.danai.app.service.ClassOfScheduleService;
 import dipl.danai.app.service.GymRatingService;
 import dipl.danai.app.service.GymService;
 import dipl.danai.app.service.InstructorService;
-import dipl.danai.app.service.MembershipTypeService;
+import dipl.danai.app.service.MembershipService;
 import dipl.danai.app.service.ScheduleService;
 import dipl.danai.app.service.WorkoutService;
 
@@ -52,7 +55,7 @@ public class GymController {
 	@Autowired
 	ScheduleService scheduleService;
 	@Autowired 
-	MembershipTypeService membershipService;
+	MembershipService membershipService;
 	@Autowired
 	WorkoutService workoutService;
 	
@@ -139,6 +142,26 @@ public class GymController {
 		 if(hasAlreadyMembershipType) {
 			 MembershipType existingMembership=gymService.findExistingMembership(gym.getGym_id(),athlete.getAthlete_id());
 			 model.addAttribute("existingMembership", existingMembership);
+			 if ("lessons".equalsIgnoreCase(existingMembership.getMembership_type_name())) {
+	                int remainingLessons = existingMembership.getRemainingLessons();
+	                List<ClassOfSchedule> attendedClasses = athleteService.findClasses(athlete); 
+	                List<ClassOfSchedule> attendedClassesInGym = attendedClasses.stream()
+	        	            .filter(classOfSchedule -> classOfSchedule.getSchedules().stream()
+	        	                    .anyMatch(schedule -> schedule.getGyms().contains(gym)))
+	        	            .collect(Collectors.toList());
+	                int attendedClassCount=attendedClassesInGym.size();
+	                model.addAttribute("remainingLessons", remainingLessons - attendedClassCount);
+	            }
+			 else {
+				 model.addAttribute("remainingLessons", null);
+			 }
+			 if ("months".equalsIgnoreCase(existingMembership.getMembership_type_name())) {
+				 Membership membership=membershipService.findMembership(existingMembership.getMembership_type_id(), athlete.getAthlete_id());
+				 model.addAttribute("expireAt", membership.getEndDate());
+			 }
+			 else {
+				 model.addAttribute("expireAt", null);
+			 }
 		 }else {
 			 model.addAttribute("existingMembership", null);
 		 }	 
@@ -238,11 +261,24 @@ public class GymController {
 	@PostMapping("gym/selectMembership")
 	public String selectMembership( HttpServletRequest request,Authentication authentication,@RequestParam("membershipId") Long membershipId,@RequestParam("gymId") Long gymId) {
 		String referringPageUrl = request.getHeader("referer");
-		MembershipType membership=membershipService.findMembershiById(membershipId);
+		MembershipType membershipType=membershipService.findMembershiById(membershipId);
 		Athletes athlete=athleteService.getAthlete(authentication.getName());
-		if(membership!=null) {
-			athlete.getMemberships().add(membership);
-			athleteService.save(athlete);
+		if(membershipType!=null) {
+			Membership membership=new Membership();
+			membership.setAthlete(athlete);
+			membership.setMembershipType(membershipType);
+			if ("months".equalsIgnoreCase(membershipType.getMembership_type_name())) {
+				 LocalDate membershipStartDate = LocalDate.now(); // Set the start date to today
+		            int months = Integer.parseInt(membershipType.getMembership_period());
+		            LocalDate membershipEndDate = membershipStartDate.plusMonths(months);
+		            membership.setStartDate(membershipStartDate);
+		            membership.setEndDate(membershipEndDate);
+		            membershipService.saveMembership(membership);
+		    } 
+			else if ("lessons".equalsIgnoreCase(membershipType.getMembership_type_name())) {
+				int remainingLessons = membershipType.getRemainingLessons();
+				membershipService.saveMembership(membership);
+			}
 		}
 		return "redirect:" + referringPageUrl;
 	}

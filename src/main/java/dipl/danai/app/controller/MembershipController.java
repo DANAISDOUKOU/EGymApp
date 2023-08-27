@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import dipl.danai.app.model.Gym;
 import dipl.danai.app.model.MembershipType;
 import dipl.danai.app.service.GymService;
-import dipl.danai.app.service.MembershipTypeService;
+import dipl.danai.app.service.MembershipService;
 
 @Controller
 public class MembershipController {
 	
 	@Autowired
-	MembershipTypeService membershipTypeService;
+	MembershipService membershipTypeService;
 	
 	@Autowired
 	GymService gymService;
@@ -36,9 +36,9 @@ public class MembershipController {
 	}
 	
 	@PostMapping("/gym/createMembershipType")
-	public String createMembershipTypeP(Model model,@Valid @ModelAttribute("membership") MembershipType membership,BindingResult bindingResult,@RequestParam(value="gymId") Long gymId) throws SQLException {
-		membership.setGym(gymService.getGymById(gymId));
-		membershipTypeService.saveMembership(membership);
+	public String createMembershipTypeP(Model model,@Valid @ModelAttribute("membership") MembershipType membershipType,BindingResult bindingResult,@RequestParam(value="gymId") Long gymId) throws SQLException {
+		membershipType.setGym(gymService.getGymById(gymId));
+		membershipTypeService.saveMembershipType(membershipType);
 		model.addAttribute("successMessage", "MembershipType registered successfully!");
 		return "gym/createMembershipType";
 	}

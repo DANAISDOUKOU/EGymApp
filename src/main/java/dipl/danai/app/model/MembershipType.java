@@ -30,13 +30,12 @@ public class MembershipType {
 	@Column 
 	private float membership_amount;
 	
-	@ManyToMany(mappedBy="memberships")
-	private Set<Athletes> athletes;
-	
 	@ManyToOne
 	@JoinColumn(name = "gym_id")
-	 private Gym gym;
+	private Gym gym;
 
+	@Column
+    private Integer remainingLessons;
 	
 	public Long getMembership_type_id() {
 		return membership_type_id;
@@ -70,13 +69,6 @@ public class MembershipType {
 		this.membership_amount = membership_amount;
 	}
 
-	public Set<Athletes> getAthletes() {
-		return athletes;
-	}
-
-	public void setAthletes(Set<Athletes> athletes) {
-		this.athletes = athletes;
-	}
 
 	public Gym getGym() {
 		return gym;
@@ -85,4 +77,14 @@ public class MembershipType {
 	public void setGym(Gym gym) {
 		this.gym = gym;
 	}
+
+	public Integer getRemainingLessons() {
+		return remainingLessons;
+	}
+
+	public void setRemainingLessons(Integer remainingLessons) {
+		this.remainingLessons = remainingLessons;
+	}
+	
+	
 }

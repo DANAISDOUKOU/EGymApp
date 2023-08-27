@@ -34,7 +34,13 @@
      <div th:if="${existingMembership != null}">
      	<h1> Your existing membership type:</h1>
      	<input type="hidden" name="gymId" th:value="${gym.gym_id}" />
-     	<p th:text="${existingMembership.membership_type_name}"+"-"+"${existingMembership.membership_period}"></p>
+     	<p th:text="${existingMembership.membership_period}"></p>
+     	<div th:if="${remainingLessons}">
+			<p>Remaining Lessons: <span th:text="${remainingLessons}"></span></p>
+    	</div>
+    	<div th:if="${expireAt}">
+			<p>Expire At: <span th:text="${expireAt}"></span></p>
+    	</div>
      </div> 
         <div th:if="${not #lists.isEmpty(programList)}">
 	    <li th:each="program: ${programList}">

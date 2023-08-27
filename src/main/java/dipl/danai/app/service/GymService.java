@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import dipl.danai.app.model.Athletes;
 import dipl.danai.app.model.Gym;
 import dipl.danai.app.model.Instructor;
+import dipl.danai.app.model.Membership;
 import dipl.danai.app.model.MembershipType;
 import dipl.danai.app.model.Room;
 import dipl.danai.app.model.Schedule;
@@ -19,6 +20,7 @@ import dipl.danai.app.model.Workout;
 import dipl.danai.app.repository.ScheduleRepository;
 import dipl.danai.app.repository.AthleteRepository;
 import dipl.danai.app.repository.GymRepository;
+import dipl.danai.app.repository.MembershipRepository;
 import dipl.danai.app.repository.RoomRepository;
 
 @Service
@@ -34,6 +36,9 @@ public class GymService {
 	
 	@Autowired
 	ScheduleRepository scheduleRepository;
+	
+	@Autowired
+	MembershipRepository membershipRepository;
 	
 	Collection<Schedule> programs=new ArrayList<>();
 	List<Workout> workouts=new ArrayList<>();
@@ -76,13 +81,11 @@ public class GymService {
 	public boolean checkIfHasSpecificMembership(Long gymId, String email,boolean alreadyMember) {
 		Athletes athlete=athleteRepository.findByEmail(email);
 		if(alreadyMember) {
-			Set<MembershipType> memberships=athlete.getMemberships();
-			for(MembershipType membership:memberships) {
-				Long athlete_membership=membership.getMembership_type_id();
-				if(gymRepository.existsByMembershipTypeId(athlete_membership)) {
-					return true;
-				}
-			}
+			 Membership membership = membershipRepository.findByAthleteAndMembershipType_Gym(gymId, athlete);
+		     if(membership!=null) {
+		    	 return true;
+		     }   
+			 return false;
 		}
 		return false;
 		}
@@ -160,8 +163,10 @@ public class GymService {
 	}
 	
 	public MembershipType findExistingMembership(Long gymId,Long athleteId) {
-		 MembershipType existingMembership=gymRepository.findExistingMebership(gymId,athleteId);
-		 return existingMembership;
+		Athletes athlete=athleteRepository.findById(athleteId).orElse(null);
+		Membership existingMembership=membershipRepository.findByAthleteAndMembershipType_Gym(gymId,athlete);
+		MembershipType existingMembershipType=existingMembership.getMembershipType();
+		return existingMembershipType;
 	}
 	
 	public Room getRoomByName(String name,Long gymId) {

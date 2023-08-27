@@ -53,10 +53,6 @@ public class Athletes {
 	 @Pattern(regexp = "\\d{10}", message = "Phone number must contain only digits")
 	 private String phoneNumber;
 	
-	 @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-	 @JoinTable(name="athletes_memberships",joinColumns=@JoinColumn(name="athlete_id"),inverseJoinColumns=@JoinColumn(name="membership_type_id"))
-	 private Set<MembershipType> memberships;
-
 	 public Long getAthlete_id() {
 		return athlete_id;
 	 }
@@ -111,14 +107,6 @@ public class Athletes {
 
 	 public void setEmail(String email) {
 		 this.email = email;
-	 }
-
-	 public Set<MembershipType> getMemberships() {
-		 return memberships;
-	 }
-
-	 public void setMemberships(Set<MembershipType> memberships) {
-		 this.memberships = memberships;
 	 }
 
 	public String getAddress() {
