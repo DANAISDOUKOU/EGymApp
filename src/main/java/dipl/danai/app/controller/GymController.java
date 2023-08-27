@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -208,7 +210,6 @@ public class GymController {
 	public String getMembers(Model model,Authentication authentication) {
 		String email=authentication.getName();
 		Gym gym=gymService.getGymByEmail(email); 
-		System.out.println(gym);
 		Set<Athletes> members=gymService.findMembers(gym.getGym_id());
 		model.addAttribute("members", members);
 		return "gym/seeMembers";
@@ -223,25 +224,27 @@ public class GymController {
 	}
 	
 	@PostMapping("gym/subscribe")
-	public String subscribeToGym(Authentication authentication,@RequestParam("gymId") Long gymId) {
+	public String subscribeToGym( HttpServletRequest request,Authentication authentication,@RequestParam("gymId") Long gymId) {
+		String referringPageUrl = request.getHeader("referer");
 		Gym gym = gymService.getGymById(gymId);
 		Athletes athlete=athleteService.getAthlete(authentication.getName());
 		if(gym!=null) {
 			gym.getGymMembers().add(athlete);
 			gymService.saveUpdatedGym(gym);
 		}
-		return "redirect:/success-page";
+		return "redirect:" + referringPageUrl;
 	}
 	
 	@PostMapping("gym/selectMembership")
-	public String selectMembership(Authentication authentication,@RequestParam("membershipId") Long membershipId,@RequestParam("gymId") Long gymId) {
+	public String selectMembership( HttpServletRequest request,Authentication authentication,@RequestParam("membershipId") Long membershipId,@RequestParam("gymId") Long gymId) {
+		String referringPageUrl = request.getHeader("referer");
 		MembershipType membership=membershipService.findMembershiById(membershipId);
 		Athletes athlete=athleteService.getAthlete(authentication.getName());
-		if(membership!=null) {//move to Service
+		if(membership!=null) {
 			athlete.getMemberships().add(membership);
 			athleteService.save(athlete);
 		}
-		return "redirect:/success-page";
+		return "redirect:" + referringPageUrl;
 	}
 	
 	@GetMapping("gym/typeOfWorkouts")

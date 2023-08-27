@@ -171,4 +171,10 @@ public class GymService {
 	public Room getRoomById(Long id) {
 		return  roomRepository.findById(id).orElse(null);
 	}
+
+	public List<Gym> getGymsByCity(String city) {
+		 List<Gym> allGyms = gymRepository.findAll();
+		 List<Gym> searchResults = allGyms.stream().filter(gym -> (city==null|| city.trim().isEmpty()||gym.getCity().trim().equalsIgnoreCase(city.trim()))).collect(Collectors.toList());
+		 return searchResults;
+	}
 }

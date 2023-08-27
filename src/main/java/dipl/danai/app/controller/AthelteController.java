@@ -1,6 +1,11 @@
 package dipl.danai.app.controller;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +20,7 @@ import dipl.danai.app.model.ClassOfSchedule;
 import dipl.danai.app.model.ClassRating;
 import dipl.danai.app.model.Gym;
 import dipl.danai.app.model.Instructor;
+import dipl.danai.app.model.MembershipType;
 import dipl.danai.app.service.AthleteService;
 import dipl.danai.app.service.ClassOfScheduleService;
 import dipl.danai.app.service.ClassRatingService;
@@ -36,8 +42,37 @@ public class AthelteController {
 	private ClassRatingService classRatingService;
 		
     @GetMapping(value = {"/athlete/dashboard"})
-    public String athletePage(){
-        return "athlete/dashboard";
+    public String athletePage(Model model, Authentication authentication){
+    	 Athletes athlete = athleteService.getAthlete(authentication.getName());
+    	    List<Gym> gymsInCity = gymService.getGymsByCity(athlete.getCity());
+    	    int numRandomGymsToShow = 3;
+    	    Collections.shuffle(gymsInCity);
+    	    List<Gym> randomGyms = gymsInCity.stream().limit(numRandomGymsToShow).collect(Collectors.toList());
+    	    List<Map<String, Object>> gymInfoList = new ArrayList<>();
+    	    Random random = new Random();
+    	    for (Gym gym : randomGyms) {
+    	        Map<String, Object> gymInfo = new HashMap<>();
+    	        gymInfo.put("gymName", gym.getGym_name());
+    	        gymInfo.put("gymId", gym.getGym_id());
+    	        List<Map<String, Object>> membershipInfoList = new ArrayList<>();
+    	        for (MembershipType membershipType : gym.getGym_memberships()) {
+    	            int randomDiscount = random.nextInt(21); // Random discount between 0 and 20
+    	            float discountedAmount = membershipType.getMembership_amount() * (1 - randomDiscount / 100.0f);
+
+    	            Map<String, Object> membershipInfo = new HashMap<>();
+    	            membershipInfo.put("membershipType", membershipType.getMembership_type_name());
+    	            membershipInfo.put("discount", randomDiscount);
+    	            membershipInfo.put("amount", membershipType.getMembership_amount());
+    	            membershipInfo.put("discountedAmount", discountedAmount);
+    	            membershipInfo.put("membershipId", membershipType.getMembership_type_id());
+    	            membershipInfoList.add(membershipInfo);
+    	        }
+    	        gymInfo.put("memberships", membershipInfoList);
+    	        gymInfoList.add(gymInfo);
+    	    }
+
+    	    model.addAttribute("gymInfoList", gymInfoList);
+    	    return "athlete/dashboard";
     }
 	
 	

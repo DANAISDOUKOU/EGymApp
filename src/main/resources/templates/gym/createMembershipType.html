@@ -5,10 +5,11 @@
 </head>
 <body>
 	<form th:action="@{/gym/createMembershipType}" th:object="${membership}" method="post">
-    <h3>Create a class</h3>
+    <h3>Create a Membership</h3>
     <input type="text" th:field="*{membership_type_name}"  placeholder="membership_type_name"/>  <br/><br/>
     <input type="text" th:field="*{membership_period}"  placeholder="membership_period"/>  <br/><br/>
     <input type="number" th:field="*{membership_amount}"  placeholder="membership_amount"/>  <br/><br/>
+    <input type="hidden" th:name="gymId" th:value="${gymId}" />
     
     
     <button type="submit">Create Membership Type</button> 

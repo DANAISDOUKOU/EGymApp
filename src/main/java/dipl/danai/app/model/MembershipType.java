@@ -7,7 +7,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -31,8 +33,10 @@ public class MembershipType {
 	@ManyToMany(mappedBy="memberships")
 	private Set<Athletes> athletes;
 	
-	@ManyToMany(mappedBy="gym_memberships")
-	private Set<Gym> gyms;
+	@ManyToOne
+	@JoinColumn(name = "gym_id")
+	 private Gym gym;
+
 	
 	public Long getMembership_type_id() {
 		return membership_type_id;
@@ -74,11 +78,11 @@ public class MembershipType {
 		this.athletes = athletes;
 	}
 
-	public Set<Gym> getGyms() {
-		return gyms;
+	public Gym getGym() {
+		return gym;
 	}
 
-	public void setGyms(Set<Gym> gyms) {
-		this.gyms = gyms;
+	public void setGym(Gym gym) {
+		this.gym = gym;
 	}
 }

@@ -18,10 +18,10 @@ public interface GymRepository extends JpaRepository<Gym, Long>{
 	public Gym findByEmail(String email);
 	@Query(value="SELECT g.gymMembers FROM Gym g WHERE g.gym_id=:gymId ")
 	public Set<Athletes> findMembers(@Param("gymId") Long gymId);
-	@Query("SELECT CASE WHEN COUNT(m) > 0 THEN TRUE ELSE FALSE END FROM Gym g JOIN g.gym_memberships m WHERE m.membership_type_id = :id")
+	@Query("SELECT CASE WHEN COUNT(m) > 0 THEN TRUE ELSE FALSE END FROM Gym g JOIN g.gymMemberships m WHERE m.membership_type_id = :id")
 	public boolean existsByMembershipTypeId(Long id);
 	 @Query("SELECT m FROM Gym g " +
-	           "JOIN g.gym_memberships gm " +
+	           "JOIN g.gymMemberships gm " +
 	           "JOIN gm.athletes ath " +
 	           "JOIN ath.memberships m " +
 	           "WHERE g.gym_id =?1 " +

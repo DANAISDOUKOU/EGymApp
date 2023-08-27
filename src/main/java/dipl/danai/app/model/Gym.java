@@ -65,10 +65,9 @@ public class Gym {
 	@JoinTable(name="gym_instructors", joinColumns=@JoinColumn(name="gym_id"),inverseJoinColumns=@JoinColumn(name="instructor_id"))
 	private Set<Instructor> gymInstructors;
 	
-	@ManyToMany
-	@JoinTable(name="gym_memberships", joinColumns=@JoinColumn(name="gym_id"),inverseJoinColumns=@JoinColumn(name="membership_type_id"))
-	private List<MembershipType> gym_memberships;
-	
+	 @OneToMany(mappedBy = "gym", cascade = CascadeType.ALL, orphanRemoval = true)
+	 private List<MembershipType> gymMemberships ;
+	 
 	@OneToMany(mappedBy = "gym", cascade = CascadeType.ALL)
     private List<Room> rooms;
 	
@@ -132,11 +131,11 @@ public class Gym {
 	}
 
 	public List<MembershipType> getGym_memberships() {
-		return gym_memberships;
+		return gymMemberships;
 	}
 
 	public void setGym_memberships(List<MembershipType> gym_memberships) {
-		this.gym_memberships = gym_memberships;
+		this.gymMemberships = gym_memberships;
 	}
 
 	public List<Room> getRooms() {
