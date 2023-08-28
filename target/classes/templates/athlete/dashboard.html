@@ -63,6 +63,7 @@
         				<form th:action="@{/gym/selectMembership}" method="post">
 	                        <input type="hidden" th:name="gymId" th:value="${gymInfo.gymId}" />
 	                        <input type="hidden" th:name="membershipId" th:value="${membershipInfo.membershipId}" />
+	                        <input type="hidden" th:name="new_amount" th:value="${membershipInfo.discountedAmount}" />
 	                        <button type="submit">Select Offer</button>
 	                    </form>
         			</li>
@@ -70,12 +71,7 @@
 			</ul>
         </div>
     </div>
-
-    <!-- Button to open the modal -->
-    <button type="button" onclick="openModal()">
-        Show Gym Offers
-    </button>
-    <script th:inline="javascript">
+	<script>
         function openModal() {
             document.getElementById("gymOffersModal").style.display = "block";
         }
@@ -83,6 +79,12 @@
         function closeModal() {
             document.getElementById("gymOffersModal").style.display = "none";
         }
+
+        // Automatically open the modal when the page loads
+        window.onload = function() {
+            openModal();
+        };
     </script>
+    
 </body>
 </html>

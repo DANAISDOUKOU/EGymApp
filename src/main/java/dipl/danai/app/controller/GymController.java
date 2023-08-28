@@ -36,6 +36,7 @@ import dipl.danai.app.service.GymRatingService;
 import dipl.danai.app.service.GymService;
 import dipl.danai.app.service.InstructorService;
 import dipl.danai.app.service.MembershipService;
+import dipl.danai.app.service.PaymentService;
 import dipl.danai.app.service.ScheduleService;
 import dipl.danai.app.service.WorkoutService;
 
@@ -58,6 +59,8 @@ public class GymController {
 	MembershipService membershipService;
 	@Autowired
 	WorkoutService workoutService;
+	@Autowired
+	PaymentService paymentService;
 	
 	@GetMapping(value = {"/gym/dashboard"})
     public String gymPage(Authentication authentication){
@@ -259,16 +262,17 @@ public class GymController {
 	}
 	
 	@PostMapping("gym/selectMembership")
-	public String selectMembership( HttpServletRequest request,Authentication authentication,@RequestParam("membershipId") Long membershipId,@RequestParam("gymId") Long gymId) {
+	public String selectMembership( HttpServletRequest request,Authentication authentication,@RequestParam("membershipId") Long membershipId,@RequestParam("gymId") Long gymId,@RequestParam(value="new_amount",required=false) Double newAmount) {
 		String referringPageUrl = request.getHeader("referer");
 		MembershipType membershipType=membershipService.findMembershiById(membershipId);
 		Athletes athlete=athleteService.getAthlete(authentication.getName());
+		Gym gym=gymService.getGymById(gymId);
 		if(membershipType!=null) {
 			Membership membership=new Membership();
 			membership.setAthlete(athlete);
 			membership.setMembershipType(membershipType);
 			if ("months".equalsIgnoreCase(membershipType.getMembership_type_name())) {
-				 LocalDate membershipStartDate = LocalDate.now(); // Set the start date to today
+				 LocalDate membershipStartDate = LocalDate.now(); 
 		            int months = Integer.parseInt(membershipType.getMembership_period());
 		            LocalDate membershipEndDate = membershipStartDate.plusMonths(months);
 		            membership.setStartDate(membershipStartDate);
@@ -279,6 +283,11 @@ public class GymController {
 				int remainingLessons = membershipType.getRemainingLessons();
 				membershipService.saveMembership(membership);
 			}
+			if (newAmount != null) {
+		        paymentService.makePayment(athlete, gym, newAmount);
+		    }else{
+		    	paymentService.makePayment(athlete, gym,membershipType.getMembership_amount());
+		    }
 		}
 		return "redirect:" + referringPageUrl;
 	}
