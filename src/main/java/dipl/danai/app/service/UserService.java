@@ -1,7 +1,13 @@
 package dipl.danai.app.service;
 
 
+import dipl.danai.app.model.Athletes;
+import dipl.danai.app.model.Gym;
+import dipl.danai.app.model.Instructor;
 import dipl.danai.app.model.User;
+import dipl.danai.app.repository.AthleteRepository;
+import dipl.danai.app.repository.GymRepository;
+import dipl.danai.app.repository.InstructorRepository;
 import dipl.danai.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -24,6 +30,13 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired 
+    private AthleteRepository athleteRepository;
+    @Autowired 
+    private GymRepository gymRepository;
+    
+    @Autowired 
+    private InstructorRepository instructorRepository;
 
     public void saveUser(User user) {
         String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
@@ -100,17 +113,18 @@ public class UserService implements UserDetailsService {
 	 public void insertAthlete( Long id,String name, String surname,
               String email,  String address,  String city,
               String phoneNumber) {
-         userRepository.insertAthlete(id, name, surname, email, address, city, phoneNumber);
+		 Athletes athlete = new Athletes(id, name, surname, email, address, city, phoneNumber);
+		 athleteRepository.save(athlete);
 	 }
 	 
 	 public void insertGym( Long id,String name, String surname,
              String email,  String address,  String city,
              String phoneNumber) {
-        userRepository.insertGym(id, name, surname, email, address, city, phoneNumber);
+        Gym gym=new Gym(id, name, surname, email, address, city, phoneNumber);
 	 }
 	 public void insertInstructor( Long id,String name, String surname,
              String email,  String address,  String city,
              String phoneNumber) {
-        userRepository.insertInstructor(id, name, surname, email, address, city, phoneNumber);
+        Instructor instructor=new Instructor(id, name, surname, email, address, city, phoneNumber);
 	 }
 }

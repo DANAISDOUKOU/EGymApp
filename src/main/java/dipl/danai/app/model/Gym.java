@@ -74,6 +74,19 @@ public class Gym {
 	@OneToMany(mappedBy = "gym", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<GymRating> ratingss;
 
+	
+
+	public Gym(Long id, String name, String surname, String email2, String address2, String city2,
+			String phoneNumber2) {
+		this.gym_id=id;
+		this.gym_name=name;
+		this.gym_surname=surname;
+		this.email=email2;
+		this.Address=address2;
+		this.City=city2;
+		this.phoneNumber=phoneNumber2;
+	}
+
 	public Long getGym_id() {
 		return gym_id;
 	}

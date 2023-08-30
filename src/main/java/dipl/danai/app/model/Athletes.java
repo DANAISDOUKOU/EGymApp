@@ -53,7 +53,22 @@ public class Athletes {
 	 @Pattern(regexp = "\\d{10}", message = "Phone number must contain only digits")
 	 private String phoneNumber;
 	
-	 public Long getAthlete_id() {
+	 public Athletes(Long id, String name, String surname, String email2, String address2, String city2,
+			String phoneNumber2) {
+		 	this.athlete_id=id;
+			this.athlete_name=name;
+			this.athlete_surname=surname;
+			this.email=email2;
+			this.Address=address2;
+			this.City=city2;
+			this.phoneNumber=phoneNumber2;
+	}
+	 
+	public Athletes() {
+		
+	}
+
+	public Long getAthlete_id() {
 		return athlete_id;
 	 }
 

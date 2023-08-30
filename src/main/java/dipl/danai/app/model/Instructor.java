@@ -52,6 +52,17 @@ public class Instructor {
 	@JoinTable(name="instructor_classes", joinColumns=@JoinColumn(name="instructor_id"),inverseJoinColumns=@JoinColumn(name="class_id"))
 	private Set<ClassOfSchedule> instructorClass;
 	
+	public Instructor(Long id, String name, String surname, String email2, String address2, String city2,
+			String phoneNumber2) {
+		this.instructor_id=id;
+		this.instructor_name=name;
+		this.instructor_surname=surname;
+		this.email=email2;
+		this.Address=address2;
+		this.City=city2;
+		this.phoneNumber=phoneNumber2;
+	}
+
 	public Long getInstructor_id() {
 		return instructor_id;
 	}
