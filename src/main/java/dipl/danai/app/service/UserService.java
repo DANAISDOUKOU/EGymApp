@@ -10,7 +10,6 @@ import dipl.danai.app.repository.GymRepository;
 import dipl.danai.app.repository.InstructorRepository;
 import dipl.danai.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -121,10 +120,12 @@ public class UserService implements UserDetailsService {
              String email,  String address,  String city,
              String phoneNumber) {
         Gym gym=new Gym(id, name, surname, email, address, city, phoneNumber);
+        gymRepository.save(gym);
 	 }
 	 public void insertInstructor( Long id,String name, String surname,
              String email,  String address,  String city,
              String phoneNumber) {
         Instructor instructor=new Instructor(id, name, surname, email, address, city, phoneNumber);
+        instructorRepository.save(instructor);
 	 }
 }
