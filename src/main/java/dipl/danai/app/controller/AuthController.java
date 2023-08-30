@@ -19,11 +19,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import javax.sql.DataSource;
 import javax.validation.Valid;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Date;
 import java.util.List;
 
@@ -31,10 +28,7 @@ import java.util.List;
 public class AuthController {
     @Autowired
     private UserService userService;
-   
-    @Autowired
-    private DataSource dataSource;  
-    
+     
     @Autowired
     private GymService gymService;
     
@@ -49,10 +43,7 @@ public class AuthController {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
-    String query=("INSERT INTO athletes(athlete_id,athlete_name,athlete_surname,email,Address,City,phone_number)"+"VALUES(?,?,?,?,?,?,?)");
-    String query2=("INSERT INTO gyms(gym_id,gym_name,gym_surname,email,Address,City,phone_number)"+"VALUES(?,?,?,?,?,?,?)");
-    String query3=("INSERT INTO instructors(instructor_id,instructor_name,instructor_surname,email,Address,City,phone_number)"+"VALUES(?,?,?,?,?,?,?)");
+  
   
     @GetMapping("/login")
     public String login(){
@@ -88,41 +79,13 @@ public class AuthController {
         String city=user.getCity();
         String address=user.getAddress();
         String phoneNumber=user.getPhoneNumber();
-        if(user.getRole()==Role.ATHLETE){
-        	PreparedStatement pstmt = dataSource.getConnection().prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
-                pstmt.setLong(1, id);
-                pstmt.setString(2, name);
-                pstmt.setString(3,surname);
-                pstmt.setString(4,email);
-                pstmt.setString(5,address);
-                pstmt.setString(6,city);
-                pstmt.setString(7,phoneNumber);
-                pstmt.executeUpdate();
-        	
-        	}
-        else if(user.getRole()==Role.GYM) {
-        	PreparedStatement pstmt = dataSource.getConnection().prepareStatement(query2,Statement.RETURN_GENERATED_KEYS);
-                pstmt.setLong(1, id);
-                pstmt.setString(2, name);
-                pstmt.setString(3,surname);
-                pstmt.setString(4,email);
-                pstmt.setString(5,address);
-                pstmt.setString(6,city);
-                pstmt.setString(7,phoneNumber);
-                pstmt.executeUpdate();	
-        	}
-        		
-        else if(user.getRole()==Role.INSTRUCTOR){
-        		PreparedStatement pstmt = dataSource.getConnection().prepareStatement(query3,Statement.RETURN_GENERATED_KEYS); 
-                pstmt.setLong(1, id);
-                pstmt.setString(2, name);
-                pstmt.setString(3,surname);
-                pstmt.setString(4,email);
-                pstmt.setString(5,address);
-                pstmt.setString(6,city);
-                pstmt.setString(7,phoneNumber);
-                pstmt.executeUpdate();  	
-        }		
+        if (user.getRole() == Role.ATHLETE) {
+            userService.insertAthlete(id, name, surname, email, address, city, phoneNumber);
+        } else if (user.getRole() == Role.GYM) {
+        	userService.insertGym(id, name, surname, email, address, city, phoneNumber);
+        } else if (user.getRole() == Role.INSTRUCTOR) {
+        	userService.insertInstructor(id, name, surname, email, address, city, phoneNumber);
+        }
         return "auth/login";
     }
     

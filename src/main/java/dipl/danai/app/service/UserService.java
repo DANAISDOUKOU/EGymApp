@@ -4,6 +4,7 @@ package dipl.danai.app.service;
 import dipl.danai.app.model.User;
 import dipl.danai.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -94,5 +95,22 @@ public class UserService implements UserDetailsService {
 	 
 	 public void updateSaveUser(User user) {
 		 userRepository.save(user);
+	 }
+	 
+	 public void insertAthlete( Long id,String name, String surname,
+              String email,  String address,  String city,
+              String phoneNumber) {
+         userRepository.insertAthlete(id, name, surname, email, address, city, phoneNumber);
+	 }
+	 
+	 public void insertGym( Long id,String name, String surname,
+             String email,  String address,  String city,
+             String phoneNumber) {
+        userRepository.insertGym(id, name, surname, email, address, city, phoneNumber);
+	 }
+	 public void insertInstructor( Long id,String name, String surname,
+             String email,  String address,  String city,
+             String phoneNumber) {
+        userRepository.insertInstructor(id, name, surname, email, address, city, phoneNumber);
 	 }
 }
