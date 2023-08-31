@@ -1,31 +1,87 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Login</title>
+    <title>Registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #87CEFA, #EFEFEF); /* Linear gradient */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            width: 400px;
+        }
+        
+        h3 {
+            margin-top: 0;
+            color: #333;
+            text-align: center;
+        }
+        
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 95%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        button[type="submit"] {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-  <form th:action="@{/register}" th:object="${user}" method="post">
-    <h3>Registration</h3>
-    <input type="text" th:field="*{firstName}" placeholder="First Name" /> <br/><br/>
-    <input type="text" th:field="*{lastName}" placeholder="Last Name" /> <br/><br/>
-    <input type="text" th:field="*{email}" placeholder="Email" /> <br/><br/>
-    <input type="password" th:field="*{password}" placeholder="Password" /> <br/><br/>
-     <input type="text" th:field="*{City}" placeholder="City"/> <br/><br/>
-    <input type="text" th:field="*{Address}" placeholder="Address"/> <br/><br/>
-    <input type="text" th:field="*{phoneNumber}" placeholder="Phone Number"/> <br/><br/>
-    <select th:field="*{role}" required>
-      <option value="">Select</option>
-      <option value="GYM">GYM</option>
-      <option value="ATHLETE">ATHLETE</option>
-      <option value="INSTRUCTOR">INSTRUCTOR</option>
-    </select> <br/><br/>
-    <button type="submit">Register</button> | <a th:href="@{|/login|}" th:text="'Log in'"></a>
-    <span th:utext="${successMessage}"></span>
-    <div th:if="${bindingResult!=null && bindingResult.getAllErrors()!=null}">
-      <ul th:each="data : ${bindingResult.getAllErrors()}">
-        <li th:text="${data.getObjectName() + ' :: ' + data.getDefaultMessage()}"></li>
-      </ul>
+    <div class="form-container">
+        <form th:action="@{/register}" th:object="${user}" method="post">
+            <h3>Registration</h3>
+            <input type="text" th:field="*{firstName}" placeholder="First Name" /> <br/><br/>
+            <input type="text" th:field="*{lastName}" placeholder="Last Name" /> <br/><br/>
+            <input type="text" th:field="*{email}" placeholder="Email" /> <br/><br/>
+            <input type="password" th:field="*{password}" placeholder="Password" /> <br/><br/>
+            <input type="text" th:field="*{City}" placeholder="City"/> <br/><br/>
+            <input type="text" th:field="*{Address}" placeholder="Address"/> <br/><br/>
+            <input type="text" th:field="*{phoneNumber}" placeholder="Phone Number"/> <br/><br/>
+            <select th:field="*{role}" required>
+                <option value="">Select</option>
+                <option value="GYM">GYM</option>
+                <option value="ATHLETE">ATHLETE</option>
+                <option value="INSTRUCTOR">INSTRUCTOR</option>
+            </select> <br/><br/>
+            <button type="submit">Register</button> | <a th:href="@{|/login|}">Log in</a>
+            <span th:utext="${successMessage}"></span>
+            <div th:if="${bindingResult!=null && bindingResult.getAllErrors()!=null}">
+                <ul th:each="data : ${bindingResult.getAllErrors()}">
+                    <li th:text="${data.getObjectName() + ' :: ' + data.getDefaultMessage()}"></li>
+                </ul>
+            </div>
+        </form>
     </div>
-</form>
 </body>
 </html>

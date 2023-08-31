@@ -64,15 +64,15 @@ public class UserService implements UserDetailsService {
     }
     
 	public void setValue(String value,String field,User user) {
-		if(field.equals("firstName")) {
+		if(field.equals("name")) {
 			user.setFirstName(value);
-		}else if(field.equals("lastName")) {
+		}else if(field.equals("surname")) {
 			user.setLastName(value);
-		}else if(field.equals("PhoneNumber")) {
+		}else if(field.equals("phone")) {
 			user.setPhoneNumber(value);
-		}else if(field.equals("Address")) {
+		}else if(field.equals("address")) {
 			user.setAddress(value);
-		}else if(field.equals("City")) {
+		}else if(field.equals("city")) {
 			user.setCity(value);
 		}
 		userRepository.save(user);

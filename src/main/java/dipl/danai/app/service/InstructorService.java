@@ -28,15 +28,15 @@ public class InstructorService{
 	}
 	
 	public void setValue(String value,String field, Instructor instructor) {
-		if(field.equals("instructor_name")) {
+		if(field.equals("name")) {
 			instructor.setInstructor_name(value);
-		}else if(field.equals("instructor_surname")) {
+		}else if(field.equals("surname")) {
 			instructor.setInstructor_surname(value);
-		}else if(field.equals("PhoneNumber")) {
+		}else if(field.equals("number")) {
 			instructor.setPhoneNumber(value);
-		}else if(field.equals("Address")) {
+		}else if(field.equals("address")) {
 			instructor.setAddress(value);
-		}else if(field.equals("City")) {
+		}else if(field.equals("city")) {
 			instructor.setCity(value);
 		}
 		instructorRepository.save(instructor);

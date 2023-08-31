@@ -2,26 +2,107 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-<title>User Profile</title>
+    <title>User Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #87CEFA, #EFEFEF);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .profile-section {
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            width: 400px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-label {
+            font-weight: bold;
+        }
+
+        .profile-info {
+            margin-bottom: 10px;
+        }
+
+        .profile-button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 16px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        .profile-form {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .profile-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
 </head>
+
 <body>
-    <p>Email: <span th:text="${user.email}"></span></p>
-    <p>Name: <span th:text="${user.firstName}"></span></p>
-    <button onclick="window.location.href='http://localhost:8080/updateProfileName'">Modify Name</button>
-    <p>Surname: <span th:text="${user.lastName}"></span></p>
-    <button onclick="window.location.href='http://localhost:8080/updateProfileSurname'">Modify Surname</button>
-    <p>Phone: <span th:text="${user.phoneNumber}"></span></p>
-    <button onclick="window.location.href='http://localhost:8080/updateProfilePhone'">Modify Phone</button>
-    <p>Address: <span th:text="${user.Address}"></span></p>
-    <button onclick="window.location.href='http://localhost:8080/updateProfileAddress'">Modify Address</button>
-	<p>Address: <span th:text="${user.City}"></span></p>
-    <button onclick="window.location.href='http://localhost:8080/updateProfileCity'">Modify City</button>
-    <div id="profile-form" style="display: none;">
-		<form action="/updateProfile?field=field_value&value=value_here" method="POST">
+    <div class="profile-section">
+        <div class="profile-info">
+            <span class="profile-label">Email:</span> <span th:text="${user.email}"></span>
+        </div>
+        <div class="profile-info">
+            <span class="profile-label">Name:</span> <span th:text="${user.firstName}"></span>
+            <button class="profile-button" onclick="showForm('name')">Modify Name</button>
+        </div>
+        <div class="profile-info">
+            <span class="profile-label">Surname:</span> <span th:text="${user.lastName}"></span>
+            <button class="profile-button" onclick="showForm('surname')">Modify Surname</button>
+        </div>
+        <div class="profile-info">
+            <span class="profile-label">Phone:</span> <span th:text="${user.phoneNumber}"></span>
+            <button class="profile-button" onclick="showForm('phone')">Modify Phone</button>
+        </div>
+        <div class="profile-info">
+            <span class="profile-label">Address:</span> <span th:text="${user.Address}"></span>
+            <button class="profile-button" onclick="showForm('address')">Modify Address</button>
+        </div>
+        <div class="profile-info">
+            <span class="profile-label">City:</span> <span th:text="${user.City}"></span>
+            <button class="profile-button" onclick="showForm('city')">Modify City</button>
+        </div>
+    </div>
+
+    <div id="profile-form" class="profile-form">
+        <form action="/updateProfile" method="POST">
             <input id="profile-input" type="text" name="value" placeholder="" required>
+            <input id="field-name" type="hidden" name="field" value="">
             <button type="submit">Save</button>
         </form>
     </div>
+
+    <script>
+        function showForm(field) {
+            var form = document.getElementById("profile-form");
+            var input = document.getElementById("profile-input");
+            var fieldName = document.getElementById("field-name");
+            fieldName.value = field;
+            form.style.display = "block";
+            input.placeholder = "Enter new " + field;
+        }
+    </script>
 </body>
 
 </html>

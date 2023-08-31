@@ -18,7 +18,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.sql.SQLException;
 import java.util.Date;
@@ -46,8 +49,14 @@ public class AuthController {
   
   
     @GetMapping("/login")
-    public String login(){
+    public String login(Model model,HttpServletRequest request){
+    	 request.getSession().setAttribute("justLoggedIn", true);
         return "auth/login";
+    }
+    @RequestMapping("/clearLoggedInSessionAttribute")
+    public String clearLoggedInSessionAttribute(HttpServletRequest request) {
+        request.getSession().removeAttribute("justLoggedIn");
+        return "redirect:/dashboard";
     }
 
     @GetMapping("/register")
@@ -96,143 +105,6 @@ public class AuthController {
 		model.addAttribute("user",user);
 		return "profile";
 	}
-	
-	
-	@GetMapping(value= {"/updateProfileName"})
-	public String getProfileName(Authentication authentication,Model model) {
-		String email=authentication.getName();
-		User user=userService.getUser(email);
-		model.addAttribute("user", user);
-		return "updateProfileName";
-	}
-	
-	@PostMapping(value= {"/updateProfileName"})
-	public String setProfileName(Authentication authentication,Model model,@RequestParam(value="name") String name) {
-		String email=authentication.getName();
-		User user=userService.getUser(email);
-		userService.setValue(name, "firstName",user);
-		if(user.getRole()==Role.GYM) {
-			Gym gym=gymService.getGymByEmail(user.getEmail());
-			gymService.setValue(name,"gym_name",gym);
-		}else if(user.getRole()==Role.ATHLETE) {
-			Athletes athlete=athleteService.getAthlete(email);
-			athleteService.setValue(name, "athlete_name", athlete);
-		}else if(user.getRole()==Role.INSTRUCTOR) {
-			Instructor instructor=instructorService.getInstructor(email);
-			instructorService.setValue(name,"instructor_name",instructor);
-		}
-		model.addAttribute("user",user);
-		return "profile";
-	}
-	
-	@GetMapping(value= {"/updateProfileSurname"})
-	public String getProfileSurname(Authentication authentication,Model model) {
-		String email=authentication.getName();
-		User user=userService.getUser(email);
-		model.addAttribute("user", user);
-		return "updateProfileSurname";
-	}
-	
-	@PostMapping(value= {"/updateProfileSurname"})
-	public String setProfileSurname(Authentication authentication,Model model,@RequestParam(value="name") String name) {
-		System.out.println("I am here");
-		String email=authentication.getName();
-		User user=userService.getUser(email);
-		userService.setValue(name, "lastName",user);
-		if(user.getRole()==Role.GYM) {
-			Gym gym=gymService.getGymByEmail(user.getEmail());
-			gymService.setValue(name,"gym_surname",gym);
-		}else if(user.getRole()==Role.ATHLETE) {
-			Athletes athlete=athleteService.getAthlete(email);
-			athleteService.setValue(name, "athlete_surname", athlete);
-		}else if(user.getRole()==Role.INSTRUCTOR) {
-			Instructor instructor=instructorService.getInstructor(email);
-			instructorService.setValue(name,"instructor_surname",instructor);
-		}
-		model.addAttribute("user",user);
-		return "profile";
-	}
-	
-	@GetMapping(value= {"/updateProfileCity"})
-	public String getProfileCity(Authentication authentication,Model model) {
-		String email=authentication.getName();
-		User user=userService.getUser(email);
-		model.addAttribute("user", user);
-		return "updateProfileCity";
-	}
-	
-	@PostMapping(value= {"/updateProfileCity"})
-	public String setProfileCity(Authentication authentication,Model model,@RequestParam(value="City") String name) {
-		String email=authentication.getName();
-		User user=userService.getUser(email);
-		userService.setValue(name, "City",user);
-		if(user.getRole()==Role.GYM) {
-			Gym gym=gymService.getGymByEmail(user.getEmail());
-			gymService.setValue(name,"City",gym);
-		}else if(user.getRole()==Role.ATHLETE) {
-			Athletes athlete=athleteService.getAthlete(email);
-			athleteService.setValue(name, "City", athlete);
-		}else if(user.getRole()==Role.INSTRUCTOR) {
-			Instructor instructor=instructorService.getInstructor(email);
-			instructorService.setValue(name,"City",instructor);
-		}
-		model.addAttribute("user",user);
-		return "profile";
-	}
-	
-	@GetMapping(value= {"/updateProfileAddress"})
-	public String getProfileAddress(Authentication authentication,Model model) {
-		String email=authentication.getName();
-		User user=userService.getUser(email);
-		model.addAttribute("user", user);
-		return "updateProfileAddress";
-	}
-	
-	@PostMapping(value= {"/updateProfileAddress"})
-	public String setProfileAddress(Authentication authentication,Model model,@RequestParam(value="Address") String name) {
-		String email=authentication.getName();
-		User user=userService.getUser(email);
-		userService.setValue(name, "Address",user);
-		if(user.getRole()==Role.GYM) {
-			Gym gym=gymService.getGymByEmail(user.getEmail());
-			gymService.setValue(name,"Address",gym);
-		}else if(user.getRole()==Role.ATHLETE) {
-			Athletes athlete=athleteService.getAthlete(email);
-			athleteService.setValue(name, "Address", athlete);
-		}else if(user.getRole()==Role.INSTRUCTOR) {
-			Instructor instructor=instructorService.getInstructor(email);
-			instructorService.setValue(name,"Address",instructor);
-		}
-		model.addAttribute("user",user);
-		return "profile";
-	}
-	
-	@GetMapping(value= {"/updateProfilePhone"})
-	public String getProfilePhoneNumber(Authentication authentication,Model model) {
-		String email=authentication.getName();
-		User user=userService.getUser(email);
-		model.addAttribute("user", user);
-		return "updateProfilePhone";
-	}
-	
-	@PostMapping(value= {"/updateProfilePhone"})
-	public String setProfilePhoneNumber(Authentication authentication,Model model,@RequestParam(value="phoneNumber") String name) {
-		String email=authentication.getName();
-		User user=userService.getUser(email);
-		userService.setValue(name, "PhoneNumber",user);
-		if(user.getRole()==Role.GYM) {
-			Gym gym=gymService.getGymByEmail(user.getEmail());
-			gymService.setValue(name,"PhoneNumber",gym);
-		}else if(user.getRole()==Role.ATHLETE) {
-			Athletes athlete=athleteService.getAthlete(email);
-			athleteService.setValue(name, "PhoneNumber", athlete);
-		}else if(user.getRole()==Role.INSTRUCTOR) {
-			Instructor instructor=instructorService.getInstructor(email);
-			instructorService.setValue(name,"PhoneNumber",instructor);
-		}
-		model.addAttribute("user",user);
-		return "profile";
-	}
 
 	@GetMapping("/forgotPassword")
 	public String showForgotPasswordPage(Model model) {
@@ -277,4 +149,26 @@ public class AuthController {
 	        return "invalidResetToken";
 	    }
 	}
+	
+	 @PostMapping("/updateProfile")
+	    public String updateProfile(@RequestParam("field") String field,
+	                                @RequestParam("value") String value,
+	                                Authentication authentication) {
+
+		 	String email=authentication.getName();
+			User user=userService.getUser(email);
+			userService.setValue(value, field, user);
+			if(user.getRole()==Role.GYM) {
+				Gym gym=gymService.getGymByEmail(user.getEmail());
+				gymService.setValue(value,field,gym);
+			}else if(user.getRole()==Role.ATHLETE) {
+				Athletes athlete=athleteService.getAthlete(email);
+				athleteService.setValue(value, field, athlete);
+			}else if(user.getRole()==Role.INSTRUCTOR) {
+				Instructor instructor=instructorService.getInstructor(email);
+				instructorService.setValue(value,field,instructor);
+			}
+
+	        return "redirect:/profile"; // Redirect back to the profile page
+	    }
 }

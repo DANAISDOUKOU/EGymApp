@@ -19,13 +19,13 @@ public class CustomLoginSucessHandler extends SimpleUrlAuthenticationSuccessHand
     @Override
     protected void handle(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
     throws IOException {
-        String targetUrl = determineTargetUrl(authentication);
+        String targetUrl = determineTargetUrl(request,authentication);
         if(response.isCommitted()) return;
         RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
         redirectStrategy.sendRedirect(request, response, targetUrl);
     }
 
-    protected String determineTargetUrl(Authentication authentication){
+    protected String determineTargetUrl(HttpServletRequest request,Authentication authentication){
         String url = "/login?error=true";
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         List<String> roles = new ArrayList<String>();
@@ -35,6 +35,7 @@ public class CustomLoginSucessHandler extends SimpleUrlAuthenticationSuccessHand
         if(roles.contains("GYM")){
             url = "/gym/dashboard";
         }else if(roles.contains("ATHLETE")) {
+        	request.getSession().setAttribute("showModal", true);
             url = "athlete/dashboard";
         }else if(roles.contains("INSTRUCTOR")) {
             url = "instructor/dashboard";

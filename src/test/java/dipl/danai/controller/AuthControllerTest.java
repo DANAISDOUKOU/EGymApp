@@ -86,7 +86,7 @@ public class AuthControllerTest {
 	        mockMvc.perform(MockMvcRequestBuilders.post("/forgotPassword")
 	                .param("email", "user@example.com"))
 	                .andExpect(MockMvcResultMatchers.status().isOk())
-	                .andExpect(MockMvcResultMatchers.view().name("forgot_password_success_page"));
+	                .andExpect(MockMvcResultMatchers.view().name("forgot_password_success_page"));  
 	    }
 
 }

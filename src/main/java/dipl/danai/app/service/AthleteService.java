@@ -26,15 +26,15 @@ public class AthleteService {
 	}
 	
 	public void setValue(String value,String field, Athletes athlete) {
-		if(field.equals("athlete_name")) {
+		if(field.equals("name")) {
 			athlete.setAthlete_name(value);
-		}else if(field.equals("athlete_surname")) {
+		}else if(field.equals("surname")) {
 			athlete.setAthlete_surname(value);
-		}else if(field.equals("PhoneNumber")) {
+		}else if(field.equals("number")) {
 			athlete.setPhoneNumber(value);
-		}else if(field.equals("Address")) {
+		}else if(field.equals("address")) {
 			athlete.setAddress(value);
-		}else if(field.equals("City")) {
+		}else if(field.equals("city")) {
 			athlete.setCity(value);
 		}
 		athleteRepository.save(athlete);

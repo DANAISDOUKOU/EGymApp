@@ -98,15 +98,15 @@ public class GymService {
 	}
 
 	public void setValue(String value,String field, Gym gym) {
-		if(field.equals("gym_name")) {
+		if(field.equals("name")) {
 			gym.setGym_name(value);
-		}else if(field.equals("gym_surname")) {
+		}else if(field.equals("surname")) {
 			gym.setGym_surname(value);
-		}else if(field.equals("PhoneNumber")) {
+		}else if(field.equals("number")) {
 			gym.setPhoneNumber(value);
-		}else if(field.equals("Address")) {
+		}else if(field.equals("address")) {
 			gym.setAddress(value);
-		}else if(field.equals("City")) {
+		}else if(field.equals("city")) {
 			gym.setCity(value);
 		}
 		gymRepository.save(gym);

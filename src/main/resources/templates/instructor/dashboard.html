@@ -1,18 +1,62 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-  <title>Instructor Dashboard</title>
+    <title>Instructor Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #87CEFA, #EFEFEF); /* Linear gradient */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
+
 <body>
-  <h2>Welcome to Instructor Dashboard</h2>
-  <p>Logged as: <span sec:authentication="name"></span></p>
-  <p>Has role: <span sec:authentication="authorities"></span></p>
-    <button onclick="window.location.href='http://localhost:8080/profile'" type="button">Profile </button>
-    <button onclick="window.location.href='http://localhost:8080/instructor/gymsIWork'" type="button">Gyms </button>
+    <h2>Welcome to Instructor Dashboard</h2>
+    <p>Logged as: <span sec:authentication="name"></span></p>
+    <p>Has role: <span sec:authentication="authorities"></span></p>
+    <button onclick="window.location.href='http://localhost:8080/profile'" type="button">Profile</button>
+    <button onclick="window.location.href='http://localhost:8080/instructor/gymsIWork'" type="button">Gyms</button>
   
-  <div>
-    <p><a th:href="@{/}">Home</a></p>
-    <p><a th:href="@{/logout}">Log out</a></p>
-  </div>
+    <div>
+        <p><a th:href="@{/logout}">Log out</a></p>
+    </div>
 </body>
+
 </html>

@@ -86,6 +86,8 @@ public class Gym {
 		this.City=city2;
 		this.phoneNumber=phoneNumber2;
 	}
+	
+	public Gym() {}
 
 	public Long getGym_id() {
 		return gym_id;

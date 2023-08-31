@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-	 <style>
+	  <style>
         /* Style for the modal */
         .modal {
             display: none;
@@ -15,6 +15,7 @@
             overflow: auto;
             background-color: rgba(0, 0, 0, 0.5);
         }
+        
         .modal-content {
             background-color: white;
             margin: 15% auto;
@@ -23,17 +24,61 @@
             width: 60%;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
+        
         .close {
             color: #aaa;
             float: right;
             font-size: 28px;
             font-weight: bold;
         }
+        
         .close:hover,
         .close:focus {
             color: black;
             text-decoration: none;
             cursor: pointer;
+        }
+        
+        /* Linear gradient background */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #87CEFA, #EFEFEF); /* Linear gradient */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        p {
+            color: #555;
+            margin-bottom: 10px;
+        }
+        
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+        
+        a:hover {
+            text-decoration: underline;
         }
     </style>
   <title>User Dashboard</title>
@@ -46,10 +91,9 @@
   <button onclick="window.location.href='http://localhost:8080/athlete/seeAllGyms'" type="button">See all Gyms </button>
   <button onclick="window.location.href='http://localhost:8080/athlete/GymsThatIAmMember'" type="button">Member Of Gyms </button>
   <div>
-    <p><a th:href="@{/}">Home</a></p>
     <p><a th:href="@{/logout}">Log out</a></p>
     
-     <div id="gymOffersModal" class="modal">
+<div id="gymOffersModal" class="modal" th:if="${session['justLoggedIn']}">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
             <ul th:each="gymInfo : ${gymInfoList}">
@@ -71,20 +115,34 @@
 			</ul>
         </div>
     </div>
-	<script>
-        function openModal() {
-            document.getElementById("gymOffersModal").style.display = "block";
-        }
+	<script th:inline="javascript">
+    var justLoggedIn = /*[[${session.justLoggedIn}]]*/;
 
-        function closeModal() {
-            document.getElementById("gymOffersModal").style.display = "none";
-        }
-
-        // Automatically open the modal when the page loads
+    if (justLoggedIn) {
         window.onload = function() {
             openModal();
+            
+            // Clear the session attribute to prevent showing the modal on subsequent visits
+            fetch('/clearLoggedInSessionAttribute'); // This should be a controller to clear the attribute
         };
-    </script>
+    }
+    
+    function openModal() {
+        var modal = document.getElementById("gymOffersModal");
+        if (modal) {
+            modal.style.display = "block";
+        }
+    }
+
+    function closeModal() {
+        var modal = document.getElementById("gymOffersModal");
+        if (modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>
+
+
     
 </body>
 </html>

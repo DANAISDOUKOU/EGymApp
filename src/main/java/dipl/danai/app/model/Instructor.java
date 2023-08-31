@@ -62,6 +62,8 @@ public class Instructor {
 		this.City=city2;
 		this.phoneNumber=phoneNumber2;
 	}
+	
+	public Instructor() {}
 
 	public Long getInstructor_id() {
 		return instructor_id;

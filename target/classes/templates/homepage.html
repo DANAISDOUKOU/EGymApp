@@ -2,26 +2,54 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Homepage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #87CEFA, #EFEFEF); /* Linear gradient */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .button-container {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: white;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        
+        .button:hover {
+            background-color: #0056b3;
+            color: white;
+        }
+    </style>
 </head>
 <body>
-  <h2>Welcome to Homepage</h2>
-  <p sec:authorize="hasRole('ROLE_ANONYMOUS')">Text visible to anonymous.</p>
-  <p sec:authorize="hasRole('USER')">Text visible to user.</p>
-  <p sec:authorize="hasRole('ADMIN')">Text visible to admin.</p>
-  <p sec:authorize="isAuthenticated()">Text visible only to authenticated users.</p>
-
-  <div sec:authorize="hasRole('ROLE_ANONYMOUS')">
-    <p><a th:href="@{|/login|}" th:text="'Log in'"></a></p>
-    <p><a th:href="@{|/register|}" th:text="'Register'"></a></p>
-  </div>
-
-  <div sec:authorize="isAuthenticated()">
-    <p>Logged as: <span sec:authentication="name"></span></p>
-    <p>Has role: <span sec:authentication="authorities"></span></p>
-    <p sec:authorize="hasAuthority('USER')"><a th:href="@{|/dashboard|}" th:text="'User Dashboard'"></a></p>
-    <p sec:authorize="hasAuthority('ADMIN')"><a th:href="@{|/admin/dashboard|}" th:text="'Admin Dashboard'"></a></p>
-    <a th:href="@{/logout}">Log out</a>
-  </div>
-
+	<img src="https://i.imgur.com/WPX7PrF.jpg" alt="EGYM Logo" style="width: 150px; height: auto; margin-top: 20px;">
+    
+    <h2>Welcome to EGYM</h2>
+  
+    <div class="button-container">
+        <a class="button" th:href="@{|/login|}" th:text="'Log in'"></a>
+        <a class="button" th:href="@{|/register|}" th:text="'Register'"></a>
+        <a class="button" th:href="@{|/visitor|}" th:text="'Log in as Visitor'"></a>
+    </div>
 </body>
 </html>
