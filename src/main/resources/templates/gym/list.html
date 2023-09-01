@@ -1,16 +1,46 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>Available Gyms</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #87CEFA, #EFEFEF);
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin: 20px 0;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 16px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+
+        p {
+            font-size: 18px;
+            margin: 20px 0;
+        }
+    </style>
 </head>
 <body>
     <h1>Available Gyms</h1>
     <div th:if="${not #lists.isEmpty(gyms)}">
        <div th:each="gym : ${gyms}">
-    		<form th:action="@{/gym/{id}(id=${gym.gym_id})}" method="get">
-        		<button type="submit" th:text="${gym.gym_name}"></button><br>
-    		</form>
-		</div>
+            <form th:action="@{/gym/{id}(id=${gym.gym_id})}" method="get">
+                <button type="submit" th:text="${gym.gym_name}"></button><br>
+            </form>
+        </div>
     </div>
     <div th:if="${#lists.isEmpty(gyms)}">
         <p>No gyms found.</p>

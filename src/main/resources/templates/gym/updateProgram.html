@@ -1,32 +1,86 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>Update the Program</title>
-</head>
-<style>
+    <meta charset="UTF-8">
+    <title>Update the Program</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(to bottom, #87CEFA, #EFEFEF);
+        }
+
         .canceled-text {
-        color: red;
-    }
- </style>
+            color: red;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            margin-top: 10px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        td {
+            padding: 5px;
+        }
+
+        .actions {
+            margin-top: 15px;
+        }
+
+        .actions a {
+            text-decoration: none;
+            background-color: transparent;
+            color: #007BFF;
+            border: none;
+            padding: 0;
+        }
+
+        .actions a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
 <body>
-	<form th:action="@{/gym/updateProgram}" th:object="${workout}" method="post">
-	<p>This is the Program: </p>
- 	<li th:each="program: ${programList}">
-		<span th:text="${program.work_out_date}"></span>
-	     	<ul>
-	        <th:block th:each="classOfSchedule: ${workoutList.get(program.work_out_date)}">
-	         <tr>
-	         	<td th:text="${classOfSchedule.getTime_start()} +' - '+${classOfSchedule.getTime_end()}"></td>
-	           	<td th:text="${classOfSchedule.workout.getName()}"></td>
-				<a th:href="@{http://localhost:8080/gym/modifyClass(classId=${classOfSchedule.classOfScheduleId},gymId=${gym.getGym_id()},scheduleId=${program.getSchedule_id})}">Modify</a>
-	        	<span th:if="${classOfSchedule.is_canceled}" class="canceled-text">(CANCELED)</span>
-	         </tr>
-	         <br>
-	        </th:block>
-	        </ul>
-			<a th:href="@{http://localhost:8080/gym/addClass(programId=${program.schedule_id})}">Add a new Class</a>
-			<a th:href="@{http://localhost:8080/gym/deleteClass(programId=${program.schedule_id})}">Delete a class</a>			
-	    </li> 
-</form>
+    <form th:action="@{/gym/updateProgram}" th:object="${workout}" method="post">
+        <p>This is the Program:</p>
+        <li th:each="program: ${programList}">
+            <span th:text="${program.work_out_date}"></span>
+            <ul>
+                <th:block th:each="classOfSchedule: ${workoutList.get(program.work_out_date)}">
+                    <tr>
+                        <td th:text="${classOfSchedule.getTime_start()} +' - '+${classOfSchedule.getTime_end()}"></td>
+                        <td th:text="${classOfSchedule.workout.getName()}"></td>
+                        <span th:if="${classOfSchedule.is_canceled}" class="canceled-text">(CANCELED)</span>
+                        <a th:href="@{http://localhost:8080/gym/modifyClass(classId=${classOfSchedule.classOfScheduleId},gymId=${gym.getGym_id()},scheduleId=${program.getSchedule_id})}">Modify</a>
+                    </tr>
+                    <br>
+                </th:block>
+            </ul>
+            <div class="actions">
+                <a th:href="@{http://localhost:8080/gym/addClass(programId=${program.schedule_id})}">Add a new Class</a>
+                <a th:href="@{http://localhost:8080/gym/deleteClass(programId=${program.schedule_id})}">Delete a class</a>
+            </div>
+        </li>
+    </form>
 </body>
 </html>

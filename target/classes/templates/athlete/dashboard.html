@@ -3,7 +3,6 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 	  <style>
-        /* Style for the modal */
         .modal {
             display: none;
             position: fixed;
@@ -39,10 +38,9 @@
             cursor: pointer;
         }
         
-        /* Linear gradient background */
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom, #87CEFA, #EFEFEF); /* Linear gradient */
+            background: linear-gradient(to bottom, #87CEFA, #EFEFEF); 
             margin: 0;
             padding: 0;
             display: flex;
@@ -68,7 +66,7 @@
             border: none;
             border-radius: 5px;
             padding: 10px 20px;
-            margin-right: 10px;
+            margin: 5px; 
             cursor: pointer;
         }
         
@@ -122,8 +120,7 @@
         window.onload = function() {
             openModal();
             
-            // Clear the session attribute to prevent showing the modal on subsequent visits
-            fetch('/clearLoggedInSessionAttribute'); // This should be a controller to clear the attribute
+            fetch('/clearLoggedInSessionAttribute');
         };
     }
     

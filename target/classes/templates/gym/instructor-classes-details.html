@@ -1,20 +1,75 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>Gym Instructor Details</title>
-</head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+		body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(to bottom, #87CEFA, #EFEFEF);
+        }
+        h1 {
+            font-size: 28px;
+            margin: 20px 0;
+        }
 
- <style>
+        h2 {
+            font-size: 24px;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+
         .canceled-text {
-        color: red;
-    }
- </style>
+            color: red;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+    </style>
+</head>
 <body>
     <h1>Classes Taught at <span th:text="${gym.gym_name}"></span></h1>
 
     <div th:each="entry : ${scheduleClassesMap}">
         <h2>Date: <span th:text="${entry.key.work_out_date}"></span></h2>
         <table>
+            <thead>
+                <tr>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Workout</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
             <tbody>
                 <tr th:each="class : ${entry.value}">
                     <td th:text="${class.time_start}"></td>
@@ -23,7 +78,7 @@
                         <a th:href="@{'/gym/class-schedule-details/' + ${class.classOfScheduleId}(gymId=${gymId})}">
                             <span th:text="${class.workout.name}"></span>
                         </a>
-                         <span th:if="${class.is_canceled}" class="canceled-text">(CANCELED)</span>
+                        <span th:if="${class.is_canceled}" class="canceled-text">(CANCELED)</span>
                     </td>
                     <td>
                         <a th:href="@{http://localhost:8080/gym/modifyClass(classId=${class.classOfScheduleId},gymId=${gymId},scheduleId=${entry.key.schedule_id})}">Modify</a>

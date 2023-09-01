@@ -3,8 +3,31 @@
 <head>
 
 <title>Create a Class</title>
+  <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #87CEFA, #EFEFEF);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+    </style>
 </head>
 <body>
+  <div class="container">
 	<form th:action="@{createClass}" th:object="${workout}" method="post">
     <h3>Create a class</h3>
     <input type="text" th:field="*{name}"  placeholder="Name"/>  <br/><br/>
@@ -19,6 +42,6 @@
     </div>
     <button onclick="window.location.href='http://localhost:8080/gym/createProgram'" type="button">Go back to Schedule</button>
 </form>
-
+</div>
 </body>
 </html>

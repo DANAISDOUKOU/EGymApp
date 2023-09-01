@@ -1,16 +1,60 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Member of Gyms</title>
+    <title>Member of Gyms</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #87CEFA, #EFEFEF);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        li {
+            margin-bottom: 10px;
+        }
+        
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-  <h1>Gyms That I Am a Member Of</h1>
-  <ul>
-   <div th:each="gym : ${gyms}">
-    <form th:action="@{'/gym/' + ${gym.gym_id}}" method="get">
-        <button type="submit" th:text="${gym.gym_name}"></button><br>
-    </form>
-    </li>
-  </ul>
+    <h1>Gyms That I Am a Member Of</h1>
+    <ul>
+        <div th:each="gym : ${gyms}">
+            <form th:action="@{'/gym/' + ${gym.gym_id}}" method="get">
+                <li>
+                    <button type="submit" th:text="${gym.gym_name}"></button><br>
+                </li>
+            </form>
+        </div>
+    </ul>
 </body>
 </html>

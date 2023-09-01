@@ -1,10 +1,37 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"><html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>Room</title>
-	<h1> Create Room</h1>
-	<form th:action="@{createRoom}" th:object="${room}" method="post">
-	 	<input type="text" th:field="*{roomName}"  placeholder="Name"/>  <br/><br/>
-		<button type="submit">Create Room</button> 
+    <title>Create Room</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #87CEFA, #EFEFEF);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Create Room</h1>
+        <form th:action="@{createRoom}" th:object="${room}" method="post">
+            <input type="text" th:field="*{roomName}"  placeholder="Name"/><br/><br/>
+            <button type="submit">Create Room</button>
+        </form>
+    </div>
+</body>
+</html>

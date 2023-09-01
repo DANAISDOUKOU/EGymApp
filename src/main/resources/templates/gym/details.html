@@ -5,6 +5,66 @@
 <title>gymDetails</title>
 </head>
  <style>
+ body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #87CEFA, #EFEFEF);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-top: 20px;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+
+        h3 {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            margin-top: 10px;
+        }
+
+        p {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
         .canceled-text {
         color: red;
     }
@@ -47,10 +107,12 @@
 	        <span th:text="${program.work_out_date}"></span>
 			 <ul>
 	             <th:block th:each="classOfSchedule: ${workoutList.get(program.work_out_date)}">
-	             	<td th:text="${classOfSchedule.time_start} +' - '+${classOfSchedule.time_end}"></td>
-					<td><a th:href="@{/workout/{workoutId}/class/{classOfScheduleId}/schedule/{scheduleId}(workoutId=${classOfSchedule.workout.workoutId}, classOfScheduleId=${classOfSchedule.classOfScheduleId}, scheduleId=${program.schedule_id})}"
-       					th:text="${classOfSchedule.workout.getName()}">Details</a>
-					</td>
+	             	<li th:class="${classOfSchedule.is_canceled} ? 'canceled-text' : ''">
+	             		<td th:text="${classOfSchedule.time_start} +' - '+${classOfSchedule.time_end}"></td>
+						<td><a th:href="@{/workout/{workoutId}/class/{classOfScheduleId}/schedule/{scheduleId}(workoutId=${classOfSchedule.workout.workoutId}, classOfScheduleId=${classOfSchedule.classOfScheduleId}, scheduleId=${program.schedule_id})}"
+       						th:text="${classOfSchedule.workout.getName()}">Details</a>
+						</td>
+					</li>
 	        	</th:block>
 	        </ul>	
 	    </li>

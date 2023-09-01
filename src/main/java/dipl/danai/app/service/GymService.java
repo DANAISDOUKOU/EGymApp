@@ -120,22 +120,41 @@ public class GymService {
 		instructors.add(instructor);
 	}
 
-	public List<Gym> searchGyms(String name, String address, String workoutType, Integer bestRating, String city) {
-		 List<Gym> allGyms = gymRepository.findAll(); 
-	   
-		 List<Gym> searchResults = allGyms.stream()
-	                .filter(gym -> (name == null || name.trim().isEmpty() ||gym.getGym_name().trim().equalsIgnoreCase(name.trim())))
-	                .filter(gym -> (workoutType == null || workoutType.trim().isEmpty() || gym.getGymWorkouts().stream()
-                    .anyMatch(workout -> workout.getName().equalsIgnoreCase(workoutType.trim()))))
-	                //.filter(gym -> (address == null || gym.getAddress().contains(address)))
-	                //.filter(gym -> (workoutType == null || gym.getGymWorkouts().stream()
-                   // .anyMatch(workout -> workout.getName().contains(workoutType))))
-	                .filter(gym -> (city==null|| city.trim().isEmpty()||gym.getCity().trim().equalsIgnoreCase(city.trim())))
-	                .filter(gym -> (bestRating == null || gym.getAverageRating() >= bestRating))
-	                .collect(Collectors.toList());
-		
-	   return searchResults;
+	public List<Gym> searchGyms(String searchBy, String query) {
+	    List<Gym> allGyms = gymRepository.findAll();
+
+	    List<Gym> searchResults = allGyms.stream()
+	            .filter(gym -> (searchBy == null || searchBy.trim().isEmpty() || matchesSearchCriteria(gym, searchBy, query)))
+	            .collect(Collectors.toList());
+
+	    return searchResults;
 	}
+
+	private boolean matchesSearchCriteria(Gym gym, String searchBy, String query) {
+	    query = query.trim().toLowerCase();
+
+	    switch (searchBy) {
+	        case "name":
+	            return gym.getGym_name().toLowerCase().contains(query);
+	        case "address":
+	            return gym.getAddress().toLowerCase().contains(query);
+	        case "workoutType":
+	            final String queryLowerCase = query; 
+	            return gym.getGymWorkouts().stream().anyMatch(workout -> workout.getName().toLowerCase().contains(queryLowerCase));
+	        case "bestRating":
+	            try {
+	                int bestRating = Integer.parseInt(query);
+	                return gym.getAverageRating() >= bestRating;
+	            } catch (NumberFormatException e) {
+	                return false;
+	            }
+	        case "city":
+	            return gym.getCity().toLowerCase().contains(query);
+	        default:
+	            return false;
+	    }
+	}
+
 	
 	public List<Gym> getGyms(){
 		List<Gym> gyms=gymRepository.findAll();
