@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -36,6 +37,8 @@ public class UserService implements UserDetailsService {
     
     @Autowired 
     private InstructorRepository instructorRepository;
+    @Autowired
+    NominatimService geonameService;
 
     public void saveUser(User user) {
         String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
@@ -119,8 +122,15 @@ public class UserService implements UserDetailsService {
 	 public void insertGym( Long id,String name, String surname,
              String email,  String address,  String city,
              String phoneNumber) {
+		 
         Gym gym=new Gym(id, name, surname, email, address, city, phoneNumber);
         gymRepository.save(gym);
+        Map<String, Double> coordinates = geonameService.getCoordinatesForAddressInCity(address, city);
+	    if (coordinates != null) {
+	        gym.setLatitude(coordinates.get("latitude"));
+	        gym.setLongitude(coordinates.get("longitude"));
+	    }
+	    gymRepository.save(gym);
 	 }
 	 public void insertInstructor( Long id,String name, String surname,
              String email,  String address,  String city,

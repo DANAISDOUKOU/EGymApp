@@ -35,7 +35,7 @@
 
         input[type="text"],
         select {
-            width: 100%;
+            width: 95%;
             padding: 8px;
             margin: 8px 0;
             border: 1px solid #ccc;
@@ -63,6 +63,15 @@
 
         span {
             color: red;
+        }
+         button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 16px;
+            cursor: pointer;
+            margin: 10px 0;
         }
     </style>
 </head>
@@ -110,9 +119,11 @@
         <form th:action="@{/gym/uncancelClassOccurrence}" method="post">
             <input type="hidden" name="classId" th:value="${classOfSchedule.classOfScheduleId}" />
             <input type="hidden" name="classOccurrenceId" th:value="${classOccurrenceId}" />
-            <input type="hidden" name="scheduleId" th:value="${scheduleId}" />
+            <input type="hidden" name="scheduleId" th:value="${schedule.schedule_id}" />
             <button type="submit">Restore Occurrence</button>
         </form>
     </th:block>
+    	<button onclick="window.history.back()" type="button">Go Back</button>
+    
 </body>
 </html>

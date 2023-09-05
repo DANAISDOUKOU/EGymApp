@@ -160,7 +160,7 @@ Model model,Authentication authentication) {
 		Gym gym=gymService.getGymByEmail(authentication.getName());
 		schedule.setWork_out_date(startDate);
 		scheduleService.saveSchedule(schedule);
-		gymService.saveProgram(schedule);
+		gym.getGymSchedules().add(schedule);
 		gymService.saveGym(gym);
 		return "gym/createProgram";
 	}

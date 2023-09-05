@@ -1,5 +1,7 @@
 package dipl.danai.app.controller;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,6 +23,7 @@ import dipl.danai.app.model.ClassRating;
 import dipl.danai.app.model.Gym;
 import dipl.danai.app.model.Instructor;
 import dipl.danai.app.model.MembershipType;
+import dipl.danai.app.model.Schedule;
 import dipl.danai.app.service.AthleteService;
 import dipl.danai.app.service.ClassOfScheduleService;
 import dipl.danai.app.service.ClassRatingService;
@@ -101,8 +104,17 @@ public class AthelteController {
 	            .filter(classOfSchedule -> classOfSchedule.getSchedules().stream()
 	                    .anyMatch(schedule -> schedule.getGyms().contains(gym)))
 	            .collect(Collectors.toList());
+	    Map<LocalDate, List<ClassOfSchedule>> classesByDate = new HashMap<>();
+	    
+	    for (ClassOfSchedule classOfSchedule : attendedClassesInGym) {
+	        for (Schedule schedule : classOfSchedule.getSchedules()) {
+	            LocalDate date = schedule.getWork_out_date().toLocalDate();
+	            classesByDate.computeIfAbsent(date, k -> new ArrayList<>()).add(classOfSchedule);
+	        }
+	    }
 	    model.addAttribute("gym",gym);
 	    model.addAttribute("attendedClasses", attendedClassesInGym);
+	    model.addAttribute("classesByDate", classesByDate);
 	    return "athlete/history";
 	}
 	

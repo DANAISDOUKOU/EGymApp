@@ -44,6 +44,12 @@ public class Gym {
 	@Column
     private String City;
 	
+	@Column
+	private Double latitude;
+
+	@Column
+	private Double longitude;
+	
 	@Column(name = "phone_number")
     @Size(min = 10, max = 10, message = "Phone number must be exactly 10 digits")
 	@Pattern(regexp = "\\d{10}", message = "Phone number must contain only digits")
@@ -223,6 +229,30 @@ public class Gym {
 
 	public void setTotalRatings(Integer totalRatings) {
 		this.totalRatings = totalRatings;
+	}
+
+	public double getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
+
+	public double getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
+	}
+
+	public List<MembershipType> getGymMemberships() {
+		return gymMemberships;
+	}
+
+	public void setGymMemberships(List<MembershipType> gymMemberships) {
+		this.gymMemberships = gymMemberships;
 	}
 	
 }

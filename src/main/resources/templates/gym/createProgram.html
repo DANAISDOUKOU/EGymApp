@@ -13,15 +13,56 @@
             align-items: center;
             min-height: 100vh;
         }
+		form {
+        text-align: center;
+    }
 
-        .container {
-            background-color: white;
-            padding: 20px;
-            border: 1px solid #ddd;
+    form input[type="date"] {
+        width: 85%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin: 10px 0;
+    }
+
+    form button {
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 10px 0;
+    }
+
+    form button:hover {
+        background-color: #0056b3;
+    }
+
+    .container {
+        background-color: white;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        width: 400px;
+    }
+      button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
             border-radius: 5px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            width: 400px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
         }
+          button:hover {
+            background-color: #0056b3;
+        }
+
+       
     </style>
 </head>
 <body>
@@ -30,7 +71,6 @@
 	 	<h3>Select a Date</h3>
         <input type="Date" name="date"><br/><br/>
         <button onclick="window.location.href='http://localhost:8080/gym/addClass'" type="button">Add a new Class for Schedule</button><br/><br/>
-        <button onclick="window.location.href='http://localhost:8080/gym/program'" type="button">Go Back</button><br/><br/>
     	<button type="submit">Create Schedule</button> 
     	<span th:utext="${successMessage}"></span>
     	<div th:if="${bindingResult!=null && bindingResult.getAllErrors()!=null}">
@@ -40,6 +80,8 @@
     	</div> 	
 	</form>
 	</div>
+		<button onclick="window.history.back()" type="button">Go Back</button>
+	
 </body>
 </html>	 	
 	  

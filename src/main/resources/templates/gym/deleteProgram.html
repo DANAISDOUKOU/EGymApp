@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+     <title>Delete Program</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(to bottom, #87CEFA, #EFEFEF);
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin: 10px;
+        }
+
+        button {
+            background-color: #FF0000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #CC0000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Select a Schedule to Delete</h1>
+    <ul>
+        <li th:each="schedule : ${deletableSchedules}">
+            <span th:text="${schedule.work_out_date}"></span>
+            <ul>
+                <li th:each="classOfSchedule : ${schedule.scheduleClasses}">
+                    <span th:text="${classOfSchedule.time_start} + ' - ' + ${classOfSchedule.time_end}"></span>
+                 	<span th:text="${classOfSchedule.workout.name}"></span>
+                </li>
+            </ul>
+            <form th:action="@{/gym/deleteSchedule}" method="post">
+                <input type="hidden" name="scheduleId" th:value="${schedule.schedule_id}" />
+                <button type="submit">Delete</button>
+            </form>
+        </li>
+    </ul>
+    	<button onclick="window.history.back()" type="button">Go Back</button>
+    
+</body>
+</html>

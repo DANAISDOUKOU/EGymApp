@@ -36,6 +36,7 @@ import dipl.danai.app.service.GymRatingService;
 import dipl.danai.app.service.GymService;
 import dipl.danai.app.service.InstructorService;
 import dipl.danai.app.service.MembershipService;
+import dipl.danai.app.service.NominatimService;
 import dipl.danai.app.service.PaymentService;
 import dipl.danai.app.service.ScheduleService;
 import dipl.danai.app.service.WorkoutService;
@@ -61,6 +62,8 @@ public class GymController {
 	WorkoutService workoutService;
 	@Autowired
 	PaymentService paymentService;
+	@Autowired
+	NominatimService geonameService;
 	
 	@GetMapping(value = {"/gym/dashboard"})
     public String gymPage(Authentication authentication){
@@ -223,14 +226,34 @@ public class GymController {
 	public String searchGyms(
 	    @RequestParam(required = false) String searchBy,
 	    @RequestParam(required = false) String query,
-	    Model model
+	    Model model, Authentication authentication
 	) {
+		Athletes athlete=athleteService.getAthlete(authentication.getName());
 	    List<Gym> gyms = new ArrayList<Gym>();
-	    List<Gym> searchResults = gymService.searchGyms(searchBy, query);
-	    gyms.addAll(searchResults);
+	    if ("address".equalsIgnoreCase(searchBy)) {
+	        Map<String, Double> coordinates = geonameService.getCoordinatesForAddressInCity(athlete.getAddress(), athlete.getCity());
+	        if (coordinates != null) {
+	        	System.out.println("Foundddddd ");
+	            double searchRadius = 150.0; 
+	            double minLat = coordinates.get("latitude") - (searchRadius / 111.32);
+	            double maxLat = coordinates.get("latitude") + (searchRadius / 111.32);
+	            double minLon = coordinates.get("longitude") + (searchRadius / (111.32 * Math.cos(coordinates.get("latitude"))));
+	            double maxLon = coordinates.get("longitude") - (searchRadius / (111.32 * Math.cos(coordinates.get("latitude"))));
+	           System.out.println(minLat+" "+maxLat+" "+minLon+" "+maxLon);
+	           
+	            List<Gym> searchResults = gymService.getGymsByCoordinates(minLat, maxLat, minLon, maxLon);
+	            gyms.addAll(searchResults);
+	        }
+	    } else {
+	        
+	        List<Gym> searchResults = gymService.searchGyms(searchBy, query);
+	        gyms.addAll(searchResults);
+	    }
+
 	    model.addAttribute("gyms", gyms);
 	    return "gym/list";
 	}
+
 
 	
 	@GetMapping("/gym/seeMembers")
@@ -310,7 +333,7 @@ public class GymController {
 		 if (selectedWorkouts != null) {
 			 for (Long workoutId : selectedWorkouts) {
 			      Workout workout = workoutService.findById(workoutId);
-			      gymService.addWorkout(workout); 
+			      gym.getGymWorkouts().add(workout); 
 			  }
 		 }
 		 gymService.saveGym(gym);
@@ -332,7 +355,7 @@ public class GymController {
 		if(selectedInstructors!= null) {
 			for(Long id:selectedInstructors) {
 				Instructor instructor=instructorService.getById(id);
-				gymService.addInstructor(instructor);
+				gym.getGymInstructors().add(instructor);
 			}
 		}
 		gymService.saveGym(gym);
@@ -364,7 +387,6 @@ public class GymController {
 	            }
 	        }
 	    }
-	  
 	    model.addAttribute("scheduleClassesMap", scheduleClassesMap);
 	    return "gym/instructor-classes-details";
 	}
@@ -421,4 +443,24 @@ public class GymController {
 
 		return "gym/workoutDetails"; 
 	 }
+	 
+	 
+	 @GetMapping("/gym/deleteProgram")
+	 public String showDeleteProgramPage(Model model,Authentication authentication) {
+		 Gym gym=gymService.getGymByEmail(authentication.getName());
+		 Collection<Schedule> deletableSchedules = gym.getGymSchedules();
+	     model.addAttribute("deletableSchedules", deletableSchedules);
+	     return "gym/deleteProgram";
+	  }
+
+	 @PostMapping("/gym/deleteSchedule")
+	 public String deleteSchedule(@RequestParam Long scheduleId,Authentication authentication) {
+	    Gym gym=gymService.getGymByEmail(authentication.getName());
+	    Collection<Schedule> schedules=gym.getGymSchedules();
+	    Schedule schedule=scheduleService.getScheduleById(scheduleId);
+	    schedules.remove(schedule);
+	    gym.setGymSchedules(schedules);
+	    gymService.saveGym(gym);
+	    return "redirect:/gym/deleteProgram"; 
+	  }
 }

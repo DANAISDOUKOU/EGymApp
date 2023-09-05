@@ -32,7 +32,6 @@ public class WorkoutController {
 	 public String createClassWorkout(Authentication authentication,Model model, @Valid Workout workout, BindingResult bindingResult) throws SQLException{
 	     Gym gym=gymService.getGymByEmail(authentication.getName()); 
 		 workoutService.saveWorkout(workout);
-	     gymService.addWorkout(workout);
 	     gymService.saveGym(gym);
 	     model.addAttribute("successMessage", "Class registered successfully!");
 		return "gym/createClass";

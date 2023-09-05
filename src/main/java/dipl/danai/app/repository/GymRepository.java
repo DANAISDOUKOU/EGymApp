@@ -1,5 +1,6 @@
 package dipl.danai.app.repository;
 
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,7 +19,8 @@ public interface GymRepository extends JpaRepository<Gym, Long>{
 	public Gym findByEmail(String email);
 	@Query(value="SELECT g.gymMembers FROM Gym g WHERE g.gym_id=:gymId ")
 	public Set<Athletes> findMembers(@Param("gymId") Long gymId);
+	@Query(value = "SELECT * FROM gyms WHERE latitude BETWEEN :minLat AND :maxLat AND longitude BETWEEN :minLon AND :maxLon", nativeQuery = true)
+	public List<Gym> findByLatitudeBetweenAndLongitudeBetween( @Param("minLat") double minLat,@Param("maxLat") double maxLat, @Param("minLon") double minLon, @Param("maxLon") double maxLon);
 
-	
 	
 }

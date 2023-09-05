@@ -4,7 +4,7 @@
 
 <title>Create a Class</title>
   <style>
-        body {
+         body {
             font-family: Arial, sans-serif;
             background: linear-gradient(to bottom, #87CEFA, #EFEFEF);
             margin: 0;
@@ -24,6 +24,46 @@
             width: 400px;
         }
 
+        form {
+            text-align: center;
+        }
+
+        h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: 90%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        button[type="submit"],
+        button[type="button"] {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        button[type="submit"]:hover,
+        button[type="button"]:hover {
+            background-color: #0056b3;
+        }
+
+        .error-messages {
+            color: red;
+            margin-top: 10px;
+        }
+
     </style>
 </head>
 <body>
@@ -41,6 +81,7 @@
       </ul>
     </div>
     <button onclick="window.location.href='http://localhost:8080/gym/createProgram'" type="button">Go back to Schedule</button>
+        
 </form>
 </div>
 </body>

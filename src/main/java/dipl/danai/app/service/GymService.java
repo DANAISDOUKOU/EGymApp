@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,18 +41,11 @@ public class GymService {
 	@Autowired
 	MembershipRepository membershipRepository;
 	
-	Collection<Schedule> programs=new ArrayList<>();
-	List<Workout> workouts=new ArrayList<>();
-	Set<Instructor> instructors=new HashSet<>();
-
-	public void saveProgram(Schedule program) {
-		programs.add(program);
-	}
+	@Autowired
+	NominatimService geonameService;
+	
 
 	public void saveGym(Gym gym) {
-		gym.setGymInstructors(instructors);
-		gym.setGymWorkouts(workouts);
-		gym.setGymSchedules(programs);
 		gymRepository.save(gym);	
 	}
 
@@ -106,19 +100,17 @@ public class GymService {
 			gym.setPhoneNumber(value);
 		}else if(field.equals("address")) {
 			gym.setAddress(value);
+			 Map<String, Double> coordinates = geonameService.getCoordinatesForAddressInCity(value, gym.getCity());
+			    if (coordinates != null) {
+			        gym.setLatitude(coordinates.get("latitude"));
+			        gym.setLongitude(coordinates.get("longitude"));
+			    }
 		}else if(field.equals("city")) {
 			gym.setCity(value);
 		}
 		gymRepository.save(gym);
 	}
 
-	public void addWorkout(Workout workout) {
-		workouts.add(workout);
-	}
-
-	public void addInstructor(Instructor instructor) {
-		instructors.add(instructor);
-	}
 
 	public List<Gym> searchGyms(String searchBy, String query) {
 	    List<Gym> allGyms = gymRepository.findAll();
@@ -201,4 +193,12 @@ public class GymService {
 		 List<Gym> searchResults = allGyms.stream().filter(gym -> (city==null|| city.trim().isEmpty()||gym.getCity().trim().equalsIgnoreCase(city.trim()))).collect(Collectors.toList());
 		 return searchResults;
 	}
+	
+	public List<Gym> getGymsByCoordinates(double minLat, double maxLat, double minLon, double maxLon) {
+		System.out.println(""+minLat+" "+maxLat+" "+minLon+" "+maxLon);
+		List<Gym> gyms=gymRepository.findByLatitudeBetweenAndLongitudeBetween(minLat, maxLat, minLon, maxLon);
+		System.out.println("hahaahha "+gyms.size());
+        return gyms;
+    }
+
 }

@@ -68,9 +68,14 @@
         .canceled-text {
         color: red;
     }
+     .date {
+            font-size: 24px; 
+            font-weight: bold; 
+        }
  </style>
 <body>
     <h1 th:text="${gym.gym_name}"></h1>
+    <h3>Average Rating: <span th:text="${gym.averageRating}"></span></h3>
     <h2>Fitness Programs:</h2>
     <div th:if="${not alreadyMember}">
      <form th:action="@{/gym/subscribe}" method="post">
@@ -104,7 +109,7 @@
      </div> 
         <div th:if="${not #lists.isEmpty(programList)}">
 	    <li th:each="program: ${programList}">
-	        <span th:text="${program.work_out_date}"></span>
+	        <span th:text="${program.work_out_date}" class="date"></span>
 			 <ul>
 	             <th:block th:each="classOfSchedule: ${workoutList.get(program.work_out_date)}">
 	             	<li th:class="${classOfSchedule.is_canceled} ? 'canceled-text' : ''">
@@ -123,6 +128,6 @@
 	</form>
     </ul>
 	<a th:href="@{http://localhost:8080/athlete/history(gymId=${gym.gym_id})}">History of Classes</a>
-	
+	<button onclick="window.history.back()" type="button">Go Back</button>
 </body>
 </html>

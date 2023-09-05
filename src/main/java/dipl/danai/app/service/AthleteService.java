@@ -34,6 +34,7 @@ public class AthleteService {
 			athlete.setPhoneNumber(value);
 		}else if(field.equals("address")) {
 			athlete.setAddress(value);
+			
 		}else if(field.equals("city")) {
 			athlete.setCity(value);
 		}

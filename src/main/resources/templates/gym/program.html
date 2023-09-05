@@ -39,6 +39,10 @@
             cursor: pointer;
             margin-top: 10px;
         }
+         .date {
+            font-size: 24px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -53,7 +57,7 @@
         <div th:if="${not #lists.isEmpty(programList) and not rooms.isEmpty()}">
             <ul>
                 <li th:each="program: ${programList}">
-                    <span th:text="${program.work_out_date}"></span>
+                    <span th:text="${program.work_out_date}"  class="date"></span>
                     <ul>
                         <th:block th:each="classOfSchedule: ${workoutList.get(program.work_out_date)}">
                             <tr>
@@ -73,6 +77,8 @@
             <button onclick="window.location.href='http://localhost:8080/gym/deleteProgram'" type="button">Delete the Existing Program</button>
         </div>
         <button onclick="window.location.href='http://localhost:8080/gym/createProgram'" type="button">Create a new Program</button>
+       <button onclick="window.location.href='http://localhost:8080/gym/dashboard'" type="button">Go back</button>
+    	
     </form>
 </body>
 </html>
