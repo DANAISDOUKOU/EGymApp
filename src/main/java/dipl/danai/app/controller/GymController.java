@@ -463,4 +463,30 @@ public class GymController {
 	    gymService.saveGym(gym);
 	    return "redirect:/gym/deleteProgram"; 
 	  }
+	 
+	 @GetMapping("/visitor/{id}")
+	 public String watchDetailsOfGym(@PathVariable Long id, Model model) {
+		 Gym gym = gymService.getGymById(id);
+		 model.addAttribute("gym", gym);
+	 	 
+	 Collection<Schedule> programList=gym.getGymSchedules();
+     model.addAttribute("programList", gym.getGymSchedules());
+     if(programList!=null) {
+			Map<Date,List<ClassOfSchedule>> classesByDate = new HashMap<>(); 
+			for (Schedule p:programList) {
+				Schedule program=scheduleService.getScheduleById(p.getSchedule_id());
+				Collection<ClassOfSchedule> classes= program.getScheduleClasses();
+				Date date=program.getWork_out_date();
+				List<ClassOfSchedule> classesOnDate=new ArrayList<ClassOfSchedule>();
+				for(ClassOfSchedule classOfSchedule:classes) {
+					classesOnDate.add(classOfSchedule);				
+				}
+				classesByDate.put(date, classesOnDate);
+			}
+			model.addAttribute("workoutList", classesByDate);
+		}
+    
+		return "visitor/gym-details";
+		 
+	 }
 }

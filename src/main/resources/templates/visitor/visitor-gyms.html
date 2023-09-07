@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>All the Available Gyms</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #87CEFA, #EFEFEF);
+            margin: 0;
+            padding: 0;
+            display: flex;a
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        
+        label {
+            font-weight: bold;
+        }
+        
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+        
+        button[type="submit"] {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        
+        .gym-button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .gym-button:hover {
+            background-color: #0056b3;
+        }
+          button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+          button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Available Gyms</h1>
+     <form th:action="@{/gym/search}" method="get">
+        <label>Search by:</label>
+        <select name="searchBy">
+            <option value="name">Name</option>
+            <option value="address">Address</option>
+            <option value="workoutType">Workout Type</option>
+            <option value="bestRating">Best Rating</option>
+            <option value="city">City</option>
+        </select>
+        <input type="text" name="query" placeholder="Enter your search...">
+        <button type="submit">Search</button>
+    </form>
+    <div th:each="gym : ${gyms}">
+        <form th:action="@{'/visitor/' + ${gym.gym_id}}" method="get">
+            <button class="gym-button" type="submit" th:text="${gym.gym_name}"></button><br>
+        </form>
+    </div>
+    	<button onclick="window.history.back()" type="button">Go Back</button>
+    
+</body>
+</html>

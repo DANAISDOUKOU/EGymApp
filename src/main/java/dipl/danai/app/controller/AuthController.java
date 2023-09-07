@@ -169,6 +169,12 @@ public class AuthController {
 				instructorService.setValue(value,field,instructor);
 			}
 
-	        return "redirect:/profile"; // Redirect back to the profile page
+	        return "redirect:/profile"; 
 	    }
+	 
+	 @GetMapping("/visitor")
+	 public String visitor(Model model) {
+		 model.addAttribute("gyms",gymService.getGyms());
+		 return "visitor/visitor-gyms";
+	 }
 }

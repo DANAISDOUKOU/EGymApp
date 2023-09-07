@@ -53,12 +53,13 @@ public class WebSecurityConfig {
 
                 http.authorizeRequests()
                 // URL matching for accessibility
-                .antMatchers("/", "/login", "/register","/forgotPassword","/resetPassword").permitAll()
+                .antMatchers("/", "/login", "/register","/forgotPassword","/resetPassword","/visitor").permitAll()
                 .antMatchers("/gym/class-schedule-details/**").permitAll()
                 .antMatchers("/gym/details").permitAll()
                 .antMatchers("/gym/{id}").permitAll()
                 .antMatchers("/gym/search").permitAll()
                 .antMatchers("/gym/list").permitAll()
+                .antMatchers("/visitor/**").permitAll()
                 .antMatchers("/gym/**").hasAnyAuthority("GYM")
                 .antMatchers("/instructor/**").hasAnyAuthority("INSTRUCTOR")
                 .antMatchers("/athlete/**").hasAnyAuthority("ATHLETE")
