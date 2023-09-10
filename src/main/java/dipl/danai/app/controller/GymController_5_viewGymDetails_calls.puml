@@ -1,0 +1,256 @@
+@startuml
+
+/' diagram meta data start
+config=CallConfiguration;
+{
+  "rootMethod": "dipl.danai.app.controller.GymController#viewGymDetails(Long,Model,Authentication)",
+  "projectClassification": {
+    "searchMode": "OpenProject", // OpenProject, AllProjects
+    "includedProjects": "",
+    "pathEndKeywords": "*.impl",
+    "isClientPath": "",
+    "isClientName": "",
+    "isTestPath": "",
+    "isTestName": "",
+    "isMappingPath": "",
+    "isMappingName": "",
+    "isDataAccessPath": "",
+    "isDataAccessName": "",
+    "isDataStructurePath": "",
+    "isDataStructureName": "",
+    "isInterfaceStructuresPath": "",
+    "isInterfaceStructuresName": "",
+    "isEntryPointPath": "",
+    "isEntryPointName": "",
+    "treatFinalFieldsAsMandatory": false
+  },
+  "graphRestriction": {
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "removeByInheritance": "", // inheritance/annotation based filtering is done in a second step
+    "removeByAnnotation": "",
+    "removeByClassPackage": "", // cleanup the graph after inheritance/annotation based filtering is done
+    "removeByClassName": "",
+    "cutMappings": false,
+    "cutEnum": true,
+    "cutTests": true,
+    "cutClient": true,
+    "cutDataAccess": true,
+    "cutInterfaceStructures": true,
+    "cutDataStructures": true,
+    "cutGetterAndSetter": true,
+    "cutConstructors": true
+  },
+  "graphTraversal": {
+    "forwardDepth": 3,
+    "backwardDepth": 3,
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "hideMappings": false,
+    "hideDataStructures": false,
+    "hidePrivateMethods": true,
+    "hideInterfaceCalls": true, // indirection: implementation -> interface (is hidden) -> implementation
+    "onlyShowApplicationEntryPoints": false, // root node is included
+    "useMethodCallsForStructureDiagram": "ForwardOnly" // ForwardOnly, BothDirections, No
+  },
+  "details": {
+    "aggregation": "GroupByClass", // ByClass, GroupByClass, None
+    "showMethodParametersTypes": false,
+    "showMethodParametersNames": false,
+    "showMethodReturnType": false,
+    "showPackageLevels": 2,
+    "showCallOrder": false,
+    "edgeMode": "MethodsOnly", // TypesOnly, MethodsOnly, TypesAndMethods, MethodsAndDirectTypeUsage
+    "showDetailedClassStructure": false
+  },
+  "rootClass": "dipl.danai.app.controller.GymController",
+  "extensionCallbackMethod": "" // qualified.class.name#methodName - signature: public static String method(String)
+}
+diagram meta data end '/
+
+
+
+digraph g {
+    rankdir="LR"
+    splines=polyline
+    
+
+'nodes 
+subgraph cluster_95350649 { 
+   	label=danai
+	labeljust=l
+	fillcolor="#ececec"
+	style=filled
+   
+   subgraph cluster_1386287572 { 
+   	label=app
+	labeljust=l
+	fillcolor="#d8d8d8"
+	style=filled
+   
+   subgraph cluster_1192028054 { 
+   	label=ScheduleService
+	labeljust=l
+	fillcolor=white
+	style=filled
+   
+   ScheduleService823322234XXXgetScheduleById2374300[
+	label="+ getScheduleById()"
+	style=filled
+	fillcolor=white
+	tooltip="ScheduleService
+
+null"
+	fontcolor=darkgreen
+];
+} 
+
+subgraph cluster_1790884350 { 
+   	label=GymService
+	labeljust=l
+	fillcolor=white
+	style=filled
+   
+   GymService823322234XXXcheckIfAlreadyMember2102179519[
+	label="+ checkIfAlreadyMember()"
+	style=filled
+	fillcolor=white
+	tooltip="GymService
+
+null"
+	fontcolor=darkgreen
+];
+
+GymService823322234XXXcheckIfHasSpecificMembership1247325203[
+	label="+ checkIfHasSpecificMembership()"
+	style=filled
+	fillcolor=white
+	tooltip="GymService
+
+null"
+	fontcolor=darkgreen
+];
+
+GymService823322234XXXfindExistingMembership131677100[
+	label="+ findExistingMembership()"
+	style=filled
+	fillcolor=white
+	tooltip="GymService
+
+null"
+	fontcolor=darkgreen
+];
+
+GymService823322234XXXgetGymById2374300[
+	label="+ getGymById()"
+	style=filled
+	fillcolor=white
+	tooltip="GymService
+
+null"
+	fontcolor=darkgreen
+];
+} 
+
+subgraph cluster_1961418807 { 
+   	label=ClassOfScheduleService
+	labeljust=l
+	fillcolor=white
+	style=filled
+   
+   ClassOfScheduleService823322234XXXcheckIfCanceled2044963013[
+	label="+ checkIfCanceled()"
+	style=filled
+	fillcolor=white
+	tooltip="ClassOfScheduleService
+
+null"
+	fontcolor=darkgreen
+];
+} 
+
+subgraph cluster_224331244 { 
+   	label=GymController
+	labeljust=l
+	fillcolor=white
+	style=filled
+   
+   GymController967126229XXXviewGymDetails1756548347[
+	label="+ viewGymDetails()"
+	style=filled
+	fillcolor=white
+	tooltip="GymController
+
+null"
+	penwidth=4
+	fontcolor=darkgreen
+];
+} 
+
+subgraph cluster_311016830 { 
+   	label=AthleteService
+	labeljust=l
+	fillcolor=white
+	style=filled
+   
+   AthleteService823322234XXXfindClasses270062260[
+	label="+ findClasses()"
+	style=filled
+	fillcolor=white
+	tooltip="AthleteService
+
+null"
+	fontcolor=darkgreen
+];
+
+AthleteService823322234XXXgetAthlete1808118735[
+	label="+ getAthlete()"
+	style=filled
+	fillcolor=white
+	tooltip="AthleteService
+
+null"
+	fontcolor=darkgreen
+];
+} 
+
+subgraph cluster_688349047 { 
+   	label=MembershipService
+	labeljust=l
+	fillcolor=white
+	style=filled
+   
+   MembershipService823322234XXXfindMembership131677100[
+	label="+ findMembership()"
+	style=filled
+	fillcolor=white
+	tooltip="MembershipService
+
+null"
+	fontcolor=darkgreen
+];
+} 
+} 
+} 
+
+'edges    
+GymController967126229XXXviewGymDetails1756548347 -> AthleteService823322234XXXfindClasses270062260;
+GymController967126229XXXviewGymDetails1756548347 -> AthleteService823322234XXXgetAthlete1808118735;
+GymController967126229XXXviewGymDetails1756548347 -> ClassOfScheduleService823322234XXXcheckIfCanceled2044963013;
+GymController967126229XXXviewGymDetails1756548347 -> GymService823322234XXXcheckIfAlreadyMember2102179519;
+GymController967126229XXXviewGymDetails1756548347 -> GymService823322234XXXcheckIfHasSpecificMembership1247325203;
+GymController967126229XXXviewGymDetails1756548347 -> GymService823322234XXXfindExistingMembership131677100;
+GymController967126229XXXviewGymDetails1756548347 -> GymService823322234XXXgetGymById2374300;
+GymController967126229XXXviewGymDetails1756548347 -> MembershipService823322234XXXfindMembership131677100;
+GymController967126229XXXviewGymDetails1756548347 -> ScheduleService823322234XXXgetScheduleById2374300;
+    
+}
+@enduml

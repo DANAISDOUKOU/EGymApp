@@ -64,6 +64,8 @@ public class ScheduleController {
 	@Autowired
 	EmailService emailService;
 	
+	
+	
 	@GetMapping(value = {"/addClass"})
 	public String addClass(HttpServletRequest request,HttpSession session,@RequestParam(value = "programId", required = false) Long programId,
 Model model,Authentication authentication) {
@@ -112,7 +114,7 @@ Model model,Authentication authentication) {
 				 bindingResult.rejectValue("gyms", "error.gyms", "The selected room at " + gym.getGym_name() + " is already occupied at this time.");
 		    }
 		    Instructor selectedInstructor = instructorService.getByName(instructor);
-		    if (scheduleService.isInstructorOccupied(selectedInstructor, Time.valueOf(start_time + ":00"), Time.valueOf(end_time + ":00"),schedulee)) {
+		    if (scheduleService.isInstructorOccupied(i, Time.valueOf(start_time + ":00"), Time.valueOf(end_time + ":00"),schedulee)) {
 				bindingResult.rejectValue("gyms", "error.gyms", "The selected instructor at " + gym.getGym_name() + " is already occupied at this time.");
 		    }
 		}else {
@@ -137,7 +139,6 @@ Model model,Authentication authentication) {
 			scheduleService.saveUpdatedSchedule(schedulee);
 		}
 		if (bindingResult.hasErrors()) {
-			System.out.println("hereee");
 	        model.addAttribute("workouts", gym.getGymWorkouts() );
 	        model.addAttribute("instructors",gym.getGymInstructors());
 	        model.addAttribute("rooms", gym.getRooms());

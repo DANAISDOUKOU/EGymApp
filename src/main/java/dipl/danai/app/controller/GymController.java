@@ -304,7 +304,6 @@ public class GymController {
 		            membershipService.saveMembership(membership);
 		    } 
 			else if ("lessons".equalsIgnoreCase(membershipType.getMembership_type_name())) {
-				int remainingLessons = membershipType.getRemainingLessons();
 				membershipService.saveMembership(membership);
 			}
 			if (newAmount != null) {
@@ -360,6 +359,20 @@ public class GymController {
 		}
 		gymService.saveGym(gym);
 	    return "redirect:/gym/MeetTheInstructors";
+	}
+	
+	@PostMapping("removeInstructorFromGym")
+	public String removeInstructorFromGym(@RequestParam("selectedInstructors") List<Long> selectedInstructors, Authentication authentication) {
+		String email = authentication.getName();
+		Gym gym=gymService.getGymByEmail(email); 
+		if(selectedInstructors!= null) {
+			for(Long id:selectedInstructors) {
+				Instructor instructor=instructorService.getById(id);
+				gym.getGymInstructors().remove(instructor);
+			}
+		}
+		gymService.saveGym(gym); 
+		return "redirect:/gym/MeetTheInstructors";
 	}
 	
 	@GetMapping("/gym/instructor{id}")

@@ -67,14 +67,25 @@
     <h3>Instructors</h3>
     <ul>
         <li th:each="instructorGym : ${instructorsGyms}">
-            <span th:text="${instructorGym.instructor_name}"></span>
+             <span th:text="${instructorGym.instructor_name}+' '+ ${instructorGym.instructor_surname}"></span>
         </li>
     </ul>
+    <h2>Remove Instructors</h2>
+    <form action="/removeInstructorFromGym" method="post">
+    	 <ul>
+        <li th:each="instructorGym : ${instructorsGyms}">
+        	<input type="checkbox" th:value="${instructorGym.instructor_id}" name="selectedInstructors">
+             <span th:text="${instructorGym.instructor_name}+' '+ ${instructorGym.instructor_surname}"></span>
+        </li>
+    </ul>
+     <input type="submit" value="Remove Selected Instructors">
+    </form>
+    <h2>Add Instructors</h2>
     <form action="/addInstrucotrToGym" method="post">
         <ul>
             <li th:each="instructor : ${instructors}">
                 <input type="checkbox" th:value="${instructor.instructor_id}" name="selectedInstructors">
-                <span th:text="${instructor.instructor_name}"></span>
+                <span th:text="${instructor.instructor_name}+' '+ ${instructor.instructor_surname}" ></span>
             </li>
         </ul>
         <input type="submit" value="Add Selected Instructors">

@@ -1,8 +1,6 @@
 package dipl.danai.app.service;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,12 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import dipl.danai.app.model.Athletes;
 import dipl.danai.app.model.Gym;
-import dipl.danai.app.model.Instructor;
 import dipl.danai.app.model.Membership;
 import dipl.danai.app.model.MembershipType;
 import dipl.danai.app.model.Room;
-import dipl.danai.app.model.Schedule;
-import dipl.danai.app.model.Workout;
 import dipl.danai.app.repository.ScheduleRepository;
 import dipl.danai.app.repository.AthleteRepository;
 import dipl.danai.app.repository.GymRepository;

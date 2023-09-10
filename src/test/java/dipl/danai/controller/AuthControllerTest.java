@@ -1,19 +1,19 @@
 package dipl.danai.controller;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -81,12 +81,85 @@ public class AuthControllerTest {
             .andExpect(MockMvcResultMatchers.redirectedUrl("/auth/login")); 
 	 }
 	 
-	  @Test
+	  
+	 @Test
+	 @WithMockUser(username = "testuser@example.org", roles = {"ATHLETE"})
+	 public void testProfile() throws Exception {
+	     User mockUser = new User();
+	     mockUser.setEmail("testuser@exmaple.org");
+	     mockUser.setPhoneNumber("0123456789");
+	     mockUser.setRole(Role.GYM);
+	     mockUser.setAddress("somewhere");
+	     mockUser.setCity("Ioannina");
+	     mockUser.setFirstName("hera");
+	     mockUser.setLastName("Kati");
+
+	     when(userService.getUser("testuser@example.org")).thenReturn(mockUser);
+
+	     mockMvc.perform(MockMvcRequestBuilders.get("/profile"))
+	         .andExpect(MockMvcResultMatchers.status().isOk())
+	         .andExpect(MockMvcResultMatchers.view().name("profile"))
+	         .andExpect(MockMvcResultMatchers.model().attributeExists("user"))
+	         .andExpect(MockMvcResultMatchers.model().attribute("user", mockUser));
+	 }
+
+	    @Test
+	    public void testForgotPasswordPage() throws Exception {
+	        mockMvc.perform(MockMvcRequestBuilders.get("/forgotPassword"))
+	                .andExpect(MockMvcResultMatchers.status().isOk())
+	                .andExpect(MockMvcResultMatchers.view().name("forgotPassword"));
+	    }
+
+	    @Test
 	    public void testForgotPassword() throws Exception {
 	        mockMvc.perform(MockMvcRequestBuilders.post("/forgotPassword")
 	                .param("email", "user@example.com"))
 	                .andExpect(MockMvcResultMatchers.status().isOk())
-	                .andExpect(MockMvcResultMatchers.view().name("forgot_password_success_page"));  
+	                .andExpect(MockMvcResultMatchers.view().name("forgot_password_success_page"));
 	    }
+
+	    @Test
+	    public void testShowResetPasswordPage() throws Exception {
+	        mockMvc.perform(MockMvcRequestBuilders.get("/resetPassword")
+	                .param("token", "someResetToken"))
+	                .andExpect(MockMvcResultMatchers.status().isOk())
+	                .andExpect(MockMvcResultMatchers.view().name("invalidResetToken"));
+	    }
+
+	    @Test
+	    public void testResetPassword() throws Exception {
+	        User user = new User();
+	        when(userService.validateResetToken("someResetToken")).thenReturn(user);
+	        mockMvc.perform(MockMvcRequestBuilders.post("/resetPassword")
+	                .param("token", "someResetToken")
+	                .param("password", "newPassword"))
+	                .andExpect(MockMvcResultMatchers.status().isOk())
+	                .andExpect(MockMvcResultMatchers.view().name("passwordResetSuccess"));
+	    } 
+
+	    @Test
+	    @WithMockUser(username = "test@example.com", roles = {"ATHLETE"})
+	    public void testUpdateProfile() throws Exception {
+	        Authentication authentication = mock(Authentication.class);
+	        when(authentication.getName()).thenReturn("test@example.com");
+	        User mockUser = new User(); 
+	        when(userService.getUser("test@example.com")).thenReturn(mockUser);
+	        mockMvc.perform(MockMvcRequestBuilders.post("/updateProfile")
+	                .param("field", "fieldName")
+	                .param("value", "fieldValue")
+	                .principal(authentication))
+	                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+	                .andExpect(MockMvcResultMatchers.redirectedUrl("/profile"));
+	        verify(userService).setValue("fieldValue", "fieldName", mockUser);
+	    }
+
+
+	    @Test
+	    public void testVisitor() throws Exception {
+	        mockMvc.perform(MockMvcRequestBuilders.get("/visitor"))
+	                .andExpect(MockMvcResultMatchers.status().isOk())
+	                .andExpect(MockMvcResultMatchers.view().name("visitor/visitor-gyms"));
+	    }
+	  
 
 }
