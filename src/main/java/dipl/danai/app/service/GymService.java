@@ -1,6 +1,7 @@
 package dipl.danai.app.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -107,13 +108,23 @@ public class GymService {
 	}
 
 
-	public List<Gym> searchGyms(String searchBy, String query) {
+	public List<Gym> searchGyms(String searchBy, String query,String sortBy,String address) {
 	    List<Gym> allGyms = gymRepository.findAll();
-
-	    List<Gym> searchResults = allGyms.stream()
+	   getAllGymsWithCoordinates();
+	    List<Gym> searchResults ;
+	    if ("bestRating".equalsIgnoreCase(sortBy)) {
+	        searchResults = allGyms.stream()
+	                .sorted(Comparator.comparing(Gym::getAverageRating).reversed())
+	                .collect(Collectors.toList());
+	    } else if ("address".equalsIgnoreCase(sortBy)) {
+	        searchResults = allGyms.stream()
+	                .sorted(Comparator.comparingDouble(gym -> calculateDistance(address, gym.getLatitude(), gym.getLongitude())))
+	                .collect(Collectors.toList());
+	    } else {
+	    searchResults = allGyms.stream()
 	            .filter(gym -> (searchBy == null || searchBy.trim().isEmpty() || matchesSearchCriteria(gym, searchBy, query)))
 	            .collect(Collectors.toList());
-
+	    }
 	    return searchResults;
 	}
 
@@ -123,18 +134,9 @@ public class GymService {
 	    switch (searchBy) {
 	        case "name":
 	            return gym.getGym_name().toLowerCase().contains(query);
-	        case "address":
-	            return gym.getAddress().toLowerCase().contains(query);
 	        case "workoutType":
 	            final String queryLowerCase = query; 
 	            return gym.getGymWorkouts().stream().anyMatch(workout -> workout.getName().toLowerCase().contains(queryLowerCase));
-	        case "bestRating":
-	            try {
-	                int bestRating = Integer.parseInt(query);
-	                return gym.getAverageRating() >= bestRating;
-	            } catch (NumberFormatException e) {
-	                return false;
-	            }
 	        case "city":
 	            return gym.getCity().toLowerCase().contains(query);
 	        default:
@@ -189,11 +191,42 @@ public class GymService {
 		 return searchResults;
 	}
 	
-	public List<Gym> getGymsByCoordinates(double minLat, double maxLat, double minLon, double maxLon) {
-		System.out.println(""+minLat+" "+maxLat+" "+minLon+" "+maxLon);
-		List<Gym> gyms=gymRepository.findByLatitudeBetweenAndLongitudeBetween(minLat, maxLat, minLon, maxLon);
-		System.out.println("hahaahha "+gyms.size());
-        return gyms;
-    }
 
+	
+	public List<Gym> getAllGymsWithCoordinates() {
+        List<Gym> allGyms = gymRepository.findAll();
+
+        for (Gym gym : allGyms) {
+            Map<String, Double> coordinates = geonameService.getCoordinatesForAddressInCity(gym.getAddress(), gym.getCity());
+            if (coordinates != null) {
+                gym.setLatitude(coordinates.get("latitude"));
+                gym.setLongitude(coordinates.get("longitude"));
+                gymRepository.save(gym);
+            }
+        }
+
+        return allGyms;
+    }
+	
+	private double calculateDistance(String yourAddress, double gymLatitude, double gymLongitude) {
+	    Map<String, Double> yourCoordinates = geonameService.getCoordinatesForAddressInCity(yourAddress, null);
+
+	    if (yourCoordinates != null) {
+	        double lat1 = yourCoordinates.get("latitude");
+	        double lon1 = yourCoordinates.get("longitude");
+	        double lat2 = gymLatitude;
+	        double lon2 = gymLongitude;
+
+	        // Implement the Haversine formula to calculate the distance
+	        double radius = 6371; // Earth's radius in kilometers
+	        double dLat = Math.toRadians(lat2 - lat1);
+	        double dLon = Math.toRadians(lon2 - lon1);
+	        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(Math.toRadians(lat1))
+	                * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+	        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+	        return radius * c;
+	    }
+
+	    return Double.MAX_VALUE; // Return a very large value if coordinates cannot be determined
+	}
 }

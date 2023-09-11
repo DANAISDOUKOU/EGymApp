@@ -1,9 +1,11 @@
 package dipl.danai.app.controller;
 
+import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -97,7 +99,6 @@ Model model,Authentication authentication) {
 		Gym gym=gymService.getGymByEmail(email);
 		Room selectedRoom = gymService.getRoomByName(name,gym.getGym_id());
 		Workout w=workoutService.getByName(workout);
-		System.out.println("Workoutttt  "+w.getName());
 		Instructor i=instructorService.getByName(instructor);
 		ClassOfSchedule c=new ClassOfSchedule();
 		c.setRoom(selectedRoom);
@@ -157,22 +158,23 @@ Model model,Authentication authentication) {
 	public String getProgram(Model model, @Valid Schedule schedule,
 			Authentication authentication, 
 			BindingResult bindingResult,
-			@RequestParam(value="date") java.sql.Date startDate)throws SQLException, ParseException {
+			@RequestParam(value="date") String date)throws SQLException, ParseException {
 		Gym gym=gymService.getGymByEmail(authentication.getName());
+		Date startDate=Date.valueOf(date);
 		schedule.setWork_out_date(startDate);
 		scheduleService.saveSchedule(schedule);
 		gym.getGymSchedules().add(schedule);
 		gymService.saveGym(gym);
-		return "gym/createProgram";
+		return "redirect:/gym/createProgram";
 	}
 	
 	
-	@PostMapping(value = {"/updateClass"})
+/*	@PostMapping(value = {"/updateClass"})
 	public String getupgradeClass(@ModelAttribute("workout") Workout workout,Model model) {
 		model.addAttribute("workout", workout);
 		return "gym/updateClass";
 	}
-	
+	*/
 	@PostMapping("/participate")
 	@Transactional
 	public String participateteInClass(@RequestParam("classOfScheduleId") Long classOfScheduleId,Authentication authentication,HttpServletRequest request,Model model) {
@@ -279,6 +281,7 @@ Model model,Authentication authentication) {
 		 	participants.removeIf(participant -> removedParticipantIds.contains(participant.getAthlete_id()));
 		 	classSchedule.setParticipants(participants);
 		 	 classOfScheduleService.save(classSchedule);
+
 		 	if("INSTRUCTOR".equals(role)) {
 		 		return "redirect:/gym/class-schedule-details/" + classOfScheduleId+"?gymId="+gymId;
 		 	}else {

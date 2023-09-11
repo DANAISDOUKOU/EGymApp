@@ -47,7 +47,6 @@ public class NominatimService {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(response.toString());
 
-            // Check if results are present in the response
             if (rootNode.isArray() && rootNode.size() > 0) {
                 JsonNode firstResult = rootNode.get(0);
                 double latitude = firstResult.get("lat").asDouble();

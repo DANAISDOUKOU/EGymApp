@@ -87,7 +87,6 @@ public class GymController {
     public String gymFitnessProgram(Authentication authentication,Model model){
     	String email=authentication.getName();
 		Gym gym=gymService.getGymByEmail(email);
-		System.out.println(gym.getRooms().size());
 		model.addAttribute("rooms", gym.getRooms());
 		Collection<Schedule> programList=gym.getGymSchedules();
 		model.addAttribute("gym",gym);
@@ -145,6 +144,7 @@ public class GymController {
 		 model.addAttribute("hasAlreadyMembershipType",hasAlreadyMembershipType);
 		 model.addAttribute("memberships", gym.getGym_memberships());
 		 Athletes athlete=athleteService.getAthlete(authentication.getName());
+		 
 		 if(hasAlreadyMembershipType) {
 			 MembershipType existingMembership=gymService.findExistingMembership(gym.getGym_id(),athlete.getAthlete_id());
 			 model.addAttribute("existingMembership", existingMembership);
@@ -226,30 +226,15 @@ public class GymController {
 	public String searchGyms(
 	    @RequestParam(required = false) String searchBy,
 	    @RequestParam(required = false) String query,
+	    @RequestParam(required = false) String sortBy,
 	    Model model, Authentication authentication
 	) {
 		Athletes athlete=athleteService.getAthlete(authentication.getName());
 	    List<Gym> gyms = new ArrayList<Gym>();
-	    if ("address".equalsIgnoreCase(searchBy)) {
-	        Map<String, Double> coordinates = geonameService.getCoordinatesForAddressInCity(athlete.getAddress(), athlete.getCity());
-	        if (coordinates != null) {
-	        	System.out.println("Foundddddd ");
-	            double searchRadius = 150.0; 
-	            double minLat = coordinates.get("latitude") - (searchRadius / 111.32);
-	            double maxLat = coordinates.get("latitude") + (searchRadius / 111.32);
-	            double minLon = coordinates.get("longitude") + (searchRadius / (111.32 * Math.cos(coordinates.get("latitude"))));
-	            double maxLon = coordinates.get("longitude") - (searchRadius / (111.32 * Math.cos(coordinates.get("latitude"))));
-	           System.out.println(minLat+" "+maxLat+" "+minLon+" "+maxLon);
-	           
-	            List<Gym> searchResults = gymService.getGymsByCoordinates(minLat, maxLat, minLon, maxLon);
-	            gyms.addAll(searchResults);
-	        }
-	    } else {
 	        
-	        List<Gym> searchResults = gymService.searchGyms(searchBy, query);
-	        gyms.addAll(searchResults);
-	    }
-
+	    List<Gym> searchResults = gymService.searchGyms(searchBy, query,sortBy,athlete.getAddress());
+	    gyms.addAll(searchResults);
+	
 	    model.addAttribute("gyms", gyms);
 	    return "gym/list";
 	}
