@@ -22,13 +22,10 @@ public class NominatimService {
         Map<String, Double> coordinates = new HashMap<>();
 
         try {
-            // Encode the address parameter
             String encodedAddress = URLEncoder.encode(address, "UTF-8");
 
-            // Construct the Nominatim API request URL
             String apiUrl = nominatimBaseUrl + "search?q=" + encodedAddress + "&format=json";
             
-            // Include the API key if required
             if (apiKey != null && !apiKey.isEmpty()) {
                 apiUrl += "&apikey=" + apiKey;
             }
