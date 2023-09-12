@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Class Schedule Details</title>
-    <style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+   <style>
         body {
             font-family: Arial, sans-serif;
             background: linear-gradient(to bottom, #87CEFA, #EFEFEF);
@@ -37,6 +38,27 @@
           button:hover {
             background-color: #0056b3;
         }
+        .athlete {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .remove-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+        }
+
+        .athlete:hover .remove-btn {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -47,9 +69,28 @@
     <p>Instructor: <span th:text="${classSchedule.instructor.instructor_name}"></span></p>
     <p>Room: <span th:text="${classSchedule.room.roomName}"></span></p>
     <p>Capacity: <span th:text="${classSchedule.capacity}"></span></p>
-    <p>Participants: <span th:each="participant : ${classSchedule.participants}"
-                          th:text="${participant.athlete_name+' '+participant.athlete_surname + ', '}"></span></p>
-
+    
+  
+      <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="participantsDropdownButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Show Participants
+        </button>
+        <div class="dropdown-menu" aria-labelledby="participantsDropdownButton">
+            <h3 class="dropdown-header">Participants:</h3>
+            <ul class="list-unstyled">
+                <li th:each="participant : ${classSchedule.participants}">
+                    <div class="athlete">
+                        <span th:text="${participant.athlete_name + ' ' + participant.athlete_surname}"></span>
+						<button class="btn btn-danger btn-sm remove-btn"  th:attr="data-participant_id=${participant.athlete_id},
+                		 data-classSchedule_id=${classSchedule.classOfScheduleId},data-gym_id=${gym.gym_id}" 
+						onclick="removeParticipant(this.getAttribute('data-participant_id'),this.getAttribute('data-classSchedule_id'),this.getAttribute('data-gym_id'))">X</button>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <a href="/gym/select-members" class="btn btn-primary">Add participant</a>
 
 	<form th:action="@{/gym/add-participant}" method="post" th:object="${classSchedule}">
         <input type="hidden" name="classOfScheduleId" th:value="${classSchedule.classOfScheduleId}" />
@@ -64,20 +105,44 @@
         <button type="submit">Add Participant</button>
     </form>
 
-    <!-- Remove Participant Button -->
-    <form th:action="@{/gym/remove-participant}" method="post" th:object="${classSchedule}">
-        <input type="hidden" name="classOfScheduleId" th:value="${classSchedule.classOfScheduleId} " />
-         <input type="hidden" name="gymId" th:value="${gym.gym_id}" />
-         <ul>
-            <li th:each="participant : ${classSchedule.participants}">
-                <input type="checkbox" name="removedParticipants" th:value="${participant.athlete_id}" />
-                <span th:text="${participant.athlete_name + ' ' + participant.athlete_surname}"></span>
-            </li>
-        </ul>
-        <button type="submit">Remove Participant</button>
-    </form>
     </div>
     	<button onclick="window.history.back()" type="button">Go Back</button>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
+     function removeParticipant(athleteId, classOfScheduleId, gymId) {
+         console.log('athleteId:', athleteId);
+          console.log('gymId:', gymId);
+         console.log('classOfScheduleId:', classOfScheduleId);
+         var form = document.createElement('form');
+        form.method = 'post';
+        form.action = '/gym/remove-participant'; // Set the appropriate action
+        form.style.display = 'none';
+
+        var input1 = document.createElement('input');
+        input1.type = 'hidden';
+        input1.name = 'classOfScheduleId';
+        input1.value = parseInt(classOfScheduleId);
+
+        var input2 = document.createElement('input');
+        input2.type = 'hidden';
+        input2.name = 'gymId';
+        input2.value = parseInt(gymId);
+
+        var input3 = document.createElement('input');
+        input3.type = 'hidden';
+        input3.name = 'removedParticipants';
+        input3.value = parseInt(athleteId);;
+
+        form.appendChild(input1);
+        form.appendChild(input2);
+        form.appendChild(input3);
+
+        document.body.appendChild(form);
+
+        // Submit the form
+        form.submit();
+    }
+</script>
     
 </body>
 </html>
