@@ -3,79 +3,104 @@
 <head>
     <title>All the Available Gyms</title>
     <style>
-        body {
+                body {
             font-family: Arial, sans-serif;
             background: linear-gradient(to bottom, #87CEFA, #EFEFEF);
             margin: 0;
             padding: 0;
-            display: flex;a
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            display: flex;
             flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
         }
-        
+
         h1 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-        
-        
-        label {
-            font-weight: bold;
-        }
-        
-        input[type="text"],
-        input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-top: 5px;
-        }
-        
-        button[type="submit"] {
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
-        }
-        
-        button[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-        
-        .gym-button {
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
-        }
-        
-        .gym-button:hover {
-            background-color: #0056b3;
-        }
-          button {
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-size: 16px;
+            font-size: 28px;
             margin-top: 20px;
         }
-          button:hover {
-            background-color: #0056b3;
+
+        h2 {
+            font-size: 24px;
+            margin-top: 20px;
         }
+
+        h3 {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            margin-top: 10px;
+        }
+
+        p {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+
+        .canceled-text {
+            color: red;
+        }
+
+        .date {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+        .cancel-button {
+		    background-color: red; /* Choose a suitable color */
+		    color: white;
+		    border: none;
+		    border-radius: 5px;
+		    padding: 8px 16px;
+		    cursor: pointer;
+		}
+
     </style>
 </head>
 <body>
@@ -83,19 +108,36 @@
     <p th:text="'Address: ' + ${gym.Address}"></p>
     <p th:text="'Phone Number: ' + ${gym.phoneNumber}"></p>
     <p th:text="'City: ' + ${gym.City}"></p>
-    <div th:if="${not #lists.isEmpty(programList)}">
-	    <li th:each="program: ${programList}">
-	        <span th:text="${program.work_out_date}" class="date"></span>
-			 <ul>
-	             <th:block th:each="classOfSchedule: ${workoutList.get(program.work_out_date)}">
-	             	<li th:class="${classOfSchedule.is_canceled} ? 'canceled-text' : ''">
-	             		<td th:text="${classOfSchedule.time_start} +' - '+${classOfSchedule.time_end}"></td>
-						<td	th:text="${classOfSchedule.workout.getName()}"></td>
-					</li>
-	        	</th:block>
-	        </ul>	
-	    </li>
-	 </div>
+    <div th:each="workout : ${gym.gymWorkouts}">
+    <h3 th:text="${workout.name}">Workout Name</h3>
+      <table style="width: 800px;">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Day</th>
+                    <th>Time</th>
+                </tr>
+                </thead>
+    <!-- Iterate through the class schedules for this workout -->
+    <div th:each="classScheduleEntry : ${workoutList}">
+        <!-- Access the date (key) and class schedules (value) from the map -->
+        <th:block th:with="schedule=${classScheduleEntry.key}, schedules=${classScheduleEntry.value}">
+          
+                <tbody>
+                <!-- Iterate through the class schedules for this specific date -->
+                <tr th:each="specificClassSchedule : ${schedules}">
+                    <div th:if="${workout.name} == ${specificClassSchedule.workout.name}">
+                        <td th:text="${#dates.format(schedule.work_out_date, 'yyyy-MM-dd')}">Date</td>
+                        <td th:text="${#dates.format(schedule.work_out_date, 'EEEE')}">Day</td>
+                        <td th:text="${specificClassSchedule.time_start}+'-'+${specificClassSchedule.time_end}">Time</td>
+                    </div>
+                </tr>
+                </tbody>
+            </table>
+        </th:block>
+    </div>
+</div>
+
     
 </body>
 </html>

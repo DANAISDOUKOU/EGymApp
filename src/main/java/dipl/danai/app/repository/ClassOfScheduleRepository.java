@@ -9,7 +9,7 @@ import dipl.danai.app.model.ClassOfSchedule;
 import dipl.danai.app.model.Schedule;
 @Repository
 public interface ClassOfScheduleRepository extends JpaRepository<ClassOfSchedule,Long>{
-	
+
 	@Query("SELECT s FROM Schedule s JOIN s.ScheduleClasses c WHERE c.classOfScheduleId = :classOfScheduleId")
     Schedule findScheduleByClassOfScheduleId(@Param("classOfScheduleId") Long classOfScheduleId);
 }

@@ -61,7 +61,7 @@ public class WaitingListEntry {
 	public void setJoinedAt(LocalDateTime joinedAt) {
 		this.joinedAt = joinedAt;
 	}
-    
-    
+
+
 
 }

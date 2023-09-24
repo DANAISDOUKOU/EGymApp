@@ -16,31 +16,25 @@ public class ClassRating {
 	 @Id
      @GeneratedValue(strategy = GenerationType.IDENTITY)
      private Long class_rating_id;
-	
+
 	 @OneToOne
 	 @JoinColumn(name = "gym_id")
 	 private Gym gym;
-	 
+
 	 @ManyToOne
 	 @JoinColumn(name = "athlete_id")
 	 private Athletes athlete;
-	 
+
 	 @ManyToOne
 	 @JoinColumn(name = "classOfScheduleId")
 	 private ClassOfSchedule classOfSchedule;
-	 
+
 	 @ManyToOne
 	 @JoinColumn(name = "instructor_id")
 	 private Instructor instructor;
-	 
+
 	 @Column
-	 private double instructorRating;
-	 
-	 @Column
-	 private double accuracyRating;
-	 
-	 @Column
-	 private double crowdingRating;
+	 private double classRating;
 
 	public Long getClass_rating_id() {
 		return class_rating_id;
@@ -82,30 +76,15 @@ public class ClassRating {
 		this.instructor = instructor;
 	}
 
-	public double getInstructorRating() {
-		return instructorRating;
+
+	public double getClassRating() {
+		return classRating;
 	}
 
-	public void setInstructorRating(double instructorRating) {
-		this.instructorRating = instructorRating;
+	public void setClassRating(double classRating) {
+		this.classRating = classRating;
 	}
 
-	public double getAccuracyRating() {
-		return accuracyRating;
-	}
 
-	public void setAccuracyRating(double accuracyRating) {
-		this.accuracyRating = accuracyRating;
-	}
-
-	public double getCrowdingRating() {
-		return crowdingRating;
-	}
-
-	public void setCrowdingRating(double crowdingRating) {
-		this.crowdingRating = crowdingRating;
-	}
-	 
-	 
 
 }

@@ -62,28 +62,46 @@
             cursor: pointer;
             margin-top: 10px;
         }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <h3>Type Of Workouts</h3>
-    <ul>
-        <li th:each="workoutGym : ${workoutGyms}">
-            <span th:text="${workoutGym.name}"></span>
-        </li>
-    </ul>
-
-    <form action="/addWorkoutsToGym" method="post">
-        <ul>
-            <li th:each="workout : ${workouts}">
-                <input type="checkbox" th:value="${workout.workoutId}" name="selectedWorkouts">
-                <span th:text="${workout.name}"></span>
-            </li>
-        </ul>
-        <input type="submit" value="Add Selected Workouts">
-    </form>
-
+    <table>
+    <thead>
+        <tr>
+            <th>Workout</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="workoutGym : ${workoutGyms}">
+            <td th:text="${workoutGym.name}"></td>
+            <td>
+                <a th:href="@{/gym/removeWorkout(workoutId=${workoutGym.workoutId})}" class="btn btn-danger">Remove</a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+	 
+	<a th:href="@{/gym/addWorkouts}" class="btn btn-primary">Add Workout</a>
     <button onclick="window.location.href='http://localhost:8080/gym/createClass'" type="button">Create a new Workout for Gym</button>
-    	<button onclick="window.history.back()" type="button">Go Back</button>
-    
+    	
+   
+    <button onclick="window.history.back()" type="button">Go Back</button>
 </body>
 </html>

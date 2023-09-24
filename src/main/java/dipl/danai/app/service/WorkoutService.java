@@ -1,7 +1,9 @@
 package dipl.danai.app.service;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import dipl.danai.app.model.Workout;
 import dipl.danai.app.repository.WorkoutRepository;
 
@@ -9,21 +11,21 @@ import dipl.danai.app.repository.WorkoutRepository;
 public class WorkoutService{
 	@Autowired
 	WorkoutRepository workoutRepository;
-	
+
 	public void saveWorkout(Workout workout) {
 		workoutRepository.save(workout);
 	}
 
 	public List<Workout> findAll() {
-		var workouts=(List<Workout>) workoutRepository.findAll();
+		var workouts=workoutRepository.findAll();
 		return workouts;
 	}
-	
+
 	public Workout findById(Long id) {
 		Workout workout = workoutRepository.findById(id).orElse(null);
 		return workout;
 	}
-	
+
 	public Workout getByName(String workout) {
 		return workoutRepository.findByName(workout);
 	}

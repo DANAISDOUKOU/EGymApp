@@ -43,7 +43,7 @@ public class InstructorControllerTest {
     @Test
     @WithMockUser(username = "testuser", authorities = "INSTRUCTOR")
     public void testGetGymsThatIWork() throws Exception {
-    	Instructor mockInstructor = Mockito.mock(Instructor.class); 
+    	Instructor mockInstructor = Mockito.mock(Instructor.class);
         Set<Gym> mockGyms = new HashSet<>();
         Gym gym1 = new Gym();
         gym1.setGym_id(1L);

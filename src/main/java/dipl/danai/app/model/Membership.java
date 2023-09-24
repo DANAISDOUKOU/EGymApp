@@ -19,18 +19,18 @@ public class Membership {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "membership_id")
     private Long membershipId;
-    
+
     @ManyToOne
     @JoinColumn(name = "athlete_id")
     private Athletes athlete;
-    
+
     @ManyToOne
     @JoinColumn(name = "membership_type_id")
     private MembershipType membershipType;
-    
+
     @Column(name = "start_date")
     private LocalDate startDate;
-    
+
     @Column(name="end_date")
     private LocalDate endDate;
 
@@ -65,7 +65,7 @@ public class Membership {
 	public void setStartDate(LocalDate startDate) {
 		this.startDate = startDate;
 	}
-    
+
 	public LocalDate getEndDate() {
 		return endDate;
 	}
@@ -73,6 +73,6 @@ public class Membership {
 	public void setEndDate(LocalDate endDate) {
 		this.endDate = endDate;
 	}
-    
-    
+
+
 }

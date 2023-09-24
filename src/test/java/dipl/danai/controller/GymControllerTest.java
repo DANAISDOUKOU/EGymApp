@@ -7,11 +7,11 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -50,47 +50,47 @@ import dipl.danai.app.service.WorkoutService;
 @ContextConfiguration(classes = EGymApplication.class)
 @AutoConfigureMockMvc
 public class GymControllerTest {
-	
+
 	@Autowired
 	private MockMvc mockMvc;
-	 
+
 	@MockBean
     private GymService gymService;
-	
+
 	@MockBean
     private AthleteService athleteService;
-	
+
 	@MockBean
 	private MembershipService membershipService;
-	
+
 	@MockBean
 	private WorkoutService workoutService;
-	
+
 	@MockBean
 	private PaymentService paymentService;
-	
+
 	@MockBean
 	private InstructorService instructorService;
-	
+
 	@MockBean
 	private GymRatingService gymRatingService;
-	
+
 	@MockBean
 	private ClassOfScheduleService classOfScheduleService;
-	
-	@MockBean 
+
+	@MockBean
 	private ScheduleService scheduleService;
-	
+
 	@Test
-	@WithMockUser(username = "testuser", authorities = "GYM") 
+	@WithMockUser(username = "testuser", authorities = "GYM")
 	public void testGymPage() throws Exception {
 	    mockMvc.perform(MockMvcRequestBuilders.get("/gym/dashboard"))
 	            .andExpect(MockMvcResultMatchers.status().isOk())
 	            .andExpect(MockMvcResultMatchers.view().name("gym/dashboard"));
 	}
-	
+
 	@Test
-	@WithMockUser(username = "testuser", authorities = "GYM") 
+	@WithMockUser(username = "testuser", authorities = "GYM")
 	public void testGymRoom() throws Exception {
 	    MockHttpServletRequest request = new MockHttpServletRequest();
 	    request.setSession(new MockHttpSession());
@@ -102,10 +102,10 @@ public class GymControllerTest {
 	            .andExpect(MockMvcResultMatchers.view().name("/gym/createRoom"))
 	            .andExpect(MockMvcResultMatchers.model().attributeExists("room"));
 	}
-	
-	
+
+
 	@Test
-	@WithMockUser(username = "testuser", authorities = "GYM") 
+	@WithMockUser(username = "testuser", authorities = "GYM")
 	public void testCreateGymRoom() throws Exception {
 	    MockHttpServletRequest request = new MockHttpServletRequest();
 	    request.setSession(new MockHttpSession());
@@ -113,14 +113,14 @@ public class GymControllerTest {
 		Gym gym= Mockito.mock(Gym.class);
 		when(gymService.getGymByEmail("testuser")).thenReturn(gym);
 	    mockMvc.perform(MockMvcRequestBuilders.post("/gym/createRoom")
-	            .param("roomAttribute", "roomValue")) 
+	            .param("roomAttribute", "roomValue"))
 	            .andExpect(MockMvcResultMatchers.status().isOk())
 	            .andExpect(MockMvcResultMatchers.view().name("/gym/createRoom"));
-	   
+
 	}
-	
+
 	@Test
-	@WithMockUser(username = "testuser", authorities = "GYM") 
+	@WithMockUser(username = "testuser", authorities = "GYM")
 	public void testGymFitnessProgram() throws Exception {
 	    MockHttpServletRequest request = new MockHttpServletRequest();
 	    request.setSession(new MockHttpSession());
@@ -133,51 +133,51 @@ public class GymControllerTest {
 	            .andExpect(MockMvcResultMatchers.status().isOk())
 	            .andExpect(MockMvcResultMatchers.view().name("gym/program"))
 	            .andExpect(MockMvcResultMatchers.model().attributeExists("rooms", "gym", "programList", "workoutList"));
-	    
+
 	}
-	
+
 	@Test
-	@WithMockUser(username = "testuser", authorities = "GYM") 
+	@WithMockUser(username = "testuser", authorities = "GYM")
 	public void testUpdateFitnessProgram() throws Exception {
 	    MockHttpServletRequest request = new MockHttpServletRequest();
 	    request.setSession(new MockHttpSession());
 	    Model model = Mockito.mock(Model.class);
 	    Gym mockedGym =Mockito.mock(Gym.class);
-	    Mockito.when(gymService.getGymByEmail(Mockito.anyString())).thenReturn(mockedGym);
+	    Mockito.when(gymService.getGymByEmail(ArgumentMatchers.anyString())).thenReturn(mockedGym);
 	    Mockito.when(mockedGym.getGymSchedules()).thenReturn(new ArrayList());
 	    mockMvc.perform(MockMvcRequestBuilders.get("/gym/updateProgram"))
 	            .andExpect(MockMvcResultMatchers.status().isOk())
 	            .andExpect(MockMvcResultMatchers.view().name("gym/updateProgram"))
 	            .andExpect(MockMvcResultMatchers.model().attributeExists("gym", "programList", "workoutList"));
-	    
+
 	}
-	
+
 	@Test
-	@WithMockUser(username = "testuser", authorities = "ATHLETE") 
+	@WithMockUser(username = "testuser", authorities = "ATHLETE")
 	public void testViewGymDetails() throws Exception {
 	    MockHttpServletRequest request = new MockHttpServletRequest();
 	    request.setSession(new MockHttpSession());
 	    Gym mockedGym =Mockito.mock(Gym.class);
 	    Athletes a=new Athletes();
-	    Mockito.when(gymService.getGymById(Mockito.anyLong())).thenReturn(mockedGym);
-	    Mockito.when(gymService.checkIfAlreadyMember(Mockito.anyLong(), Mockito.anyString())).thenReturn(true); 
-	    Mockito.when(gymService.checkIfHasSpecificMembership(Mockito.anyLong(), Mockito.anyString(), Mockito.eq(true))).thenReturn(false);	
+	    Mockito.when(gymService.getGymById(ArgumentMatchers.anyLong())).thenReturn(mockedGym);
+	    Mockito.when(gymService.checkIfAlreadyMember(ArgumentMatchers.anyLong(), ArgumentMatchers.anyString())).thenReturn(true);
+	    Mockito.when(gymService.checkIfHasSpecificMembership(ArgumentMatchers.anyLong(), ArgumentMatchers.anyString(), ArgumentMatchers.eq(true))).thenReturn(false);
 	    MembershipType existingMembership =null;
-	    Mockito.when(gymService.findExistingMembership(Mockito.anyLong(), Mockito.anyLong())).thenReturn(existingMembership);
+	    Mockito.when(gymService.findExistingMembership(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong())).thenReturn(existingMembership);
 	    Mockito.when(athleteService.getAthlete("testuser")).thenReturn(a);
 	    mockMvc.perform(MockMvcRequestBuilders.get("/gym/{id}", 1L))
 	            .andExpect(MockMvcResultMatchers.status().isOk())
 	            .andExpect(MockMvcResultMatchers.view().name("gym/details"))
 	            .andExpect(MockMvcResultMatchers.model().attributeExists("gym", "alreadyMember", "hasAlreadyMembershipType", "memberships", "programList", "workoutList"));
-	    
+
 	}
-	
+
 	@Test
-	@WithMockUser(username = "testuser", authorities = "ATHLETE") 
+	@WithMockUser(username = "testuser", authorities = "ATHLETE")
 	public void testSearchGyms() throws Exception {
 		 Athletes a=new Athletes();
 		 Mockito.when(athleteService.getAthlete("testuser")).thenReturn(a);
-		 Mockito.when(gymService.searchGyms(Mockito.anyString(), Mockito.anyString(),Mockito.anyString(),Mockito.anyString())).thenReturn(new ArrayList());
+		 Mockito.when(gymService.searchGyms(ArgumentMatchers.anyString(), ArgumentMatchers.anyString(),ArgumentMatchers.anyString(),ArgumentMatchers.anyString())).thenReturn(new ArrayList());
 	    mockMvc.perform(MockMvcRequestBuilders.get("/gym/search")
 	            .param("searchBy", "searchField")
 	            .param("query", "searchQuery")
@@ -187,9 +187,9 @@ public class GymControllerTest {
 	            .andExpect(MockMvcResultMatchers.model().attributeExists("gyms"))
 	            .andReturn();
 	}
-	
+
 	@Test
-	@WithMockUser(username = "testuser", authorities = "GYM") 
+	@WithMockUser(username = "testuser", authorities = "GYM")
 	public void testGetMembers() throws Exception {
 		Gym gym=new Gym();
 		gym.setGym_id(1L);
@@ -201,9 +201,9 @@ public class GymControllerTest {
 	            .andExpect(MockMvcResultMatchers.model().attributeExists("members"))
 	            .andReturn();
 	}
-	
+
 	@Test
-	@WithMockUser(username = "testuser", authorities = "GYM") 
+	@WithMockUser(username = "testuser", authorities = "GYM")
 	public void testMembershipTypes() throws Exception {
 		Gym gym=Mockito.mock(Gym.class);
 		gym.setGym_id(1L);
@@ -215,14 +215,14 @@ public class GymControllerTest {
 	            .andExpect(MockMvcResultMatchers.model().attributeExists("membershipList"))
 	            .andReturn();
 	}
-	
+
 	@Test
-	@WithMockUser(username = "testuser", authorities = "ATHLETE") 
+	@WithMockUser(username = "testuser", authorities = "ATHLETE")
 	public void testSubscribeToGym() throws Exception {
-		 Long gymId = 1L; 
+		 Long gymId = 1L;
 		 String expectedRedirectUrl = "http://localhost:8080/gym/"+gymId;
 	     MockHttpSession session = new MockHttpSession();
-	     session.setAttribute("referer", expectedRedirectUrl); 
+	     session.setAttribute("referer", expectedRedirectUrl);
 		 Athletes a=new Athletes();
 		 Mockito.when(athleteService.getAthlete("testuser")).thenReturn(a);
 		 Gym gym=Mockito.mock(Gym.class);
@@ -236,16 +236,16 @@ public class GymControllerTest {
 	            .andExpect(MockMvcResultMatchers.redirectedUrl(expectedRedirectUrl))
 	            .andReturn();
 	}
-	
+
 	 @Test
 	 @WithMockUser(username = "testuser", authorities = "ATHLETE")
 	 public void testSelectMembership() throws Exception {
 	     Long membershipId = 1L;
 	     Long gymId = 123L;
-	     Double newAmount = 50.0; 
+	     double newAmount = 50.0;
 		 String expectedRedirectUrl = "http://localhost:8080/gym/details";
 		 MockHttpSession session = new MockHttpSession();
-	     session.setAttribute("referer", expectedRedirectUrl); 
+	     session.setAttribute("referer", expectedRedirectUrl);
 	     MembershipType membershipType = new MembershipType();
 	     Athletes athlete = new Athletes();
 	     Gym gym = new Gym();
@@ -253,16 +253,16 @@ public class GymControllerTest {
 	     when(membershipService.findMembershiById(membershipId)).thenReturn(membershipType);
 	     when(athleteService.getAthlete("testuser")).thenReturn(athlete);
 	     when(gymService.getGymById(gymId)).thenReturn(gym);
-	     doNothing().when(paymentService).makePayment(Mockito.any(), Mockito.any(), Mockito.anyDouble());
+	     doNothing().when(paymentService).makePayment(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.anyDouble());
 	      mockMvc.perform(MockMvcRequestBuilders.post("/gym/selectMembership")
 	                .param("membershipId", membershipId.toString())
 	                .param("gymId", gymId.toString())
-	                .param("new_amount", newAmount.toString())
+	                .param("new_amount", Double.toString(newAmount))
 	                .header("referer", expectedRedirectUrl))
-	                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()) 
-	                .andExpect(MockMvcResultMatchers.redirectedUrl(expectedRedirectUrl)); 
+	                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+	                .andExpect(MockMvcResultMatchers.redirectedUrl(expectedRedirectUrl));
 	 }
-	 
+
 	 @Test
 	 @WithMockUser(username = "testuser", authorities = "GYM")
 	 public void testTypeOfWorkouts() throws Exception {
@@ -277,7 +277,7 @@ public class GymControllerTest {
 	          .andExpect(MockMvcResultMatchers.view().name("gym/typeOfWorkouts"))
 	          .andExpect(MockMvcResultMatchers.model().attributeExists("workouts", "workoutGyms"));
 	 }
-	 
+
 	 @Test
 	 @WithMockUser(username = "testuser", authorities = "GYM")
 	 public void testAddWorkoutsToGym() throws Exception {
@@ -290,8 +290,8 @@ public class GymControllerTest {
 	    when(gym.getGymWorkouts()).thenReturn(new ArrayList());
 	    mockMvc.perform(MockMvcRequestBuilders.post("/addWorkoutsToGym")
 	           .param("selectedWorkouts", workoutId.toString()))
-	           .andExpect(MockMvcResultMatchers.status().is3xxRedirection()) 
-	           .andExpect(MockMvcResultMatchers.redirectedUrl("/gym/typeOfWorkouts")); 
+	           .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+	           .andExpect(MockMvcResultMatchers.redirectedUrl("/gym/typeOfWorkouts"));
 	     verify(gymService, times(1)).saveGym(gym);
 	  }
 
@@ -303,12 +303,12 @@ public class GymControllerTest {
 	     when(gymService.getGymByEmail("testuser")).thenReturn(gym);
 	     when(instructorService.findAll()).thenReturn(instructors);
 	     mockMvc.perform(MockMvcRequestBuilders.get("/gym/MeetTheInstructors"))
-	            .andExpect(MockMvcResultMatchers.status().isOk()) 
+	            .andExpect(MockMvcResultMatchers.status().isOk())
 	            .andExpect(MockMvcResultMatchers.view().name("gym/MeetTheInstructors"))
 	            .andExpect(MockMvcResultMatchers.model().attribute("instructorsGyms", gym.getGymInstructors()))
 	            .andExpect(MockMvcResultMatchers.model().attribute("instructors", instructors));
 	  }
-	  
+
 	  @Test
 	  @WithMockUser(username = "testuser", authorities = "SOME_AUTHORITY")
 	  public void testAddInstructorToGym() throws Exception {
@@ -321,8 +321,8 @@ public class GymControllerTest {
 	     when(gym.getGymInstructors()).thenReturn(new HashSet());
 	     mockMvc.perform(MockMvcRequestBuilders.post("/addInstrucotrToGym")
 	            .param("selectedInstructors", instructorId.toString()))
-	            .andExpect(MockMvcResultMatchers.status().is3xxRedirection()) 
-	            .andExpect(MockMvcResultMatchers.redirectedUrl("/gym/MeetTheInstructors")); 
+	            .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+	            .andExpect(MockMvcResultMatchers.redirectedUrl("/gym/MeetTheInstructors"));
 	     verify(gymService, times(1)).saveGym(gym);
 	  }
 
@@ -333,12 +333,12 @@ public class GymControllerTest {
 	     List<Long> selectedInstructors = Arrays.asList(instructorId);
 	     Gym gym = Mockito.mock(Gym.class);
 	     Instructor instructor = new Instructor();
-	     gym.getGymInstructors().add(instructor); 
+	     gym.getGymInstructors().add(instructor);
 	     when(gymService.getGymByEmail("testuser")).thenReturn(gym);
 	     when(instructorService.getById(instructorId)).thenReturn(instructor);
 	      mockMvc.perform(MockMvcRequestBuilders.post("/removeInstructorFromGym")
 	           .param("selectedInstructors", instructorId.toString()))
-	           .andExpect(MockMvcResultMatchers.status().is3xxRedirection()) 
+	           .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
 	           .andExpect(MockMvcResultMatchers.redirectedUrl("/gym/MeetTheInstructors"));
 
 	     verify(gymService, times(1)).saveGym(gym);
@@ -363,13 +363,13 @@ public class GymControllerTest {
 	   when(instructorService.getByEmail("testuser")).thenReturn(instructor);
 	   mockMvc.perform(MockMvcRequestBuilders.get("/gym/instructor" + gymId))
 	          .andExpect(MockMvcResultMatchers.status().isOk())
-	          .andExpect(MockMvcResultMatchers.view().name("gym/instructor-classes-details")) 
+	          .andExpect(MockMvcResultMatchers.view().name("gym/instructor-classes-details"))
 	          .andExpect(MockMvcResultMatchers.model().attribute("gym", gym))
 	          .andExpect(MockMvcResultMatchers.model().attribute("gymId", gymId))
 	          .andExpect(MockMvcResultMatchers.model().attribute("instructorId", instructorId))
 	          .andExpect(MockMvcResultMatchers.model().attributeExists("scheduleClassesMap"));
 	  }
-	
+
 
     @Test
     @WithMockUser(username = "testuser", authorities = "INSTRUCTOR")
@@ -383,8 +383,8 @@ public class GymControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/gym/instructor-classes-details")
                 .param("gymId", gymId.toString())
                 .param("instructorId", instructorId.toString()))
-                .andExpect(MockMvcResultMatchers.status().isOk()) 
-                .andExpect(MockMvcResultMatchers.view().name("gym/instructor-classes-details")) 
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.view().name("gym/instructor-classes-details"))
                 .andExpect(MockMvcResultMatchers.model().attribute("classes", classes));
     }
 
@@ -400,7 +400,7 @@ public class GymControllerTest {
         when(gymRatingService.calculateAverageRating(gym)).thenReturn(4.5);
         mockMvc.perform(MockMvcRequestBuilders.post("/rate-gym/{gymId}", gymId)
                 .param("rating", String.valueOf(rating)))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()) 
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/gym/" + gymId + "?"));
 
         verify(gymRatingService, times(1)).addRating(gym, athlete, rating);
@@ -426,17 +426,17 @@ public class GymControllerTest {
         when(classOfSchedule.getWorkout()).thenReturn(workout);
         mockMvc.perform(MockMvcRequestBuilders.get("/workout/{workoutId}/class/{classOfScheduleId}/schedule/{scheduleId}", workoutId, classOfScheduleId, scheduleId))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.view().name("gym/workoutDetails")) 
+                .andExpect(MockMvcResultMatchers.view().name("gym/workoutDetails"))
                 .andExpect(MockMvcResultMatchers.model().attribute("workout", workout))
                 .andExpect(MockMvcResultMatchers.model().attribute("classOfSchedule", classOfSchedule))
                 .andExpect(MockMvcResultMatchers.model().attributeExists("position", "isInWaitingList", "alreadySelected", "allPositionsReserved"));
     }
-    
+
     @Test
     @WithMockUser(username = "testuser", authorities = "GYM")
     public void testShowDeleteProgramPage() throws Exception {
         Gym gym = Mockito.mock(Gym.class);
-        Mockito.when(gymService.getGymByEmail(Mockito.anyString())).thenReturn(gym);
+        Mockito.when(gymService.getGymByEmail(ArgumentMatchers.anyString())).thenReturn(gym);
         Mockito.when(gym.getGymSchedules()).thenReturn(new ArrayList());
         mockMvc.perform(MockMvcRequestBuilders.get("/gym/deleteProgram")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -449,11 +449,11 @@ public class GymControllerTest {
     @WithMockUser(username = "testuser", authorities = "GYM")
     public void testDeleteSchedule() throws Exception {
         Gym gym = Mockito.mock(Gym.class);
-        Mockito.when(gymService.getGymByEmail(Mockito.anyString())).thenReturn(gym);
+        Mockito.when(gymService.getGymByEmail(ArgumentMatchers.anyString())).thenReturn(gym);
         gym.setGymSchedules(new ArrayList());
-        Schedule schedule = new Schedule(); 
+        Schedule schedule = new Schedule();
         gym.getGymSchedules().add(schedule);
-        Mockito.when(scheduleService.getScheduleById(Mockito.anyLong())).thenReturn(schedule);
+        Mockito.when(scheduleService.getScheduleById(ArgumentMatchers.anyLong())).thenReturn(schedule);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/gym/deleteSchedule")
                 .param("scheduleId", "1")
@@ -465,14 +465,14 @@ public class GymControllerTest {
     @Test
     public void testWatchDetailsOfGym() throws Exception {
     	Long gymId=1L;
-        Gym gym = new Gym(); 
-        Mockito.when(gymService.getGymById(Mockito.anyLong())).thenReturn(gym);
+        Gym gym = new Gym();
+        Mockito.when(gymService.getGymById(ArgumentMatchers.anyLong())).thenReturn(gym);
         gym.setGym_id(gymId);
         gym.setGymSchedules(new ArrayList());
-        Schedule schedule = new Schedule(); 
-        Mockito.when(scheduleService.getScheduleById(Mockito.anyLong())).thenReturn(schedule);
+        Schedule schedule = new Schedule();
+        Mockito.when(scheduleService.getScheduleById(ArgumentMatchers.anyLong())).thenReturn(schedule);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/visitor/"+gymId) 
+        mockMvc.perform(MockMvcRequestBuilders.get("/visitor/"+gymId)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.view().name("visitor/gym-details"))

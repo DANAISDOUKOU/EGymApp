@@ -62,6 +62,7 @@
     <td th:text="${classOfSchedule.capacity - classOfSchedule.participants.size()}"></td>
 	<form th:action="@{/gym/participate}" method="post">
        	<input type="hidden" name="classOfScheduleId" th:value="${classOfSchedule.classOfScheduleId}" />
+       	<input type="hidden" name="gymId" th:value="${gym.gym_id}" />
       	<span th:if="${classOfSchedule.is_canceled}" class="canceled-text">(CANCELED)</span>
        	<td th:if="${not classOfSchedule.is_canceled}">
     	<div th:if="${not alreadySelected and not allPositionsReserved}">

@@ -49,25 +49,54 @@
         button:hover {
             background-color: #CC0000;
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+         .schedule-container {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
     </style>
 </head>
 <body>
     <h1>Select a Schedule to Delete</h1>
-    <ul>
-        <li th:each="schedule : ${deletableSchedules}">
-            <span th:text="${schedule.work_out_date}"></span>
-            <ul>
-                <li th:each="classOfSchedule : ${schedule.scheduleClasses}">
-                    <span th:text="${classOfSchedule.time_start} + ' - ' + ${classOfSchedule.time_end}"></span>
-                 	<span th:text="${classOfSchedule.workout.name}"></span>
-                </li>
-            </ul>
-            <form th:action="@{/gym/deleteSchedule}" method="post">
-                <input type="hidden" name="scheduleId" th:value="${schedule.schedule_id}" />
-                <button type="submit">Delete</button>
-            </form>
-        </li>
-    </ul>
+    <div th:each="schedule : ${deletableSchedules}" class="schedule-container">
+        <h2>Date: <span th:text="${schedule.work_out_date}"></span></h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Workout</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Loop through classes within each schedule -->
+                <th:block th:each="classOfSchedule : ${schedule.scheduleClasses}" th:remove="tag">
+                    <tr>
+                    <td th:text="${classOfSchedule.time_start} + ' - ' + ${classOfSchedule.time_end}"></td>
+                    <td th:text="${classOfSchedule.workout.name}"></td>
+                </tr>
+            </tbody>
+        </table>
+        <form th:action="@{/gym/deleteSchedule}" method="post">
+            <input type="hidden" name="scheduleId" th:value="${schedule.schedule_id}" />
+            <button type="submit">Delete</button>
+        </form>
+    </div>
     	<button onclick="window.history.back()" type="button">Go Back</button>
     
 </body>

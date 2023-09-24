@@ -53,7 +53,7 @@ public class WebSecurityConfig {
 
                 http.authorizeRequests()
                 // URL matching for accessibility
-                .antMatchers("/", "/login", "/register","/forgotPassword","/resetPassword","/visitor").permitAll()
+                .antMatchers("/", "/login", "/register","/forgotPassword","/resetPassword","/visitor","/uploadProfilePicture").permitAll()
                 .antMatchers("/gym/class-schedule-details/**").permitAll()
                 .antMatchers("/gym/details").permitAll()
                 .antMatchers("/gym/{id}").permitAll()

@@ -9,5 +9,5 @@ import dipl.danai.app.model.Room;
 public interface RoomRepository extends JpaRepository<Room, Long> {
 	@Query("SELECT r FROM Room r WHERE r.roomName = ?1 AND r.gym.gym_id = ?2")
 	Room findByNameAndGymId(String name, Long gymId);
-	
+
 }

@@ -2,10 +2,7 @@ package dipl.danai.app.model;
 
 import java.sql.Time;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,50 +12,48 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 @Entity
 @Table(name = "classes")
 public class ClassOfSchedule {
-	
+
 	@Id
 	@Column
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long classOfScheduleId;
-	
+
 	@ManyToOne
 	@JoinColumn(name="workout_id")
 	private Workout workout;
-	
+
 	@Column
 	private Time time_start;
-	    
+
 	@Column
 	private Time time_end;
-	
+
 	@ManyToOne
 	@JoinColumn(name="instructor_id")
 	private Instructor instructor;
-	
+
 	@ManyToOne
 	@JoinColumn(name="roomId")
 	private Room room;
-	
+
 	@Column
 	private int capacity;
-	
+
 	@Column
 	private Boolean is_canceled;
-	
+
 	@ManyToMany
 	@JoinTable(name="athletes_classes",joinColumns=@JoinColumn(name="classOfScheduleId"),inverseJoinColumns=@JoinColumn(name="athlete_id"))
 	private List<Athletes> participants;
-	
+
 	@ManyToMany(mappedBy = "ScheduleClasses")
 	private List<Schedule> schedules;
-	
+
 	public Workout getWorkout() {
 		return workout;
 	}
@@ -122,7 +117,7 @@ public class ClassOfSchedule {
 	public void setIs_canceled(Boolean is_canceled) {
 		this.is_canceled = is_canceled;
 	}
-	
+
 	public Time getTime_start() {
 	    return time_start;
 	}
@@ -137,6 +132,6 @@ public class ClassOfSchedule {
 
 	public void setTime_end(Time time_end) {
 	    this.time_end = time_end;
-	}	
-	
+	}
+
 }

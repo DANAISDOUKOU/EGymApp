@@ -10,22 +10,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class NominatimService {
     private final static String nominatimBaseUrl = "https://nominatim.openstreetmap.org/";
-    private final static String apiKey = "1lKTiR5sbiOjVJKu6U9TDWpFcHNdQWRiF6KXfXc9"; 
+    private final static String apiKey = "1lKTiR5sbiOjVJKu6U9TDWpFcHNdQWRiF6KXfXc9";
 
-    public static Map<String, Double> getCoordinatesForAddressInCity(String address,String city) {
+    public Map<String, Double> getCoordinatesForAddressInCity(String address,String city) {
         Map<String, Double> coordinates = new HashMap<>();
 
         try {
             String encodedAddress = URLEncoder.encode(address, "UTF-8");
-
             String apiUrl = nominatimBaseUrl + "search?q=" + encodedAddress + "&format=json";
-            
             if (apiKey != null && !apiKey.isEmpty()) {
                 apiUrl += "&apikey=" + apiKey;
             }

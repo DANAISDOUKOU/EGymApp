@@ -61,36 +61,47 @@
             cursor: pointer;
             margin: 10px 0;
         }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <h3>Instructors</h3>
-    <ul>
-        <li th:each="instructorGym : ${instructorsGyms}">
-             <span th:text="${instructorGym.instructor_name}+' '+ ${instructorGym.instructor_surname}"></span>
-        </li>
-    </ul>
-    <h2>Remove Instructors</h2>
-    <form action="/removeInstructorFromGym" method="post">
-    	 <ul>
-        <li th:each="instructorGym : ${instructorsGyms}">
-        	<input type="checkbox" th:value="${instructorGym.instructor_id}" name="selectedInstructors">
-             <span th:text="${instructorGym.instructor_name}+' '+ ${instructorGym.instructor_surname}"></span>
-        </li>
-    </ul>
-     <input type="submit" value="Remove Selected Instructors">
-    </form>
-    <h2>Add Instructors</h2>
-    <form action="/addInstrucotrToGym" method="post">
-        <ul>
-            <li th:each="instructor : ${instructors}">
-                <input type="checkbox" th:value="${instructor.instructor_id}" name="selectedInstructors">
-                <span th:text="${instructor.instructor_name}+' '+ ${instructor.instructor_surname}" ></span>
-            </li>
-        </ul>
-        <input type="submit" value="Add Selected Instructors">
-    </form>
-    	<button onclick="window.history.back()" type="button">Go Back</button>
+     <table>
+    <thead>
+        <tr>
+            <th>Instructor Name</th>
+            <th>Instructor Phone</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        <tr th:each="instructorGym : ${instructorsGyms}">
+             <td th:text="${instructorGym.instructor_name}+' '+ ${instructorGym.instructor_surname}"></td>
+             <td th:text="${instructorGym.phoneNumber}"></td>
+              <td>
+                <a th:href="@{/removeInstructorFromGym(instructorId=${instructorGym.instructor_id})}" class="btn btn-danger">Remove</a>
+            </td>
+       </tr>
+       </tbody>
+       </table>
+    <a th:href="@{/gym/addInstructor}" class="btn btn-primary">Add Instructor</a>
     
+     
+    <button onclick="window.history.back()" type="button">Go Back</button>
 </body>
 </html>

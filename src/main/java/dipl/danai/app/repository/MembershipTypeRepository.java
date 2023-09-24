@@ -7,5 +7,5 @@ import dipl.danai.app.model.MembershipType;
 
 @Repository
 public interface MembershipTypeRepository extends JpaRepository<MembershipType,Long> {
-	
+
 }

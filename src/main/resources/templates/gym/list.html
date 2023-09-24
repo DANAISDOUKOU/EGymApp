@@ -1,60 +1,169 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Available Gyms</title>
+    <title>All the Available Gyms</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background: linear-gradient(to bottom, #87CEFA, #EFEFEF);
             margin: 0;
             padding: 0;
-            text-align: center;
+            display: flex;a
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
         }
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: linear-gradient(to bottom, #87CEFA, #EFEFEF);
-        }
-
+        
         h1 {
-            font-size: 28px;
-            margin: 20px 0;
+            color: #333;
+            margin-bottom: 20px;
         }
-
-        button {
+        
+        
+        label {
+            font-weight: bold;
+        }
+        
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+        
+        button[type="submit"] {
             background-color: #007BFF;
             color: white;
             border: none;
             border-radius: 5px;
-            padding: 8px 16px;
+            padding: 10px 20px;
             cursor: pointer;
-            margin: 10px 0;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        
+        .gym-button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .gym-button:hover {
+            background-color: #0056b3;
+        }
+          button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+          button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
         }
 
-        p {
-            font-size: 18px;
-            margin: 20px 0;
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
         }
+
+        th {
+            background-color: #f2f2f2;
+        }
+        .dropdown-label {
+       		font-weight: bold;
+        	font-size: 16px;
+       		 margin-right: 10px;
+    	}
+
+    	.dropdown-select {
+        	width: 150px; /* Adjust the width as needed */
+        	font-size: 16px;
+    }
+
+    /* Style the "Search" button using Bootstrap classes */
+    .search-button {
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 12px 24px;
+        cursor: pointer;
+        font-size: 18px;
+        margin-top: 10px;
+    }
+
+    /* Hover effect for the "Search" button */
+    .search-button:hover {
+        background-color: #0056b3;
+    }
     </style>
 </head>
 <body>
     <h1>Available Gyms</h1>
-    <div th:if="${not #lists.isEmpty(gyms)}">
-       <div th:each="gym : ${gyms}">
-            <form th:action="@{/gym/{id}(id=${gym.gym_id})}" method="get">
-                <button type="submit" th:text="${gym.gym_name}"></button><br>
-            </form>
-        </div>
-    </div>
-    <div th:if="${#lists.isEmpty(gyms)}">
-        <p>No gyms found.</p>
-    </div>
+     <form th:action="@{/gym/search}" method="get">
+        <label class="dropdown-label">Search by:</label>
+        <select class="form-control dropdown-select" name="searchBy">
+            <option value="name">Name</option>
+            <option value="workoutType">Workout Type</option>
+            <option value="city">City</option>
+        </select>
+        <label class="dropdown-label">Sort by:</label>
+    	 <select class="form-control dropdown-select" name="sortBy">
+    		<option value="none">None</option>
+        	<option value="address">Distance</option>
+        	<option value="bestRating">Best Rating</option>
+    	</select>
+        <input type="text" name="query" placeholder="Enter your search...">
+        <button  class="btn btn-primary search-button" type="submit">Search</button>
+    </form>
+    <table>
+    <thead>
+        <tr>
+         	<th></th>
+            <th>Name</th>
+            <th>Workout Types</th>
+            <th>Rating</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="gym : ${gyms}">
+        	<td>
+            <!-- Display the gym's picture (assuming you have a 'pictureUrl' property in your 'gym' object) -->
+               <img th:src="'data:image/png;base64,' + ${gym.profilePictureBase64}" alt="Gym Picture" width="100" height="100">
+            </td>
+            <td>
+                <a th:href="@{'/gym/' + ${gym.gym_id}}"><span th:text="${gym.gym_name}"></span></a>
+            </td>
+            <td>
+    			<ul>
+        			<li th:each="workout : ${gym.gymWorkouts}" th:text="${workout.name}"></li>
+    			</ul>
+			</td>
+            <td th:text="${gym.averageRating}"></td>
+        </tr>
+    </tbody>
+</table>
     	<button onclick="window.history.back()" type="button">Go Back</button>
     
 </body>

@@ -6,7 +6,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom, #87CEFA, #EFEFEF); /* Linear gradient */
+            background: linear-gradient(to bottom, #87CEFA, #EFEFEF);
             margin: 0;
             padding: 0;
             display: flex;
@@ -16,14 +16,24 @@
             flex-direction: column;
         }
 
-        h2 {
+        h1 {
             color: #333;
             margin-bottom: 20px;
         }
 
-        p {
-            color: #555;
-            margin-bottom: 10px;
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
         }
 
         button {
@@ -32,7 +42,7 @@
             border: none;
             border-radius: 5px;
             padding: 10px 20px;
-            margin: 5px; 
+            margin: 5px;
             cursor: pointer;
         }
 
@@ -44,16 +54,54 @@
         a:hover {
             text-decoration: underline;
         }
+
+        .top-buttons-container {
+            position: absolute;
+            top: 0;
+            right: 0;
+            margin: 10px;
+        }
+
+        img {
+            max-width: 100px;
+            max-height: 100px;
+        }
     </style>
 </head>
 
 <body>
-    <h2>Welcome to Instructor Dashboard</h2>
-    <p>Logged as: <span sec:authentication="name"></span></p>
-    <p>Has role: <span sec:authentication="authorities"></span></p>
-    <button onclick="window.location.href='http://localhost:8080/profile'" type="button">Profile</button>
-    <button onclick="window.location.href='http://localhost:8080/instructor/gymsIWork'" type="button">Gyms</button>
-  
+    <h1>Gyms That I Work At</h1>
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Workout Types</th>
+                <th>Rating</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="gym : ${gyms}">
+                <td>
+                    <img th:src="'data:image/png;base64,' + ${gym.profilePictureBase64}" alt="Gym Picture">
+                </td>
+                <td>
+                    <form th:action="@{'/gym/instructor' + ${gym.gym_id}}" method="get">
+                        <button type="submit" th:text="${gym.gym_name}"></button><br>
+                    </form>
+                </td>
+                <td>
+                    <ul>
+                        <li th:each="workout : ${gym.gymWorkouts}" th:text="${workout.name}"></li>
+                    </ul>
+                </td>
+                <td th:text="${gym.averageRating}"></td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="top-buttons-container">
+        <button onclick="window.location.href='http://localhost:8080/profile'" type="button">Profile</button>
+    </div>
     <div>
         <p><a th:href="@{/logout}">Log out</a></p>
     </div>

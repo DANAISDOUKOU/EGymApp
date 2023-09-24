@@ -18,7 +18,7 @@ public interface WaitingListEntryRepository extends JpaRepository<WaitingListEnt
 		       "AND entry.joinedAt <= (SELECT joinedAt FROM WaitingListEntry WHERE athlete = :athlete)")
 	 int countBeforeAthleteJoinedAt(@Param("classOfSchedule") ClassOfSchedule classOfSchedule,
 	                                   @Param("athlete") Athletes athlete);
-	
+
 	 @Query("SELECT entry FROM WaitingListEntry entry " +
 	           "WHERE entry.classOfSchedule = :classOfSchedule")
 	 List<WaitingListEntry> findByClassOfSchedule(@Param("classOfSchedule") ClassOfSchedule classOfSchedule);

@@ -28,7 +28,7 @@ public class GymRatingService {
 	    public List<GymRating> getRatingsForGym(Gym gym) {
 	        return gymRatingRepository.findByGym(gym);
 	    }
-	    
+
 	    public double calculateAverageRating(Gym gym) {
 	    	double currentTotalRatings = gymRatingRepository.calculateAverageRatingByGym(gym);
 	    	return currentTotalRatings;

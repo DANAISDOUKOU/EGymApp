@@ -16,14 +16,14 @@ public class Room {
 	@Column
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long roomId;
-	
+
 	@ManyToOne
     @JoinColumn(name = "gym_id")
     private Gym gym;
-	
+
 	@Column
 	private String roomName;
-	
+
 	public Long getRoomId() {
 		return roomId;
 	}

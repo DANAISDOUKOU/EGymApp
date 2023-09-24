@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 
 import dipl.danai.app.model.Athletes;
 import dipl.danai.app.model.Gym;
-import dipl.danai.app.model.MembershipType;
 @Repository
 public interface GymRepository extends JpaRepository<Gym, Long>{
 	@Query(value="SELECT g FROM Gym g WHERE gym_name=?1")
@@ -22,5 +21,5 @@ public interface GymRepository extends JpaRepository<Gym, Long>{
 	@Query(value = "SELECT * FROM gyms WHERE latitude BETWEEN :minLat AND :maxLat AND longitude BETWEEN :minLon AND :maxLon", nativeQuery = true)
 	public List<Gym> findByLatitudeBetweenAndLongitudeBetween( @Param("minLat") double minLat,@Param("maxLat") double maxLat, @Param("minLon") double minLon, @Param("maxLon") double maxLon);
 
-	
+
 }

@@ -1,4 +1,4 @@
-package dipl.danai.app.model; 
+package dipl.danai.app.model;
 
 public enum WorkoutTypes {
 	YOGA("Yoga"),
@@ -40,7 +40,7 @@ public enum WorkoutTypes {
    	<option th:value="Hoops Intermediate">HOOPS INTERMEDIATEoption>
   	<option th:value="Callisthenics Intermediate">CALLISTHENICS INTERMEDIATE</option>
    	<option th:value="Callisthenics Advanced">CALLI*/
-   	
+
    private final String value;
 
     private WorkoutTypes(String value) {

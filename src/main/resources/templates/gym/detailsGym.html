@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>gymDetails</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #87CEFA, #EFEFEF);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-top: 20px;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+
+        h3 {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            margin-top: 10px;
+        }
+
+        p {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+
+        .canceled-text {
+            color: red;
+        }
+
+        .date {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+        .cancel-button {
+		    background-color: red; /* Choose a suitable color */
+		    color: white;
+		    border: none;
+		    border-radius: 5px;
+		    padding: 8px 16px;
+		    cursor: pointer;
+		}
+    </style>
+</head>
+<body>
+<div th:if="${not alreadyMember}">
+     <form th:action="@{/gym/subscribe}" method="post">
+    	<h1>Do you want to be a member?</h1>
+        <input type="hidden" name="gymId" th:value="${gym.gym_id}" />
+        <button type="submit">Subscribe</button>
+    </form>
+    </div>
+    <h1>Top Popular Workouts for  <span th:text="${gym.gym_name}"></span></h1>
+
+    <ul>
+        <li th:each="popularWorkout : ${popularWorkouts}">
+            <span th:text="${popularWorkout.workout.name}"></span>
+        </li>
+    </ul>
+<h2>Workouts Schedule</h2>
+<!-- Iterate through the gym's schedules -->
+<div th:each="workout : ${gym.gymWorkouts}">
+    <h3 th:text="${workout.name}">Workout Name</h3>
+      <table style="width: 800px;">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Day</th>
+                    <th>Time</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+    <!-- Iterate through the class schedules for this workout -->
+    <div th:each="classScheduleEntry : ${workoutList}">
+        <!-- Access the date (key) and class schedules (value) from the map -->
+        <th:block th:with="schedule=${classScheduleEntry.key}, schedules=${classScheduleEntry.value}">
+          
+                <tbody>
+                <!-- Iterate through the class schedules for this specific date -->
+                <tr th:each="specificClassSchedule : ${schedules}">
+                    <div th:if="${workout.name} == ${specificClassSchedule.workout.name}">
+                        <td th:text="${#dates.format(schedule.work_out_date, 'yyyy-MM-dd')}">Date</td>
+                        <td th:text="${#dates.format(schedule.work_out_date, 'EEEE')}">Day</td>
+                        <td th:text="${specificClassSchedule.time_start}+'-'+${specificClassSchedule.time_end}">Time</td>
+                        <td>
+                              <a th:href="@{/workout/{workoutId}/class/{classOfScheduleId}/schedule/{scheduleId}/gym/{gymId}(workoutId=${specificClassSchedule.workout.workoutId}, classOfScheduleId=${specificClassSchedule.classOfScheduleId}, scheduleId=${schedule.schedule_id},gymId=${gym.gym_id})}"
+              					 th:text="Join">Details</a>
+       
+                        </td>
+                    </div>
+                </tr>
+                </tbody>
+            </table>
+        </th:block>
+    </div>
+</div>
+
+<button onclick="window.history.back()" type="button">Go Back</button>
+</body>
+</html>

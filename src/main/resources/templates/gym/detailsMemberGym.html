@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+<title>gymDetails</title>
+</head>
+ <style>
+ body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #87CEFA, #EFEFEF);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-top: 20px;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+
+        h3 {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            margin-top: 10px;
+        }
+
+        p {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+        .canceled-text {
+        color: red;
+    }
+     .date {
+            font-size: 24px; 
+            font-weight: bold; 
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+ </style>
+<body>
+   
+    <div th:if="${not hasAlreadyMembershipType and alreadyMember}">
+     <form th:action="@{/gym/selectMembership}" method="post">
+    	<h1>Do you want a specific membershipType?</h1>
+    	<input type="hidden" name="gymId" th:value="${gym.gym_id}" />
+    	<ul>
+	    	<li th:each="membership :${memberships}">
+	    		<input type="hidden" name="membershipId" th:value="${membership.getMembership_type_id}"/>
+	    		<button type="submit" th:text="${membership.getMembership_period+' '+membership.getMembership_type_name}"></button>
+    		</li>
+    	</ul>
+    </form>
+    </div>
+     <div th:if="${existingMembership != null}">
+     	<h1> Your existing membership type:</h1>
+     	<input type="hidden" name="gymId" th:value="${gym.gym_id}" />
+     	 <p th:text="${existingMembership.getMembership_period+' '+existingMembership.getMembership_type_name}"></p>
+     	<div th:if="${remainingLessons}">
+			<p>Remaining Lessons: <span th:text="${remainingLessons}"></span></p>
+    	</div>
+    	<div th:if="${expireAt}">
+			<p>Expire At: <span th:text="${expireAt}"></span></p>
+    	</div>
+     </div> 
+       <div th:each="workout : ${gym.gymWorkouts}">
+    <h3 th:text="${workout.name}">Workout Name</h3>
+      <table style="width: 800px;">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Day</th>
+                    <th>Time</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+    <!-- Iterate through the class schedules for this workout -->
+    <div th:each="classScheduleEntry : ${workoutList}">
+        <!-- Access the date (key) and class schedules (value) from the map -->
+        <th:block th:with="schedule=${classScheduleEntry.key}, schedules=${classScheduleEntry.value}">
+          
+                <tbody>
+                <!-- Iterate through the class schedules for this specific date -->
+                <tr th:each="specificClassSchedule : ${schedules}">
+                    <div th:if="${workout.name} == ${specificClassSchedule.workout.name}">
+                        <td th:text="${#dates.format(schedule.work_out_date, 'yyyy-MM-dd')}">Date</td>
+                        <td th:text="${#dates.format(schedule.work_out_date, 'EEEE')}">Day</td>
+                        <td th:text="${specificClassSchedule.time_start}+'-'+${specificClassSchedule.time_end}">Time</td>
+                        <td>
+                              <a th:href="@{/workout/{workoutId}/class/{classOfScheduleId}/schedule/{scheduleId}(workoutId=${specificClassSchedule.workout.workoutId}, classOfScheduleId=${specificClassSchedule.classOfScheduleId}, scheduleId=${schedule.schedule_id})}"
+              					 th:text="Join">Details</a>
+       
+                        </td>
+                    </div>
+                </tr>
+                </tbody>
+            </table>
+        </th:block>
+    </div>
+</div>
+	 <form th:action="@{/rate-gym/{gymId}(gymId=${gym.gym_id})}" method="post">
+    	<input type="number" name="rating" min="1" max="5" required />
+    	<button type="submit">Rate Gym</button>
+	</form>
+    </ul>
+	<a th:href="@{http://localhost:8080/athlete/history(gymId=${gym.gym_id})}">History of Classes</a>
+	<button onclick="window.history.back()" type="button">Go Back</button>
+</body>
+</html>

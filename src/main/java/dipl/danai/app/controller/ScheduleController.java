@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.text.ParseException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,18 +20,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import dipl.danai.app.model.Schedule;
 import dipl.danai.app.model.Athletes;
 import dipl.danai.app.model.ClassOccurrence;
 import dipl.danai.app.model.ClassOfSchedule;
 import dipl.danai.app.model.Gym;
 import dipl.danai.app.model.Instructor;
 import dipl.danai.app.model.Room;
+import dipl.danai.app.model.Schedule;
 import dipl.danai.app.model.WaitingListEntry;
 import dipl.danai.app.model.Workout;
 import dipl.danai.app.service.AthleteService;
@@ -39,35 +38,36 @@ import dipl.danai.app.service.ClassOfScheduleService;
 import dipl.danai.app.service.EmailService;
 import dipl.danai.app.service.GymService;
 import dipl.danai.app.service.InstructorService;
+import dipl.danai.app.service.PopularityCalculationService;
 import dipl.danai.app.service.ScheduleService;
 import dipl.danai.app.service.WorkoutService;
 
 @Controller
 @RequestMapping("/gym")
 public class ScheduleController {
-		
-	@Autowired 
+
+	@Autowired
 	ScheduleService scheduleService;
 
 	@Autowired
 	InstructorService instructorService;
-	
+
 	@Autowired
 	GymService gymService;
-	
+
 	@Autowired
 	WorkoutService workoutService;
-	
+
 	@Autowired
 	AthleteService athleteService;
 	@Autowired
 	ClassOfScheduleService classOfScheduleService;
-	
+
 	@Autowired
 	EmailService emailService;
-	
-	
-	
+	@Autowired
+	PopularityCalculationService workoutPopularityService;
+
 	@GetMapping(value = {"/addClass"})
 	public String addClass(HttpServletRequest request,HttpSession session,@RequestParam(value = "programId", required = false) Long programId,
 Model model,Authentication authentication) {
@@ -77,12 +77,12 @@ Model model,Authentication authentication) {
 		String referer = request.getHeader("Referer");
 		model.addAttribute("referer", referer);
 		model.addAttribute("workouts",gym.getGymWorkouts());
-		model.addAttribute("instructors",gym.getGymInstructors());	
+		model.addAttribute("instructors",gym.getGymInstructors());
 		model.addAttribute("rooms", gym.getRooms());
 		model.addAttribute("programId",programId);
 		return "gym/addClass";
 	}
-	 
+
 	@PostMapping(value = {"/addClass"})
 	public String getClass(Authentication authentication,Model model, @Valid Schedule schedule,@RequestParam(value="workouts") String workout,
 			@RequestParam(value="instructors") String instructor,
@@ -114,7 +114,6 @@ Model model,Authentication authentication) {
 				 gym = selectedRoom.getGym();
 				 bindingResult.rejectValue("gyms", "error.gyms", "The selected room at " + gym.getGym_name() + " is already occupied at this time.");
 		    }
-		    Instructor selectedInstructor = instructorService.getByName(instructor);
 		    if (scheduleService.isInstructorOccupied(i, Time.valueOf(start_time + ":00"), Time.valueOf(end_time + ":00"),schedulee)) {
 				bindingResult.rejectValue("gyms", "error.gyms", "The selected instructor at " + gym.getGym_name() + " is already occupied at this time.");
 		    }
@@ -147,7 +146,7 @@ Model model,Authentication authentication) {
 	    }
 		return "redirect:"+previousUrl;
 	}
-	
+
 	@GetMapping(value = {"/createProgram"})
 	public String createProgram(Model model) {
 		model.addAttribute("fitnessProgram",new Schedule());
@@ -156,7 +155,7 @@ Model model,Authentication authentication) {
 
 	@PostMapping(value = {"/createProgram"})
 	public String getProgram(Model model, @Valid Schedule schedule,
-			Authentication authentication, 
+			Authentication authentication,
 			BindingResult bindingResult,
 			@RequestParam(value="date") String date)throws SQLException, ParseException {
 		Gym gym=gymService.getGymByEmail(authentication.getName());
@@ -167,25 +166,21 @@ Model model,Authentication authentication) {
 		gymService.saveGym(gym);
 		return "redirect:/gym/createProgram";
 	}
-	
-	
-/*	@PostMapping(value = {"/updateClass"})
-	public String getupgradeClass(@ModelAttribute("workout") Workout workout,Model model) {
-		model.addAttribute("workout", workout);
-		return "gym/updateClass";
-	}
-	*/
+
+
 	@PostMapping("/participate")
 	@Transactional
-	public String participateteInClass(@RequestParam("classOfScheduleId") Long classOfScheduleId,Authentication authentication,HttpServletRequest request,Model model) {
+	public String participateteInClass(@RequestParam("gymId") Long gymId,@RequestParam("classOfScheduleId") Long classOfScheduleId,Authentication authentication,HttpServletRequest request,Model model) {
 		String previousPageUrl = request.getHeader("Referer");
 		Athletes a=athleteService.getAthlete(authentication.getName());
 		ClassOfSchedule classOfSchedule=classOfScheduleService.getClassOfScheduleById(classOfScheduleId);
+		Gym gym=gymService.getGymById(gymId);
 		if (authentication.getAuthorities().stream()
 		        .anyMatch(auth -> auth.getAuthority().equals("ATHLETE"))) {
 			if (classOfSchedule != null && classOfSchedule.getParticipants().size() < classOfSchedule.getCapacity()) {
 				if(!classOfSchedule.getParticipants().contains(a)) {
 					classOfScheduleService.addParicipant(a, classOfSchedule);
+					workoutPopularityService.recordUserInteraction(gym, classOfSchedule.getWorkout());
 				}else {
 					model.addAttribute("alreadySelected",true);
 				}
@@ -194,7 +189,7 @@ Model model,Authentication authentication) {
 		classOfScheduleService.save(classOfSchedule);
 		return "redirect:"+previousPageUrl;
 	}
-	
+
 	 @PostMapping("/cancelPosition")
 	 @Transactional
 	 public String cancelPosition(@RequestParam("classOfScheduleId") Long classOfScheduleId, Authentication authentication, Model model,HttpServletRequest request) {
@@ -222,7 +217,7 @@ Model model,Authentication authentication) {
 		classOfScheduleService.save(classOfSchedule);
 	    return "redirect:"+previousPageUrl;
 	 }
-	
+
 	 @GetMapping("/class-schedule-details/{classOfScheduleId}")
 	    public String getClassScheduleDetails(@PathVariable Long classOfScheduleId, Model model ,Authentication authentication, @RequestParam(required = false) Long gymId) {
 		 Gym gym;
@@ -246,10 +241,41 @@ Model model,Authentication authentication) {
 		    model.addAttribute("availableAthletes", availableAthletes);
 	        return "gym/classOfScheduleDetails";
 	 }
-	 
+
+	 @GetMapping("/select-members")
+	 public String selectMembers(Model model,Authentication authentication,@RequestParam Long classOfScheduleId,@RequestParam Long gymId) {
+		Gym	gym=gymService.getGymById(gymId);
+		 Set<Athletes> availableAthletes = gymService.findMembers(gym.getGym_id());
+		 ClassOfSchedule classSchedule = classOfScheduleService.getClassScheduleDetails(classOfScheduleId);
+		 	List<Athletes> participants=classSchedule.getParticipants();
+		 	availableAthletes = availableAthletes.stream()
+		            .filter(athlete -> !participants.contains(athlete))
+		            .collect(Collectors.toSet());
+		 model.addAttribute("availableAthletes", availableAthletes);
+		 model.addAttribute("gymId",gymId);
+		 model.addAttribute("classOfScheduleId",classOfScheduleId);
+		  return "gym/select-members";
+	 }
+
+	 @GetMapping("/search-members")
+	    public String searchMembers(@RequestParam String searchTerm, Model model,@RequestParam Long gymId,@RequestParam Long classOfScheduleId) {
+		 Gym	gym=gymService.getGymById(gymId);
+		 Set<Athletes> availableAthletes = gymService.findMembers(gym.getGym_id());
+		 ClassOfSchedule classSchedule = classOfScheduleService.getClassScheduleDetails(classOfScheduleId);
+		 	List<Athletes> participants=classSchedule.getParticipants();
+		 	availableAthletes = availableAthletes.stream()
+		            .filter(athlete -> !participants.contains(athlete))
+		            .collect(Collectors.toSet());
+		 	List<Athletes> searchResults = gymService.searchMembers(searchTerm,availableAthletes);
+	        model.addAttribute("searchResults", searchResults);
+	        model.addAttribute("gymId", gymId);
+	        model.addAttribute("classOfScheduleId",classOfScheduleId);
+	        return "gym/select-members";
+	    }
+
 	 @PostMapping("/add-participant")
 	 public String addParticipant(@RequestParam Long classOfScheduleId,
-	                              @RequestParam("selectedAthletes") List<Long> selectedAthleteIds,
+	                              @RequestParam("selectedAthletes") Long selectedAthleteIds,
 	                              @RequestParam Long gymId,Authentication authentication) {
 		 String role = authentication.getAuthorities().stream()
                  .findFirst()
@@ -257,10 +283,9 @@ Model model,Authentication authentication) {
                  .orElse("");
 		 ClassOfSchedule classOfSchedule=classOfScheduleService.getClassOfScheduleById(classOfScheduleId);
 		 if(selectedAthleteIds!=null) {
-			 for(Long athleteId:selectedAthleteIds) {
-				 Athletes athlete=athleteService.getById(athleteId);
-				 classOfScheduleService.addParicipant(athlete,classOfSchedule);
-			 }
+			 Athletes athlete=athleteService.getById(selectedAthleteIds);
+			 classOfScheduleService.addParicipant(athlete,classOfSchedule);
+
 		 }
 		 classOfScheduleService.save(classOfSchedule);
 		 if("INSTRUCTOR".equals(role)) {
@@ -288,16 +313,17 @@ Model model,Authentication authentication) {
 		 		return "redirect:/gym/class-schedule-details/" + classOfScheduleId;
 		 	}
 	    }
-	 
+
 	 @GetMapping("/deleteClass")
 	 public String showDeleteClassPage(@RequestParam(value = "programId") Long programId,Model model) {
 		 Schedule schedule = scheduleService.getScheduleById(programId);
-		List<ClassOfSchedule> workoutList = schedule.getScheduleClasses();
+		 List<ClassOfSchedule> workoutList = schedule.getScheduleClasses();
+		 workoutList.sort(Comparator.comparing(ClassOfSchedule::getTime_start));
 		 model.addAttribute("program", schedule);
 		 model.addAttribute("workoutList", workoutList);
 		 return "gym/deleteClass";
 	 }
-	 
+
 	 @PostMapping("/deleteClass")
 	 public String deleteSelectedClasses(@RequestParam(value = "programId") Long programId,
 	                                     @RequestParam(value = "selectedClasses", required = false) List<Long> selectedClassIds,
@@ -314,7 +340,7 @@ Model model,Authentication authentication) {
 	    scheduleService.saveUpdatedSchedule(schedule);
 	    return "redirect:" + previousPageUrl;
 	 }
-	 
+
 	 @GetMapping("/modifyClass")
 	 public String modifyClass(@RequestParam("classId") Long classId, Model model,Authentication authentication,@RequestParam(value="gymId",required=false) Long gymId,@RequestParam(value="roomError",required=false) String roomError,@RequestParam(value="instructorError",required=false) String instructorError,@RequestParam(value="scheduleId",required=false) Long scheduleId, HttpSession session ) {
 		ClassOfSchedule classOfSchedule=classOfScheduleService.getClassOfScheduleById(classId);
@@ -336,7 +362,7 @@ Model model,Authentication authentication) {
 	    model.addAttribute("gymId", gymId);
 	    return "gym/modifyClass";
 	 }
-	 
+
 	 @PostMapping("/performModification")
 	 public String performModification(
 	            @RequestParam("classId") Long classId,
@@ -390,7 +416,7 @@ Model model,Authentication authentication) {
 	        }
 	        return "redirect:" + referringPageUrl;
 	    }
-	 
+
 	 @PostMapping("/cancelClassOccurrence")
 	 public String cancelClassOccurrence(
 	         @RequestParam(value="classOccurrenceId",required=false) Long classOccurrenceId,
@@ -398,19 +424,19 @@ Model model,Authentication authentication) {
 	         @RequestParam("classId") Long classId,
 	         HttpServletRequest request) {
 		 String referringPageUrl = request.getHeader("referer");
-	 
+
 	   ClassOccurrence classOcc=new  ClassOccurrence ();
 	   classOcc.setSchedule(scheduleService.getScheduleById(scheduleId));
 	   classOcc.setClassOfSchedule(classOfScheduleService.getClassOfScheduleById(classId));
 	   classOcc.setCanceled(true);
 	   classOfScheduleService.saveClassOccurrence(classOcc);
-	     
+
 	     return "redirect:" + referringPageUrl;
 	 }
-	 
+
 	 @PostMapping("/uncancelClassOccurrence")
 	 public String uncancelClassOccurrence(@RequestParam Long classId, @RequestParam("scheduleId") Long scheduleId,@RequestParam(value="classOccurrenceId",required=false) Long classOccurrenceId,HttpServletRequest request) {
-		 String referringPageUrl = request.getHeader("referer"); 
+		 String referringPageUrl = request.getHeader("referer");
 		 ClassOccurrence classOccurrence = classOfScheduleService.getClassOccurrence(scheduleId, classId);
 		 List<ClassOccurrence> occurrences=classOfScheduleService.findAll();
 		 ClassOfSchedule classOfSchedule = classOfScheduleService.getClassOfScheduleById(classId);
@@ -420,9 +446,9 @@ Model model,Authentication authentication) {
 	            classOfSchedule.setIs_canceled(false);
 	            classOfScheduleService.save(classOfSchedule);
 	        }
-	        return "redirect:" + referringPageUrl;	 
+	        return "redirect:" + referringPageUrl;
 	  }
-	 
+
 	 @PostMapping("/joinWaitingList")
 	 @Transactional
 	 public String joinWaitingList(@RequestParam("classOfScheduleId") Long classOfScheduleId, Authentication authentication, Model model, HttpServletRequest request) {
@@ -438,7 +464,7 @@ Model model,Authentication authentication) {
 		        model.addAttribute("isInWaitingList", true);
 		    }
 		}
-		
+
 	    String previousPageUrl = request.getHeader("Referer");
 	    return "redirect:" + previousPageUrl;
 	 }

@@ -93,12 +93,8 @@
                                     <form th:action="@{/rate-class}" method="post">
                                         <input type="hidden" name="classOfScheduleId" th:value="${classOfSchedule.classOfScheduleId}" />
                                         <input type="hidden" name="gymId" th:value="${gym.gym_id}" />
-                                        <label for="instructorRating">Instructor Rating:</label>
-                                        <input type="number" name="instructorRating" min="1" max="5" required /><br>
-                                        <label for="accuracyRating">Accuracy Rating:</label>
-                                        <input type="number" name="accuracyRating" min="1" max="5" required /><br>
-                                        <label for="crowdingRating">Crowding Rating:</label>
-                                        <input type="number" name="crowdingRating" min="1" max="5" required /><br>
+                                        <label for="clasRating">Class Rating:</label>
+                                        <input type="number" name="classRating" min="1" max="5" required /><br>
                                         <button type="submit">Rate Class</button>
                                     </form>
                                 </td>

@@ -10,5 +10,5 @@ import dipl.danai.app.model.Workout;
 public interface WorkoutRepository extends JpaRepository<Workout, Long>{
 		@Query(value="SELECT w FROM Workout w WHERE name=?1")
 		public Workout findByName(String name);
-		
+
 }

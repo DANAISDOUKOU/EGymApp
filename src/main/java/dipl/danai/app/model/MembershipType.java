@@ -1,42 +1,39 @@
 package dipl.danai.app.model;
 
-import java.util.Set;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "membershipType")
 public class MembershipType {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column
 	private Long membership_type_id;
-	
+
 	@Column
 	private String membership_type_name;
-	
+
 	@Column
 	private String membership_period;
-	
-	@Column 
+
+	@Column
 	private float membership_amount;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "gym_id")
 	private Gym gym;
 
 	@Column
     private Integer remainingLessons;
-	
+
 	public Long getMembership_type_id() {
 		return membership_type_id;
 	}
@@ -85,6 +82,6 @@ public class MembershipType {
 	public void setRemainingLessons(Integer remainingLessons) {
 		this.remainingLessons = remainingLessons;
 	}
-	
-	
+
+
 }

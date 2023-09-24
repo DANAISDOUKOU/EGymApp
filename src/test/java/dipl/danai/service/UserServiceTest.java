@@ -35,7 +35,7 @@ public class UserServiceTest {
     @Test
     public void testIsUserPresentWithNonExistingUser() {
     	User user = new User();
-        user.setEmail("nonexisting@example.com"); 
+        user.setEmail("nonexisting@example.com");
         when(userRepository.findByEmail(user.getEmail())).thenReturn(null);
         boolean result = userService1.isUserPresent(user) != null;
         assertTrue(result);

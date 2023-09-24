@@ -59,6 +59,6 @@ public class ClassOccurrence {
 		this.canceled = canceled;
 	}
 
-    
+
 }
 

@@ -14,20 +14,20 @@ import dipl.danai.app.repository.MembershipTypeRepository;
 public class MembershipService  {
 	@Autowired
 	MembershipTypeRepository membershipTypeRepository;
-	
+
 
 	@Autowired
 	MembershipRepository membershiRepository;
-	
+
 	public void saveMembershipType(MembershipType membershipType) {
-		membershipTypeRepository.save(membershipType);	
+		membershipTypeRepository.save(membershipType);
 	}
-	
+
 	public List<MembershipType> findAll() {
 		List<MembershipType> memberships=membershipTypeRepository.findAll();
 		return memberships;
 	}
-	
+
 	public MembershipType findMembershiById(Long id) {
 		MembershipType membershipType=membershipTypeRepository.findById(id).orElse(null);
 		return membershipType;
@@ -35,12 +35,12 @@ public class MembershipService  {
 
 	public void saveMembership(Membership membership) {
 		membershiRepository.save(membership);
-		
+
 	}
-	
+
 	public Membership findMembership(Long membershipTypeId,Long athleteId) {
 		return membershiRepository.findMembership(membershipTypeId,athleteId);
 	}
-		
+
 
 }

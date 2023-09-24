@@ -1,9 +1,11 @@
 package dipl.danai.app.controller;
 
 import java.sql.SQLException;
-import org.springframework.security.core.Authentication;
+
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,13 +21,13 @@ import dipl.danai.app.service.MembershipService;
 
 @Controller
 public class MembershipController {
-	
+
 	@Autowired
 	MembershipService membershipTypeService;
-	
+
 	@Autowired
 	GymService gymService;
-		
+
 	@GetMapping("/gym/createMembershipType")
 	public String createMembershipType(Model model,Authentication authentication) {
 		MembershipType membership=new MembershipType();
@@ -34,7 +36,7 @@ public class MembershipController {
 		model.addAttribute("membership",membership);
 		return "gym/createMembershipType";
 	}
-	
+
 	@PostMapping("/gym/createMembershipType")
 	public String createMembershipTypeP(Model model,@Valid @ModelAttribute("membership") MembershipType membershipType,BindingResult bindingResult,@RequestParam(value="gymId") Long gymId) throws SQLException {
 		membershipType.setGym(gymService.getGymById(gymId));
@@ -42,5 +44,5 @@ public class MembershipController {
 		model.addAttribute("successMessage", "MembershipType registered successfully!");
 		return "gym/createMembershipType";
 	}
-	
+
 }

@@ -12,20 +12,20 @@ import javax.persistence.Table;
 @Entity
 @Table(name="workouts")
 public class Workout  {
-	
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long workoutId;
-	
+
 	@Column
 	private String name;
-	
+
 	@Column
 	private String description;
-	
+
 	@ManyToMany(mappedBy="gymWorkouts")
 	private Set<Gym> gyms;
-	
+
 	public Long getWorkoutId() {
 		return workoutId;
 	}

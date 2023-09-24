@@ -2,7 +2,6 @@ package dipl.danai.app.service;
 
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,10 +14,10 @@ import dipl.danai.app.repository.PaymentRepository;
 @Service
 public class PaymentService {
 	  @Autowired
-	  private EmailService emailService; 
+	  private EmailService emailService;
 
 	   @Autowired
-	   private PaymentRepository paymentRepository; 
+	   private PaymentRepository paymentRepository;
 
 	   public void makePayment(Athletes athlete, Gym gym, double amount) {
 	        Payment payment = new Payment();

@@ -6,12 +6,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import java.sql.Date;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
 import dipl.danai.app.EGymApplication;
 import dipl.danai.app.model.Athletes;
 import dipl.danai.app.model.ClassOccurrence;
@@ -62,12 +65,12 @@ public class ScheduleControllerTest {
 
 	    @MockBean
 	    private AthleteService athleteService;
-	    
+
 	    @MockBean
 	    private ClassOfScheduleService classOfScheduleService;
-	    
-	    
-	   
+
+
+
 	    @Test
 	    @WithMockUser(username = "testuser", authorities = "GYM")
 	    public void testAddClass() throws Exception {
@@ -76,16 +79,16 @@ public class ScheduleControllerTest {
 	    	String programId = "384";
 	    	when(gymService.getGymByEmail("testuser")).thenReturn(gym);
 	    	mockMvc.perform(MockMvcRequestBuilders.get("/gym/addClass")
-	    	        .param("programId", programId)) 
+	    	        .param("programId", programId))
 	    	        .andExpect(MockMvcResultMatchers.status().isOk())
 	    	        .andExpect(MockMvcResultMatchers.view().name("gym/addClass"))
 	    	        .andExpect(MockMvcResultMatchers.model().attributeExists("workouts", "instructors", "rooms", "programId"));
 	    }
-	    
+
 	    @Test
 	    @WithMockUser(username = "testuser", authorities = "GYM")
 	    public void testAddClassPost() throws Exception {
-	    	
+
 	    	String previousUrl = "http://localhost:8080/gym/createProgram";
 	        String email = "testuser";
 	        String roomName = "Room1";
@@ -96,19 +99,19 @@ public class ScheduleControllerTest {
 	        int capacity = 20;
 	        Authentication authentication = mock(Authentication.class);
 	        when(authentication.getName()).thenReturn(email);
-	        Gym gym = Mockito.mock(Gym.class); 
+	        Gym gym = Mockito.mock(Gym.class);
 	        gym.setGym_id(1L);
 	        when(gymService.getGymByEmail("testuser")).thenReturn(gym);
 
-	        Workout workout = Mockito.mock(Workout.class); 
+	        Workout workout = Mockito.mock(Workout.class);
 	        workout.setName(workoutName);
 	        when(workoutService.getByName(workoutName)).thenReturn(workout);
 
-	        Instructor instructor = Mockito.mock(Instructor.class); 
+	        Instructor instructor = Mockito.mock(Instructor.class);
 	        instructor.setInstructor_name(instructorName);
 	        when(instructorService.getByName(instructorName)).thenReturn(instructor);
 
-	        Room room = Mockito.mock(Room.class); 
+	        Room room = Mockito.mock(Room.class);
 	        room.setRoomName(roomName);
 	        room.setGym(gym);
 	        when(gymService.getRoomByName(roomName, gym.getGym_id())).thenReturn(room);
@@ -125,9 +128,9 @@ public class ScheduleControllerTest {
 	                .param("capacity", String.valueOf(capacity))
 	                .session(session)
 	        )
-	        		.andExpect(MockMvcResultMatchers.status().is3xxRedirection()) 
+	        		.andExpect(MockMvcResultMatchers.status().is3xxRedirection())
 	                .andExpect(MockMvcResultMatchers.redirectedUrl(previousUrl));
-	        
+
 	      	verify(gymService, times(1)).getGymByEmail(email);
 	        verify(workoutService, times(1)).getByName(workoutName);
 	        verify(instructorService, times(2)).getByName(instructorName);
@@ -136,7 +139,7 @@ public class ScheduleControllerTest {
 	        verify(scheduleService, times(1)).saveClass(any(ClassOfSchedule.class));
 	        verify(instructorService, times(1)).saveClass(any(ClassOfSchedule.class));
 	    }
-	    
+
 	    @Test
 	    @WithMockUser(username = "testuser", authorities = "GYM")
 	    public void testCreateProgram() throws Exception {
@@ -145,7 +148,7 @@ public class ScheduleControllerTest {
 	                .andExpect(MockMvcResultMatchers.view().name("gym/createProgram"))
 	                .andExpect(MockMvcResultMatchers.model().attributeExists("fitnessProgram"));
 	    }
-	    
+
 	    @Test
 	    @WithMockUser(username = "testuser", authorities = "GYM")
 	    public void testGetProgram() throws Exception {
@@ -168,7 +171,7 @@ public class ScheduleControllerTest {
 	        verify(gym, times(1)).getGymSchedules();
 	        verify(gymService, times(1)).saveGym(gym);
 	    }
-	    
+
 
 	    @Test
 	    @WithMockUser(username = "testuser", authorities = "ATLHETE")
@@ -189,8 +192,8 @@ public class ScheduleControllerTest {
 	        mockMvc.perform(MockMvcRequestBuilders.post("/gym/participate")
 	                .param("classOfScheduleId", "1")
 	        		.header("Referer", expectedRedirectUrl))
-	                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()) 
-	                .andExpect(MockMvcResultMatchers.redirectedUrl(expectedRedirectUrl)); 
+	                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+	                .andExpect(MockMvcResultMatchers.redirectedUrl(expectedRedirectUrl));
 	    }
 
 	    @Test
@@ -210,10 +213,10 @@ public class ScheduleControllerTest {
 	        mockMvc.perform(MockMvcRequestBuilders.post("/gym/cancelPosition")
 	                .param("classOfScheduleId", "1")
 	                .header("Referer", expectedRedirectUrl))
-	                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()) 
-	                .andExpect(MockMvcResultMatchers.redirectedUrl(expectedRedirectUrl)); 
+	                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+	                .andExpect(MockMvcResultMatchers.redirectedUrl(expectedRedirectUrl));
 	    }
-	    
+
 	    @Test
 	    @WithMockUser(username = "testuser", authorities = "GYM")
 	    public void testGetClassScheduleDetails() throws Exception {
@@ -248,14 +251,14 @@ public class ScheduleControllerTest {
 	    public void testAddParticipant() throws Exception {
 	        Long classOfScheduleId = 1L;
 	        Long gymId = 123L;
-	        List<Long> selectedAthleteIds = Arrays.asList(1L, 2L); 
+	        List<Long> selectedAthleteIds = Arrays.asList(1L, 2L);
 	        ClassOfSchedule classSchedule = new ClassOfSchedule();
 	        classSchedule.setClassOfScheduleId(classOfScheduleId);
 	        Gym gym=new Gym();
 	        gym.setEmail("testuser");
 	        gym.setGym_id(gymId);
 	        Athletes ath1=new Athletes();
-	        
+
 	        Athletes ath2=new Athletes();
 	        when(classOfScheduleService.getClassOfScheduleById(classOfScheduleId)).thenReturn(classSchedule);
 	        when(athleteService.getById(1L)).thenReturn(ath1);
@@ -263,12 +266,12 @@ public class ScheduleControllerTest {
 
 	        mockMvc.perform(MockMvcRequestBuilders.post("/gym/add-participant")
 	                .param("classOfScheduleId", classOfScheduleId.toString())
-	                .param("selectedAthletes", "1", "2") 
+	                .param("selectedAthletes", "1", "2")
 	                .param("gymId", gymId.toString()))
 	                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
 	                .andExpect(MockMvcResultMatchers.redirectedUrl("/gym/class-schedule-details/" + classOfScheduleId + "?gymId=" + gymId));
 	    }
-	    
+
 	    @Test
 	    @WithMockUser(username = "testuser", authorities = "INSTRUCTOR")
 	    public void testRemoveParticipant() throws Exception {
@@ -300,7 +303,7 @@ public class ScheduleControllerTest {
 		     assertEquals(0, updatedParticipants.size());
 	        verify(classOfScheduleService, times(1)).save(classSchedule);
 	    }
-	    
+
 	    @Test
 	    @WithMockUser(username = "testuser", authorities = "INSTRUCTOR")
 	    public void testShowDeleteClassPage() throws Exception {
@@ -315,7 +318,7 @@ public class ScheduleControllerTest {
 	                .andExpect(MockMvcResultMatchers.model().attribute("program", schedule));
 	        verify(scheduleService, times(1)).getScheduleById(programId);
 	    }
-	    
+
 	    @Test
 	    @WithMockUser(username = "testuser", authorities = "INSTRUCTOR")
 	    public void testDeleteSelectedClasses() throws Exception {
@@ -344,8 +347,8 @@ public class ScheduleControllerTest {
 	        assertEquals(1,updatedWorkoutList.size());
 	        verify(scheduleService, times(1)).saveUpdatedSchedule(schedule);
 	    }
-	    
-	    
+
+
 	    @Test
 	    @WithMockUser(username = "testuser", authorities = "INSTRUCTOR")
 	    public void testModifyClass() throws Exception {
@@ -372,7 +375,7 @@ public class ScheduleControllerTest {
 	        classOfSchedule.setRoom(r);
 	        classOfSchedule.setIs_canceled(false);
 	        ClassOccurrence c=new ClassOccurrence();
-	        
+
 	        when(classOfScheduleService.getClassOccurrence(programId, classId)).thenReturn(c);
 	        when(gymService.getGymById(gymId)).thenReturn(gym);
 	        when(scheduleService.getScheduleById(programId)).thenReturn(schedule);
@@ -388,90 +391,90 @@ public class ScheduleControllerTest {
 	                .andExpect(MockMvcResultMatchers.view().name("gym/modifyClass"))
 	                .andExpect(MockMvcResultMatchers.model().attributeExists("classOfSchedule", "workouts", "instructors", "rooms", "classOccurrence", "schedule", "gymId"));
 	    }
-	    
+
 	    @Test
 	    @WithMockUser(username = "testuser", authorities = "INSTRUCTOR")
 	    public void testPerformModification() throws Exception {
 	    	String expectedRedirectUrl = "http://localhost:8080/gym/modifyClass";
 	        MockHttpSession session = new MockHttpSession();
 	        session.setAttribute("referer", expectedRedirectUrl);
-	        Long classId = 1L;
-	        Long workoutId=1L;
-	        Long instructorId=1L;
-	        Long roomId=1L;
-	        Long scheduleId=1L;
-	        Long gymId=1L;
+	        long classId = 1L;
+	        long workoutId=1L;
+	        long instructorId=1L;
+	        long roomId=1L;
+	        long scheduleId=1L;
+	        long gymId=1L;
 	        String time1="19:00:00";
 	        String time2="20:00:00";
 	        Time startTime=Time.valueOf(time1);
 	        Time endTime=Time.valueOf(time2);
 	        mockMvc.perform(MockMvcRequestBuilders.post("/gym/performModification")
-	                .param("classId", classId.toString())
+	                .param("classId", Long.toString(classId))
 	                .param("timeStart", startTime.toString())
 	                .param("timeEnd", endTime.toString())
-	                .param("instructorId", instructorId.toString())
-	                .param("roomId", roomId.toString())
-	                .param("scheduleId", scheduleId.toString())
-	                .param("gymId", gymId.toString())
-	                .param("workoutId", workoutId.toString())
-	                .header("referer", expectedRedirectUrl))
-	                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()) 
-	                .andExpect(MockMvcResultMatchers.redirectedUrl(expectedRedirectUrl)); 
-	    }
-	    
-	    @Test
-	    @WithMockUser(username = "testuser", authorities = "INSTRUCTOR")
-	    public void testCancelClassOccurrence() throws Exception {
-	        Long classOccurrenceId = 1L;
-	        Long scheduleId = 2L;
-	        Long classId = 3L;
-	        String expectedRedirectUrl = "http://localhost:8080/gym/modifyClass";
-	        MockHttpSession session = new MockHttpSession();
-	        session.setAttribute("referer", expectedRedirectUrl);
-	        
-	        mockMvc.perform(MockMvcRequestBuilders.post("/gym/cancelClassOccurrence")
-	                .param("classOccurrenceId", classOccurrenceId.toString())
-	                .param("scheduleId", scheduleId.toString())
-	                .param("classId", classId.toString())
+	                .param("instructorId", Long.toString(instructorId))
+	                .param("roomId", Long.toString(roomId))
+	                .param("scheduleId", Long.toString(scheduleId))
+	                .param("gymId", Long.toString(gymId))
+	                .param("workoutId", Long.toString(workoutId))
 	                .header("referer", expectedRedirectUrl))
 	                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
 	                .andExpect(MockMvcResultMatchers.redirectedUrl(expectedRedirectUrl));
-	        
 	    }
-	    
+
+	    @Test
+	    @WithMockUser(username = "testuser", authorities = "INSTRUCTOR")
+	    public void testCancelClassOccurrence() throws Exception {
+	        long classOccurrenceId = 1L;
+	        long scheduleId = 2L;
+	        long classId = 3L;
+	        String expectedRedirectUrl = "http://localhost:8080/gym/modifyClass";
+	        MockHttpSession session = new MockHttpSession();
+	        session.setAttribute("referer", expectedRedirectUrl);
+
+	        mockMvc.perform(MockMvcRequestBuilders.post("/gym/cancelClassOccurrence")
+	                .param("classOccurrenceId", Long.toString(classOccurrenceId))
+	                .param("scheduleId", Long.toString(scheduleId))
+	                .param("classId", Long.toString(classId))
+	                .header("referer", expectedRedirectUrl))
+	                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+	                .andExpect(MockMvcResultMatchers.redirectedUrl(expectedRedirectUrl));
+
+	    }
+
 	    @Test
 	    @WithMockUser(username = "testuser", authorities = "INSTRUCTOR")
 	    public void testUncancelClassOccurrence() throws Exception {
-	        Long classId = 1L;
-	        Long scheduleId = 2L;
-	        Long classOccurrenceId = 3L;
+	        long classId = 1L;
+	        long scheduleId = 2L;
+	        long classOccurrenceId = 3L;
 	        String expectedRedirectUrl = "http://localhost:8080/gym/modifyClass";
 	        MockHttpSession session = new MockHttpSession();
 	        session.setAttribute("referer", expectedRedirectUrl);
 	        mockMvc.perform(MockMvcRequestBuilders.post("/gym/uncancelClassOccurrence")
-	                .param("classId", classId.toString())
-	                .param("scheduleId", scheduleId.toString())
-	                .param("classOccurrenceId", classOccurrenceId.toString())
+	                .param("classId", Long.toString(classId))
+	                .param("scheduleId", Long.toString(scheduleId))
+	                .param("classOccurrenceId", Long.toString(classOccurrenceId))
 	                .header("referer", expectedRedirectUrl))
 	                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
 	                .andExpect(MockMvcResultMatchers.redirectedUrl(expectedRedirectUrl));
-	        
+
 	    }
-	    
+
 	    @Test
 	    @WithMockUser(username = "testuser", authorities = "ATHLETE")
 	    public void testJoinWaitingList() throws Exception {
-	        Long classOfScheduleId = 1L;
-	        
+	        long classOfScheduleId = 1L;
+
 	        String expectedRedirectUrl = "http://localhost:8080/gym/workoutDetails";
 	        MockHttpSession session = new MockHttpSession();
-	        session.setAttribute("Referer", expectedRedirectUrl); 
-	        
+	        session.setAttribute("Referer", expectedRedirectUrl);
+
 	        mockMvc.perform(MockMvcRequestBuilders.post("/gym/joinWaitingList")
-	                .param("classOfScheduleId", classOfScheduleId.toString())
+	                .param("classOfScheduleId", Long.toString(classOfScheduleId))
 	                .header("Referer", expectedRedirectUrl))
 	                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
 	                .andExpect(MockMvcResultMatchers.redirectedUrl(expectedRedirectUrl));
-	        
+
 	    }
 }

@@ -1,5 +1,24 @@
 package dipl.danai.app.model;
 
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.Table;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.Length;
@@ -7,31 +26,20 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
-
-import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-
 
 @SuppressWarnings("serial")
 @Entity
 @Table(name = "users")
 public class User implements UserDetails  {
-	
+
 	@Id
 	@Column
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    
+
     @Enumerated(EnumType.STRING)
     private Role role;
-    
+
     @NotNull(message = "First Name cannot be empty")
     @Column(name = "first_name")
     private String firstName;
@@ -63,23 +71,27 @@ public class User implements UserDetails  {
 
     @Column(name = "enabled")
     private Boolean enabled = true;
-    
+
     @Column(name="resetToken")
     private String resetToken;
-    
+
     @Column
     private Date resetTokenExpiryDate;
-    
+
     @Column
     private String Address;
-    
+
     @Column
     private String City;
-    
+
     @Column(name = "phone_number")
     @Size(min = 10, max = 10, message = "Phone number must be exactly 10 digits")
     @Pattern(regexp = "\\d{10}", message = "Phone number must contain only digits")
     private String phoneNumber;
+    
+    @Lob
+    @Column(name = "profilePicture")
+    private byte[] profilePicture;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -130,7 +142,7 @@ public class User implements UserDetails  {
     }
 
     public Role getRole() {
-    	return role; 
+    	return role;
     }
 
     public void setRole(Role role) {
@@ -138,26 +150,26 @@ public class User implements UserDetails  {
     }
 
     public String getEmail() {
-    	return email; 
+    	return email;
     }
 
-    public void setEmail(String email) { 
-    	this.email = email; 
+    public void setEmail(String email) {
+    	this.email = email;
     }
 
-    public String getFirstName() { 
-    	return firstName; 
+    public String getFirstName() {
+    	return firstName;
     }
 
-    public void setFirstName(String firstName) { 
+    public void setFirstName(String firstName) {
     	this.firstName = firstName;
     }
 
-    public String getLastName() { 
-    	return lastName; 
+    public String getLastName() {
+    	return lastName;
     }
 
-    public void setLastName(String lastName) { 
+    public void setLastName(String lastName) {
     	this.lastName = lastName;
     }
 
@@ -200,6 +212,15 @@ public class User implements UserDetails  {
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
 	}
-    
-    
+
+	public byte[] getProfilePicture() {
+		return profilePicture;
+	}
+
+	public void setProfilePicture(byte[] profilePicture) {
+		this.profilePicture = profilePicture;
+	}
+
+
+
 }

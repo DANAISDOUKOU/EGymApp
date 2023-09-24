@@ -1,7 +1,6 @@
 package dipl.danai.app.model;
 
 
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -11,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -24,22 +24,22 @@ public class Instructor {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column
 	private Long instructor_id;
-	
+
 	@Column
 	private String instructor_name;
-	
+
 	@Column
 	private String instructor_surname;
-	
-	@Column 
+
+	@Column
 	private String email;
-	
+
 	@Column
 	private String Address;
-	    
+
 	@Column
 	private String City;
-	    
+
 	@Column(name = "phone_number")
 	@Size(min = 10, max = 10, message = "Phone number must be exactly 10 digits")
 	@Pattern(regexp = "\\d{10}", message = "Phone number must contain only digits")
@@ -48,12 +48,18 @@ public class Instructor {
 	@ManyToMany(mappedBy="gymInstructors")
 	private Set<Gym> gyms;
 	
+	@Lob
+	@Column(name = "picture")
+	private byte[] picture;
+
+	private String profilePictureBase64;
+	
 	@OneToMany
 	@JoinTable(name="instructor_classes", joinColumns=@JoinColumn(name="instructor_id"),inverseJoinColumns=@JoinColumn(name="class_id"))
 	private Set<ClassOfSchedule> instructorClass;
-	
+
 	public Instructor(Long id, String name, String surname, String email2, String address2, String city2,
-			String phoneNumber2) {
+			String phoneNumber2, byte[] profilePictureBytes) {
 		this.instructor_id=id;
 		this.instructor_name=name;
 		this.instructor_surname=surname;
@@ -61,8 +67,9 @@ public class Instructor {
 		this.Address=address2;
 		this.City=city2;
 		this.phoneNumber=phoneNumber2;
+		this.picture=profilePictureBytes;
 	}
-	
+
 	public Instructor() {}
 
 	public Long getInstructor_id() {
@@ -136,5 +143,23 @@ public class Instructor {
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
 	}
+
+	public byte[] getPicture() {
+		return picture;
+	}
+
+	public void setPicture(byte[] profilePicture) {
+		this.picture = profilePicture;
+	}
+
+	public String getProfilePictureBase64() {
+		return profilePictureBase64;
+	}
+
+	public void setProfilePictureBase64(String profilePictureBase64) {
+		this.profilePictureBase64 = profilePictureBase64;
+	}
 	
+	
+
 }

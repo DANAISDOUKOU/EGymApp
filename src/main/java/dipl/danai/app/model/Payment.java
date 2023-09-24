@@ -15,28 +15,28 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "payment")
 public class Payment {
-	
+
 	@Id
 	@Column
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long payment_id;
-	
-	
+
+
 	@ManyToOne
 	@JoinColumn(name = "athlete_id")
 	private Athletes athlete;
-	 
+
 	@ManyToOne
 	@JoinColumn(name = "gym_id")
 	private Gym gym;
-	 
-	@Column 
+
+	@Column
 	private double amount;
-	
+
 	@Column
 	private Timestamp payment_time;
-	
-	@Column 
+
+	@Column
 	private Date payment_date;
 
 	public Long getPayment_id() {
@@ -86,7 +86,7 @@ public class Payment {
 	public void setPayment_date(Date payment_date) {
 		this.payment_date = payment_date;
 	}
-	
-	
+
+
 
 }

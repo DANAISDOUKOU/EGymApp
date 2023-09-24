@@ -10,9 +10,9 @@ import dipl.danai.app.repository.ClassRatingRepository;
 public class ClassRatingService {
 		@Autowired
 		ClassRatingRepository classRatingRepo;
-		
+
 		public void saveClassRating(ClassRating classRating) {
 			classRatingRepo.save(classRating);
 		}
-		
+
 }

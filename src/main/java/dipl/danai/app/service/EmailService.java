@@ -1,9 +1,5 @@
 package dipl.danai.app.service;
 
-import java.util.Properties;
-import javax.mail.*;
-import javax.mail.internet.*;
-
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;

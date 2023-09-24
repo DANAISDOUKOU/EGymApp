@@ -1,5 +1,6 @@
 package dipl.danai.app.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -9,12 +10,16 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
 import dipl.danai.app.model.Athletes;
 import dipl.danai.app.model.Gym;
+import dipl.danai.app.model.Instructor;
 import dipl.danai.app.model.Membership;
 import dipl.danai.app.model.MembershipType;
 import dipl.danai.app.model.Room;
-import dipl.danai.app.repository.ScheduleRepository;
+import dipl.danai.app.model.Workout;
 import dipl.danai.app.repository.AthleteRepository;
 import dipl.danai.app.repository.GymRepository;
 import dipl.danai.app.repository.MembershipRepository;
@@ -23,26 +28,19 @@ import dipl.danai.app.repository.RoomRepository;
 @Service
 public class GymService {
 	@Autowired
-	AthleteRepository athleteRepository;
-	
+	private AthleteRepository athleteRepository;
 	@Autowired
-	RoomRepository roomRepository;
-	
+	private RoomRepository roomRepository;
 	@Autowired
-	GymRepository gymRepository;
-	
+	private GymRepository gymRepository;
 	@Autowired
-	ScheduleRepository scheduleRepository;
-	
+	private MembershipRepository membershipRepository;
 	@Autowired
-	MembershipRepository membershipRepository;
-	
-	@Autowired
-	NominatimService geonameService;
-	
+	private NominatimService nominatimService;
 
+	@Transactional
 	public void saveGym(Gym gym) {
-		gymRepository.save(gym);	
+		gymRepository.save(gym);
 	}
 
 	public void addMembershipToGym(Long gymId, MembershipType membership) {
@@ -74,39 +72,38 @@ public class GymService {
 			 Membership membership = membershipRepository.findByAthleteAndMembershipType_Gym(gymId, athlete);
 		     if(membership!=null) {
 		    	 return true;
-		     }   
+		     }
 			 return false;
 		}
 		return false;
 		}
-	
+
 	public void addRoomToGym(Gym gym, Room room) {
 		gym.getRooms().add(room);
 		gymRepository.save(gym);
 		room.setGym(gym);
 		roomRepository.save(room);
 	}
+	
+	@Transactional
+	public Gym updateGymProfile(String email, String firstName, String lastName, String phoneNumber, String address,
+			String city) {
+		Gym gym=gymRepository.findByEmail(email);
 
-	public void setValue(String value,String field, Gym gym) {
-		if(field.equals("name")) {
-			gym.setGym_name(value);
-		}else if(field.equals("surname")) {
-			gym.setGym_surname(value);
-		}else if(field.equals("number")) {
-			gym.setPhoneNumber(value);
-		}else if(field.equals("address")) {
-			gym.setAddress(value);
-			 Map<String, Double> coordinates = geonameService.getCoordinatesForAddressInCity(value, gym.getCity());
-			    if (coordinates != null) {
-			        gym.setLatitude(coordinates.get("latitude"));
-			        gym.setLongitude(coordinates.get("longitude"));
-			    }
-		}else if(field.equals("city")) {
-			gym.setCity(value);
-		}
+		gym.setGym_name(firstName);
+		gym.setGym_surname(lastName);
+		gym.setPhoneNumber(phoneNumber);
+		gym.setAddress(address);
+		Map<String, Double> coordinates = nominatimService.getCoordinatesForAddressInCity(address, gym.getCity());
+		    if (coordinates != null) {
+		    	gym.setLatitude(coordinates.get("latitude"));
+		    	gym.setLongitude(coordinates.get("longitude"));
+			}
+		gym.setCity(city);
+		
 		gymRepository.save(gym);
+		return gym;
 	}
-
 
 	public List<Gym> searchGyms(String searchBy, String query,String sortBy,String address) {
 	    List<Gym> allGyms = gymRepository.findAll();
@@ -135,7 +132,7 @@ public class GymService {
 	        case "name":
 	            return gym.getGym_name().toLowerCase().contains(query);
 	        case "workoutType":
-	            final String queryLowerCase = query; 
+	            final String queryLowerCase = query;
 	            return gym.getGymWorkouts().stream().anyMatch(workout -> workout.getName().toLowerCase().contains(queryLowerCase));
 	        case "city":
 	            return gym.getCity().toLowerCase().contains(query);
@@ -144,43 +141,42 @@ public class GymService {
 	    }
 	}
 
-	
 	public List<Gym> getGyms(){
 		List<Gym> gyms=gymRepository.findAll();
 		return gyms;
 	}
-	
+
 	public Gym getGymById(Long id) {
 		 Gym gym = gymRepository.findById(id).orElse(null);
 		 return gym;
 	}
-	
+
 	public Gym getGymByEmail(String email) {
 		Gym gym=gymRepository.findByEmail(email);
 		return gym;
 
 	}
-	
+
 	public Set<Athletes> findMembers(Long id){
 		Set<Athletes> members=gymRepository.findMembers(id);
 		return members;
 	}
-	
+
 	public void saveUpdatedGym(Gym gym) {
 		gymRepository.save(gym);
 	}
-	
+
 	public MembershipType findExistingMembership(Long gymId,Long athleteId) {
 		Athletes athlete=athleteRepository.findById(athleteId).orElse(null);
 		Membership existingMembership=membershipRepository.findByAthleteAndMembershipType_Gym(gymId,athlete);
 		MembershipType existingMembershipType=existingMembership.getMembershipType();
 		return existingMembershipType;
 	}
-	
+
 	public Room getRoomByName(String name,Long gymId) {
 		return  roomRepository.findByNameAndGymId(name,gymId);
 	}
-	
+
 	public Room getRoomById(Long id) {
 		return  roomRepository.findById(id).orElse(null);
 	}
@@ -190,27 +186,25 @@ public class GymService {
 		 List<Gym> searchResults = allGyms.stream().filter(gym -> (city==null|| city.trim().isEmpty()||gym.getCity().trim().equalsIgnoreCase(city.trim()))).collect(Collectors.toList());
 		 return searchResults;
 	}
-	
 
-	
+
+
 	public List<Gym> getAllGymsWithCoordinates() {
         List<Gym> allGyms = gymRepository.findAll();
 
         for (Gym gym : allGyms) {
-            Map<String, Double> coordinates = geonameService.getCoordinatesForAddressInCity(gym.getAddress(), gym.getCity());
+            Map<String, Double> coordinates = nominatimService.getCoordinatesForAddressInCity(gym.getAddress(), gym.getCity());
             if (coordinates != null) {
                 gym.setLatitude(coordinates.get("latitude"));
                 gym.setLongitude(coordinates.get("longitude"));
                 gymRepository.save(gym);
             }
         }
-
         return allGyms;
     }
-	
-	private double calculateDistance(String yourAddress, double gymLatitude, double gymLongitude) {
-	    Map<String, Double> yourCoordinates = geonameService.getCoordinatesForAddressInCity(yourAddress, null);
 
+	private double calculateDistance(String yourAddress, double gymLatitude, double gymLongitude) {
+	    Map<String, Double> yourCoordinates = nominatimService.getCoordinatesForAddressInCity(yourAddress, null);
 	    if (yourCoordinates != null) {
 	        double lat1 = yourCoordinates.get("latitude");
 	        double lon1 = yourCoordinates.get("longitude");
@@ -226,7 +220,60 @@ public class GymService {
 	        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 	        return radius * c;
 	    }
+	    return Double.MAX_VALUE;
+	}
 
-	    return Double.MAX_VALUE; // Return a very large value if coordinates cannot be determined
+	public List<Athletes> searchMembers(String searchTerm,Set<Athletes> members) {
+		  List<Athletes> matchingAthletes = new ArrayList<>();
+		  for (Athletes athlete : members) {
+		      if (athlete.getAthlete_name().contains(searchTerm)) {
+		          matchingAthletes.add(athlete);
+		      }
+		  }
+		  return matchingAthletes;
+	}
+
+	public void updateGymPicture(Gym gym,MultipartFile file) {
+		try {
+			gym.setPicture(file.getBytes());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		gymRepository.save(gym);
+	}
+
+	public List<Workout> searchWokrouts(String searchTerm, List<Workout> avaliableWorkouts) {
+		List<Workout> workouts=new ArrayList<>();
+		for(Workout w:avaliableWorkouts) {
+			if(w.getName().contains(searchTerm)) {
+				workouts.add(w);
+			}
+		}
+		return workouts;
+	}
+
+	public List<Instructor> searchInstructors(String searchTerm, List<Instructor> avaliableInstructor) {
+		List<Instructor> instructors=new ArrayList<>();		
+		for(Instructor i:avaliableInstructor) {
+			System.out.println(searchTerm+" "+i.getInstructor_name());
+			if(i.getInstructor_name().contains(searchTerm)) {
+					System.out.println("bhkaaa");
+				instructors.add(i);
+			}
+		}
+		return instructors;
+	}
+	
+	public boolean shouldUseMembershipTypesAsOffers(Long gymId) {
+        Gym gym = gymRepository.findById(gymId).orElse(null);
+        if (gym != null) {
+            return gym.isUseMembershipTypesAsOffers();
+        }
+        return false; 
+    }
+
+	public void updateUseMembershipTypesAsOffers(Gym gym) {
+		gym.setUseMembershipTypesAsOffers(gym.isUseMembershipTypesAsOffers());		
+		gymRepository.save(gym);
 	}
 }
