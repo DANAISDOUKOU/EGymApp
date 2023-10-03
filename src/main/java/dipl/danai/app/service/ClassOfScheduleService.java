@@ -21,9 +21,11 @@ import dipl.danai.app.repository.WorkoutRepository;
 @Service
 public class ClassOfScheduleService {
 	@Autowired
-	ClassOfScheduleRepository classOfScheduleRepository;
+	
+	public ClassOfScheduleRepository classOfScheduleRepository;
 
 	@Autowired
+	public
 	ClassOccurrenceRepository classOccurenceRepo;
 
 	@Autowired
@@ -118,5 +120,13 @@ public class ClassOfScheduleService {
 
 	public boolean checkIfSame(ClassOfSchedule classOfSchedule, ClassOfSchedule c) {
 		return (classOfSchedule.getTime_start().equals(c.getTime_start())&&classOfSchedule.getTime_end().equals(c.getTime_end())&&classOfSchedule.getWorkout().getName().equals(c.getWorkout().getName()));
+	}
+
+	public void setClassOfScheduleRepository(ClassOfScheduleRepository classOfScheduleRepository2) {
+		this.classOfScheduleRepository=classOfScheduleRepository2;
+	}
+
+	public void setWaitingListEntryRepository(WaitingListEntryRepository waitingListEntryRepository2) {
+		this.waitingListEntryRepository=waitingListEntryRepository2;
 	}
 }

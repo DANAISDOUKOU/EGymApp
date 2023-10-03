@@ -42,7 +42,6 @@ public class UserService implements UserDetailsService {
     private byte[] temporaryProfilePictureBytes;
 
     public void setTemporaryProfilePictureBytes(byte[] profilePictureBytes) {
-    	System.out.println(profilePictureBytes);
         this.temporaryProfilePictureBytes = profilePictureBytes;
     }
 
@@ -157,7 +156,6 @@ public class UserService implements UserDetailsService {
 	 public void saveProfilePicture(User user, MultipartFile profilePicture) {
 	        try {
 	            byte[] profilePictureBytes = profilePicture.getBytes();
-	            System.out.println("ppppp"+profilePictureBytes);
 	            user.setProfilePicture(profilePictureBytes);
 	            userRepository.save(user);
 	        } catch (Exception e) {

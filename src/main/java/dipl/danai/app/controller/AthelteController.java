@@ -97,18 +97,6 @@ public class AthelteController {
 
 
 
-	@GetMapping(value={"/athlete/seeAllGyms"})
-	public String seeAllGyms(Authentication authentication,Model model) {
-		List<Gym> gyms=gymService.getGyms();
-		 for (Gym gym : gyms) {
-		        byte[] pictureBytes = gym.getPicture(); // Assuming you have a method to get the picture bytes
-		        String pictureBase64 = Base64.getEncoder().encodeToString(pictureBytes);
-		        gym.setProfilePictureBase64(pictureBase64); // Assuming you have a setter for the Base64 representation
-		    }
-		model.addAttribute("gyms",gyms);
-		return "athlete/seeAllGyms";
-	}
-
 	@GetMapping(value={"/athlete/GymsThatIAmMember"})
 	public String seeGymsThatIamMember(Authentication authentication,Model model) {
 		 String athleteEmail = authentication.getName();

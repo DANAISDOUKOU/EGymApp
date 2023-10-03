@@ -1,5 +1,6 @@
 package dipl.danai.controller;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.util.HashSet;
@@ -35,7 +36,14 @@ public class InstructorControllerTest {
     @Test
     @WithMockUser(username = "testuser", authorities = "INSTRUCTOR")
     public void testInstructorPage() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/instructor/dashboard"))
+    	Instructor instructor = Mockito.mock(Instructor.class);
+    	Gym gym=new Gym();
+    	byte[] picture=new byte[] {};
+    	gym.setPicture(picture);
+    	instructor.getGyms().add(gym);
+    	when(instructorService.getByEmail(anyString())).thenReturn(instructor);
+    	when(instructor.getGyms()).thenReturn(new HashSet<Gym> ());
+    	mockMvc.perform(MockMvcRequestBuilders.get("/instructor/dashboard"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.view().name("instructor/dashboard"));
     }

@@ -2,6 +2,7 @@ package dipl.danai.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -9,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -25,8 +27,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.result.StatusResultMatchers;
 
 import dipl.danai.app.EGymApplication;
 import dipl.danai.app.model.Athletes;
@@ -129,7 +133,7 @@ public class ScheduleControllerTest {
 	                .session(session)
 	        )
 	        		.andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-	                .andExpect(MockMvcResultMatchers.redirectedUrl(previousUrl));
+	                .andExpect(MockMvcResultMatchers.redirectedUrl(previousUrl+ "?successMessage=Class+added+to+FitnessProgram%21"));
 
 	      	verify(gymService, times(1)).getGymByEmail(email);
 	        verify(workoutService, times(1)).getByName(workoutName);
@@ -161,9 +165,11 @@ public class ScheduleControllerTest {
 	        Date date=Date.valueOf(str);
 	        when(gymService.getGymByEmail("testuser")).thenReturn(gym);
 	        when(gym.getGymSchedules()).thenReturn(new ArrayList<>());
+	        int validWeeks = 1;
 	        mockMvc.perform(MockMvcRequestBuilders.post("/gym/createProgram")
 	                .flashAttr("schedule", schedule)
-	                .param("date", str))
+	                .param("date", str)
+	                .param("weeks", String.valueOf(validWeeks)))
 	        		.andExpect(MockMvcResultMatchers.status().is3xxRedirection())
 	        		 .andExpect(MockMvcResultMatchers.redirectedUrl("/gym/createProgram"));
 	        verify(gymService, times(1)).getGymByEmail(email);
@@ -176,7 +182,7 @@ public class ScheduleControllerTest {
 	    @Test
 	    @WithMockUser(username = "testuser", authorities = "ATLHETE")
 	    public void testParticipateInClass() throws Exception {
-	    	String expectedRedirectUrl = "http://localhost:8080/gym/workoutDetails";
+	    	String expectedRedirectUrl = "http://localhost:8080/gym/workoutDetails?isModalOpen=true&workoutId=2&scheduleId=4&gymId=3&classOfScheduleId=1";
 
 	        MockHttpSession session = new MockHttpSession();
 	        session.setAttribute("Referer", expectedRedirectUrl);
@@ -191,6 +197,9 @@ public class ScheduleControllerTest {
 
 	        mockMvc.perform(MockMvcRequestBuilders.post("/gym/participate")
 	                .param("classOfScheduleId", "1")
+	                .param("workoutId", "2")
+	                .param("gymId", "3")
+	                .param("scheduleId", "4")
 	        		.header("Referer", expectedRedirectUrl))
 	                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
 	                .andExpect(MockMvcResultMatchers.redirectedUrl(expectedRedirectUrl));
@@ -199,7 +208,7 @@ public class ScheduleControllerTest {
 	    @Test
 	    @WithMockUser(username = "testuser", authorities = "ATLHETE")
 	    public void testCancelPosition() throws Exception {
-	    	String expectedRedirectUrl = "http://localhost:8080/gym/workoutDetails";
+	    	String expectedRedirectUrl = "http://localhost:8080/gym/workoutDetails?isModalOpen=true&workoutId=2&scheduleId=4&gymId=3&classOfScheduleId=1";
 
 	        MockHttpSession session = new MockHttpSession();
 	        session.setAttribute("Referer", expectedRedirectUrl);
@@ -212,9 +221,12 @@ public class ScheduleControllerTest {
 
 	        mockMvc.perform(MockMvcRequestBuilders.post("/gym/cancelPosition")
 	                .param("classOfScheduleId", "1")
+	                .param("workoutId", "2")
+	                .param("gymId", "3")
+	                .param("scheduleId", "4")
 	                .header("Referer", expectedRedirectUrl))
 	                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-	                .andExpect(MockMvcResultMatchers.redirectedUrl(expectedRedirectUrl));
+	                .andExpect(MockMvcResultMatchers.redirectedUrl(expectedRedirectUrl+ "&alreadySelected=false"));
 	    }
 
 	    @Test
@@ -477,4 +489,7 @@ public class ScheduleControllerTest {
 	                .andExpect(MockMvcResultMatchers.redirectedUrl(expectedRedirectUrl));
 
 	    }
+	  
+
+	
 }

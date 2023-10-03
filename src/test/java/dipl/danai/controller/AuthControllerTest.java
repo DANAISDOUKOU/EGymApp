@@ -91,7 +91,8 @@ public class AuthControllerTest {
 	     mockUser.setCity("Ioannina");
 	     mockUser.setFirstName("hera");
 	     mockUser.setLastName("Kati");
-
+	     byte[] picture=new byte[] {};
+	     mockUser.setProfilePicture(picture);
 	     when(userService.getUser("testuser@example.org")).thenReturn(mockUser);
 
 	     mockMvc.perform(MockMvcRequestBuilders.get("/profile"))

@@ -127,7 +127,7 @@ public class GymService {
 	    return searchResults;
 	}
 
-	private boolean matchesSearchCriteria(Gym gym, String searchBy, String query) {
+	public boolean matchesSearchCriteria(Gym gym, String searchBy, String query) {
 	    query = query.trim().toLowerCase();
 
 	    switch (searchBy) {

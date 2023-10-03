@@ -35,7 +35,9 @@ public class AthleteService {
 	public Athletes updateAthleteProfile(String email, String firstName, String lastName, String phoneNumber, String address,
 			String city) {
 		Athletes athlete=athleteRepository.findByEmail(email);
+		System.out.println("aaaaaaaaaa "+email);
 		if(athlete!=null) {
+			System.out.println("hereee");
 			athlete.setAthlete_name(firstName);
 			athlete.setAthlete_surname(lastName);
 			athlete.setPhoneNumber(phoneNumber);

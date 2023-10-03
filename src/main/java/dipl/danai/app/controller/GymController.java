@@ -227,7 +227,6 @@ public class GymController {
 	     popylarityCalculationService.setScheduledGym(gym);
 	     popylarityCalculationService.updatePopularityScoresForGym();
 	     List<WorkoutPopularity> popularWorkouts = popylarityCalculationService.getTopPopularWorkoutsForGym(gym, 3);
-	     System.out.println("ahahhahahahaha "+popularWorkouts.size());
 	     model.addAttribute("popularWorkouts", popularWorkouts);
 
 	     if(programList!=null) {
@@ -491,12 +490,10 @@ public class GymController {
 	    Collection<Schedule> schedules = gym.getGymSchedules();
 	    Map<Schedule, List<ClassOfSchedule>> scheduleClassesMap = new HashMap<>();
 
-	    // Calculate the start and end dates for the current week
 	    LocalDate now = LocalDate.now();
 	    LocalDate startOfWeek = now.with(DayOfWeek.MONDAY);
 	    LocalDate endOfWeek = now.with(DayOfWeek.SUNDAY);
 
-	    // Custom comparator for sorting by date and time
 	    Comparator<Schedule> scheduleComparator = (schedule1, schedule2) -> {
 	        LocalDate date1 = schedule1.getWork_out_date().toLocalDate();
 	        LocalDate date2 = schedule2.getWork_out_date().toLocalDate();
@@ -522,7 +519,6 @@ public class GymController {
 	                }
 	            }
 
-	            // Filter classes for the current week
 	            if (!classesForInstructor.isEmpty() && schedule.getWork_out_date().toLocalDate().isAfter(startOfWeek.minusDays(1))
 	                    && schedule.getWork_out_date().toLocalDate().isBefore(endOfWeek.plusDays(1))) {
 	                classesForInstructor.sort(Comparator.comparing(ClassOfSchedule::getTime_start));
