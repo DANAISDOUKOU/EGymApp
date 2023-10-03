@@ -61,8 +61,10 @@
     <h2>Positions remaining:</h2>
     <td th:text="${classOfSchedule.capacity - classOfSchedule.participants.size()}"></td>
 	<form th:action="@{/gym/participate}" method="post">
-       	<input type="hidden" name="classOfScheduleId" th:value="${classOfSchedule.classOfScheduleId}" />
-       	<input type="hidden" name="gymId" th:value="${gym.gym_id}" />
+       <input type="hidden" name="classOfScheduleId" th:value="${classOfSchedule.classOfScheduleId}" />
+        <input type="hidden" name="gymId" th:value="${gym.gym_id}" />
+        <input type="hidden" name="workoutId" th:value="${workout.workoutId}" />
+        <input type="hidden" name="scheduleId" th:value="${schedule.schedule_id}" />
       	<span th:if="${classOfSchedule.is_canceled}" class="canceled-text">(CANCELED)</span>
        	<td th:if="${not classOfSchedule.is_canceled}">
     	<div th:if="${not alreadySelected and not allPositionsReserved}">
@@ -70,11 +72,31 @@
 		</div>
 	</td>	
    	</form>
+<div th:if="${alreadySelected and schedule.weeks > 1 and !alreadySelectedForAllTheWeeks }">
+    <form th:action="@{/gym/participateNextWeeks}" method="post">
+        <input type="hidden" name="classOfScheduleId" th:value="${classOfSchedule.classOfScheduleId}" />
+        <input type="hidden" name="gymId" th:value="${gym.gym_id}" />
+        <input type="hidden" name="workoutId" th:value="${workout.workoutId}" />
+        <input type="hidden" name="scheduleId" th:value="${schedule.schedule_id}" />
+        <label for="weeksToReserve">Reserve for how many weeks?</label>
+        <label for="weeksToReserve">Reserve for how many weeks?</label>
+        <select name="weeksToReserve" id="weeksToReserve">
+            <option th:each="weekNumber : ${#numbers.sequence(1, schedule.weeks - 1)}"
+                th:value="${weekNumber}" th:text="${weekNumber}"
+                th:unless="${#lists.contains(reservedWeeks, weekNumber)}"></option>
+        </select>
+        <button type="submit">Reserve for Multiple Weeks</button>
+    </form>
+</div>
+
    
     <div th:if="${alreadySelected}">
     <p>You have already reserved a position.</p>
     <form th:action="@{/gym/cancelPosition}" method="post">
         <input type="hidden" name="classOfScheduleId" th:value="${classOfSchedule.classOfScheduleId}" />
+        <input type="hidden" name="gymId" th:value="${gym.gym_id}" />
+        <input type="hidden" name="workoutId" th:value="${workout.workoutId}" />
+        <input type="hidden" name="scheduleId" th:value="${schedule.schedule_id}" />
         <td th:if="${not classOfSchedule.is_canceled}">
       		<button type="submit">Cancel Reservation</button>
         </td>

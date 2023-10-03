@@ -1,5 +1,6 @@
 package dipl.danai.app.service;
 
+import java.sql.Date;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import dipl.danai.app.model.ClassOfSchedule;
+import dipl.danai.app.model.Gym;
 import dipl.danai.app.model.Instructor;
 import dipl.danai.app.model.Room;
 import dipl.danai.app.model.Schedule;
@@ -74,5 +76,9 @@ public class ScheduleService {
 			}
 		}
 		return false;
+	}
+
+	public Schedule getScheduleByDateAndGym(Date date, Gym gym) {
+		return scheduleRepository.findByGymIdAndDate(gym.getGym_id(), date);
 	}
 }

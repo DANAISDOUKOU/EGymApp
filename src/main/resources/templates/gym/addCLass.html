@@ -69,80 +69,61 @@
     </style>
 </head>
 <body>
-	 <div class="form-container">
-	 <form th:action="@{addClass}" th:object="${fitnessProgram}" method="post">
-    <h2>Add a Session</h2>
-    <div th:if="${referer == 'http://localhost:8080/gym/createProgram'}">
-    		<h3>Select a workout</h3>
-    		 <select name='workouts'>
- 				<option th:each="workout : ${workouts}"
-            	 		th:text="${workout.name}">WorkoutName>  		 	
-            </select>
-            <h3>Select an Instructor</h3>
-            <select name='instructors'>
-            	<option th:each="instructor : ${instructors}"
-            	th:text="${instructor.instructor_name}">InstructorName>
-            </select>
-            <h3>Select a Room</h3>
-            <select name='rooms'>
-            	<option th:each="room : ${rooms}"
-            	th:text="${room.roomName}">RoomName>
-            </select>
-            <br/><br/>
-            <h3>Capacity</h3>
-            <input type="arithmetic" name="capacity"><br/><br/>
-        	<h3>Start Time </h3>
-        	<input type="Time" name="start_time"><br/><br/>
-        	<h3>End Time </h3>
-        	<input type="Time" name="end_time"><br/><br/>
-        	<button type="Submit">Add</button> 
-    		<span th:utext="${successMessage}"></span>
-	    <div th:if="${bindingResult!=null && bindingResult.getAllErrors()!=null}">
-	      <ul th:each="data : ${bindingResult.getAllErrors()}">
-	      	<p>here</p>
-	        <li th:text="${data.getObjectName() + ' :: ' + data.getDefaultMessage()}"></li>
-	      </ul>
-	    </div> 	
-       <button onclick="window.location.href='http://localhost:8080/gym/createRoom'" type="button">Create Room</button>
-        <button  onclick="window.location.href='http://localhost:8080/gym/createClass'" type="button">Create a new Class for Schedule</button><br/><br/>
-        <button  onclick="window.location.href='http://localhost:8080/gym/createProgram'" type="button">Go back Schedule</button><br/><br/>
-	</div>	
-	<div th:if="${referer == 'http://localhost:8080/gym/updateProgram'}">
-    		<h3>Select a workout</h3>
-    		 <select name='workouts'>
- 				<option th:each="workout : ${workouts}"
-            	 		th:text="${workout.name}">WorkoutName>  		 	
-            </select>
-            <h3>Select an Instructor</h3>
-            <select name='instructors'>
-            	<option th:each="instructor : ${instructors}"
-            	th:text="${instructor.instructor_name}">InstructorName>
-            </select>
-            <h3>Select a Room</h3>
-            <select name='rooms'>
-            	<option th:each="room : ${rooms}"
-            	th:text="${room.roomName}">RoomName>
-            </select>
-            <br/><br/>
-            <h3>Capacity</h3>
-            <input type="arithmetic" name="capacity"><br/><br/>
-        	<h3>Start Time </h3>
-        	<input type="Time" name="start_time"><br/><br/>
-        	<h3>End Time </h3>
-        	<input type="Time" name="end_time"><br/><br/>
-        	 <input type="hidden" name="programId" th:value="${programId}" />
-        	<button type="Submit">Add</button> 
-    		<span th:utext="${successMessage}"></span>
-	    <div th:if="${bindingResult!=null && bindingResult.getAllErrors()!=null}">
-	      <ul th:each="data : ${bindingResult.getAllErrors()}">
-	        <li th:text="${data.getObjectName() + ' :: ' + data.getDefaultMessage()}"></li>
-	      </ul>
-	    </div> 	
-        <button  onclick="window.location.href='http://localhost:8080/gym/createClass'" type="button">Create a new Class for Schedule</button><br/><br/>
-		<button  onclick="window.location.href='http://localhost:8080/gym/updateProgram'" type="button">Go back Schedule</button><br/><br/>
-	</div>
-</form>
+<div class="form-container">
+    <form th:action="@{addClass}" th:object="${fitnessProgram}" method="post">
+        <h2>Add a Fitness Class</h2>
+        <div th:if="${errorMessage}" class="error-messages">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
+        <!-- Common form elements for both scenarios -->
+        <h3>Select a workout</h3>
+        <select name='workouts'>
+            <option th:each="workout : ${workouts}" th:text="${workout.name}"></option>
+        </select>
+        <h3>Select an Instructor</h3>
+        <select name='instructors'>
+            <option th:each="instructor : ${instructors}" th:text="${instructor.instructor_name}"></option>
+        </select>
+        <h3>Select a Room</h3>
+        <select name='rooms'>
+            <option th:each="room : ${rooms}" th:text="${room.roomName}"></option>
+        </select>
+        <br/><br/>
+        <h3>Capacity</h3>
+        <input type="number" name="capacity"><br/><br/>
+        <h3>Start Time</h3>
+        <input type="time" name="start_time"><br/><br/>
+        <h3>End Time</h3>
+        <input type="time" name="end_time"><br/><br/>
+        <button type="Submit">Add</button>
+        <span th:utext="${successMessage}"></span>
+        <div th:if="${bindingResult != null && bindingResult.getAllErrors() != null}">
+            <ul th:each="data : ${bindingResult.getAllErrors()}">
+                <li th:text="${data.getObjectName() + ' :: ' + data.getDefaultMessage()}"></li>
+            </ul>
+        </div>
+
+        <!-- Additional elements specific to the 'createProgram' scenario -->
+        <div th:if="${referer == 'http://localhost:8080/gym/createProgram'}">
+            <!-- Add any additional elements specific to createProgram here -->
+            <button onclick="window.location.href='http://localhost:8080/gym/createRoom'" type="button">Create Room</button>
+         <button onclick="window.location.href='http://localhost:8080/gym/createClass'" type="button">Create a new Class for Schedule</button>
+         <button  onclick="window.location.href='http://localhost:8080/gym/createProgram'" type="button">Go back Schedule</button><br/><br/>
+        
+        </div>
+
+        <!-- Additional elements specific to the 'addClass' scenario -->
+        <div th:if="${referer == 'http://localhost:8080/gym/addClass'}">
+            <!-- Add any additional elements specific to addClass here -->
+            <button onclick="window.location.href='http://localhost:8080/gym/createClass'" type="button">Create a new Class for Schedule</button>
+        	<button  onclick="window.location.href='http://localhost:8080/gym/updateProgram'" type="button">Go back Schedule</button><br/><br/>
+        	
+        </div>
+
+        <!-- Common buttons for both scenarios -->
+        <button onclick="window.location.href='http://localhost:8080/gym/createProgram'" type="button">Go back Schedule</button><br/><br/>
+    </form>
 </div>
 </body>
-</html>	 	
-	  
+</html>

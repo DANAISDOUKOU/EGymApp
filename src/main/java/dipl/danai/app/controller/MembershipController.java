@@ -38,11 +38,29 @@ public class MembershipController {
 	}
 
 	@PostMapping("/gym/createMembershipType")
-	public String createMembershipTypeP(Model model,@Valid @ModelAttribute("membership") MembershipType membershipType,BindingResult bindingResult,@RequestParam(value="gymId") Long gymId) throws SQLException {
-		membershipType.setGym(gymService.getGymById(gymId));
-		membershipTypeService.saveMembershipType(membershipType);
-		model.addAttribute("successMessage", "MembershipType registered successfully!");
-		return "gym/createMembershipType";
+	public String createMembershipTypeP(
+	    Model model,
+	    @Valid @ModelAttribute("membership") MembershipType membershipType,
+	    BindingResult bindingResult,
+	    @RequestParam(value = "gymId") Long gymId
+	) throws SQLException {
+	    Gym gym = gymService.getGymById(gymId);
+
+	    if ("lessons".equalsIgnoreCase(membershipType.getMembership_type_name())) {
+	        try {
+	            int lessons = Integer.parseInt(membershipType.getMembership_period());
+	            membershipType.setRemainingLessons(lessons);
+	        } catch (NumberFormatException e) {
+	            // Handle invalid input if necessary
+	            bindingResult.rejectValue("membership_period", "error.invalid", "Invalid number of lessons");
+	            return "gym/createMembershipType";
+	        }
+	    }
+
+	    membershipType.setGym(gym);
+	    membershipTypeService.saveMembershipType(membershipType);
+	    model.addAttribute("successMessage", "MembershipType registered successfully!");
+	    return "gym/createMembershipType";
 	}
 
 }

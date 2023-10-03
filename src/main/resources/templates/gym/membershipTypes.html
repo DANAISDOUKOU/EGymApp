@@ -20,22 +20,30 @@
             z-index: -1;
             background: linear-gradient(to bottom, #87CEFA, #EFEFEF);
         }
-        
 
         h1 {
             font-size: 28px;
             margin: 20px 0;
         }
 
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            text-align: left;
         }
 
-        li {
-            font-size: 18px;
-            margin: 10px 0;
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:hover {
+            background-color: #f5f5f5;
         }
 
         button[type="button"] {
@@ -52,16 +60,24 @@
 <body>
     <h1>This is your Membership Types</h1>
     <div th:if="${membershipList != null}">
-        <ul>
-            <li th:each="membership:${membershipList}">
-                <span th:text="${membership.membership_type_name}"></span>
-                <span th:text="${membership.membership_period}"></span>
-                <span th:text="${membership.membership_amount}"></span>
-            </li>
-        </ul>
+        <table>
+            <thead>
+                <tr>
+                    <th>Membership Type</th>
+                    <th>Membership Period</th>
+                    <th>Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="membership: ${membershipList}">
+                    <td th:text="${membership.membership_type_name}"></td>
+                    <td th:text="${membership.membership_period}"></td>
+                    <td th:text="${membership.membership_amount}"></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
     <button onclick="window.location.href='/gym/createMembershipType'" type="button">Create Membership Type</button>
-    	<button onclick="window.history.back()" type="button">Go Back</button>
-    
+    <button onclick="window.history.back()" type="button">Go Back</button>
 </body>
 </html>

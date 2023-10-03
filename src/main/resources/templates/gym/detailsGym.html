@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>gymDetails</title>
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -93,48 +94,128 @@
             background-color: #f5f5f5;
         }
         .cancel-button {
-		    background-color: red; /* Choose a suitable color */
+            background-color: red; /* Choose a suitable color */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: red;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .canceled-text {
+            color: red;
+        }
+        .membership-button {
+		    position: absolute;
+		    top: 20px; /* Adjust the top position as needed */
+		    right: 20px; /* Adjust the right position as needed */
+		    background-color: #007BFF;
 		    color: white;
 		    border: none;
 		    border-radius: 5px;
 		    padding: 8px 16px;
 		    cursor: pointer;
 		}
+		.dropdown-container-2 {
+    position: relative; /* Change to relative */
+    display: inline-block;
+}
+.dropdown-button-2 {
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+.dropdown-menu-2 {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    display: none;
+    background-color: white;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    min-width: 160px;
+    z-index: 1;
+}
+.top-buttons-container {
+    display: flex;
+    flex-direction: row; /* Make the buttons display horizontally */
+    align-items: flex-start; /* Center the items vertically within the container */
+    justify-content: flex-end; /* Align items to the start of the container */
+}
     </style>
 </head>
 <body>
+<div class="top-buttons-container">
+<a th:href="@{'/gym/seeMembershipTypes/{gymId}'(gymId=${gym.gym_id})}" class="membership-button">View Membership Types</a>
 <div th:if="${not alreadyMember}">
      <form th:action="@{/gym/subscribe}" method="post">
     	<h1>Do you want to be a member?</h1>
         <input type="hidden" name="gymId" th:value="${gym.gym_id}" />
         <button type="submit">Subscribe</button>
     </form>
-    </div>
-    <h1>Top Popular Workouts for  <span th:text="${gym.gym_name}"></span></h1>
-
-    <ul>
+</div>
+<div class="dropdown">
+    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+        Top Popular Workouts
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         <li th:each="popularWorkout : ${popularWorkouts}">
-            <span th:text="${popularWorkout.workout.name}"></span>
+            <a class="dropdown-item" th:text="${popularWorkout.workout.name}"></a>
         </li>
     </ul>
+</div>
+
+</div>
 <h2>Workouts Schedule</h2>
 <!-- Iterate through the gym's schedules -->
 <div th:each="workout : ${gym.gymWorkouts}">
     <h3 th:text="${workout.name}">Workout Name</h3>
-      <table style="width: 800px;">
-                <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Day</th>
-                    <th>Time</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-    <!-- Iterate through the class schedules for this workout -->
-    <div th:each="classScheduleEntry : ${workoutList}">
-        <!-- Access the date (key) and class schedules (value) from the map -->
-        <th:block th:with="schedule=${classScheduleEntry.key}, schedules=${classScheduleEntry.value}">
-          
+    <table style="width: 800px;">
+        <thead>
+        <tr>
+            <th>Date</th>
+            <th>Day</th>
+            <th>Time</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <!-- Iterate through the class schedules for this workout -->
+        <div th:each="classScheduleEntry : ${workoutList}">
+            <!-- Access the date (key) and class schedules (value) from the map -->
+            <th:block th:with="schedule=${classScheduleEntry.key}, schedules=${classScheduleEntry.value}">
                 <tbody>
                 <!-- Iterate through the class schedules for this specific date -->
                 <tr th:each="specificClassSchedule : ${schedules}">
@@ -143,18 +224,109 @@
                         <td th:text="${#dates.format(schedule.work_out_date, 'EEEE')}">Day</td>
                         <td th:text="${specificClassSchedule.time_start}+'-'+${specificClassSchedule.time_end}">Time</td>
                         <td>
-                              <a th:href="@{/workout/{workoutId}/class/{classOfScheduleId}/schedule/{scheduleId}/gym/{gymId}(workoutId=${specificClassSchedule.workout.workoutId}, classOfScheduleId=${specificClassSchedule.classOfScheduleId}, scheduleId=${schedule.schedule_id},gymId=${gym.gym_id})}"
-              					 th:text="Join">Details</a>
-       
+                           <span th:if="${specificClassSchedule.is_canceled}">
+						        <p class="canceled-text">Canceled</p>
+						    </span>
+						    <span th:unless="${specificClassSchedule.is_canceled}">
+						        <a href="#"
+						           th:attr="data-workout-id=${specificClassSchedule.workout.workoutId},
+						                     data-schedule-id=${schedule.schedule_id},
+						                     data-gym-id=${gym.gym_id},
+						                     data-class-id=${specificClassSchedule.classOfScheduleId}"
+						           onclick="openPopup(this)">
+						            View
+						        </a>
+						     </span>
                         </td>
                     </div>
                 </tr>
                 </tbody>
-            </table>
-        </th:block>
-    </div>
+            </th:block>
+        </div>
+    </table>
 </div>
 
 <button onclick="window.history.back()" type="button">Go Back</button>
+
+<div id="workoutDetailsModal" class="modal" th:style="${isModalOpen == true} ? 'display: block;' : 'display: none;'">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Workout Details</h2>
+        <!-- Content will be inserted here dynamically -->
+        <div id="modal-content-placeholder"></div>
+    </div>
+</div>
+
+<script>
+var urlParams = new URLSearchParams(window.location.search);
+var isModalOpenParam = urlParams.get('isModalOpen');
+var isModalOpen = isModalOpenParam === 'true';
+var workoutId = urlParams.get('workoutId');
+var scheduleId = urlParams.get('scheduleId');
+var gymId = urlParams.get('gymId');
+var classId = urlParams.get('classOfScheduleId');
+if (isModalOpen) {
+	var urlParams = new URLSearchParams(window.location.search);
+   
+   var detailsUrl = "/workout/" + workoutId + "/class/" + classId + "/schedule/" + scheduleId + "/gym/" + gymId;
+
+     fetch(detailsUrl)
+        .then(response => response.text())
+        .then(data => {
+            var modal = document.getElementById("workoutDetailsModal");
+            var modalContent = modal.querySelector(".modal-content");
+
+            modalContent.innerHTML = '<span class="close" onclick="closeModal()">&times;</span>' +
+                '<h2>Workout Details</h2>' +
+                data; // Insert your dynamic content here
+
+            modal.style.display = "block";
+            
+        });
+        isModalOpen = true;
+}
+function openPopup(link) {
+	console.log("hereee");
+    // Get the workout ID, schedule ID, and gym ID from data attributes
+    var workoutId = link.getAttribute("data-workout-id");
+    var scheduleId = link.getAttribute("data-schedule-id");
+    var gymId = link.getAttribute("data-gym-id");
+    var classId = link.getAttribute("data-class-id");
+      var newUrl = window.location.pathname;
+    window.history.replaceState({}, '', newUrl);
+   var detailsUrl = "/workout/" + workoutId + "/class/" + classId + "/schedule/" + scheduleId + "/gym/" + gymId;
+
+     fetch(detailsUrl)
+        .then(response => response.text())
+        .then(data => {
+            // Get the modal and content elements
+            var modal = document.getElementById("workoutDetailsModal");
+            var modalContent = modal.querySelector(".modal-content");
+
+            // Set the content of the modal (including "X")
+            modalContent.innerHTML = '<span class="close" onclick="closeModal()">&times;</span>' +
+                '<h2>Workout Details</h2>' +
+                data; // Insert your dynamic content here
+
+            // Display the modal
+            modal.style.display = "block";
+        });
+        isModalOpen = true;
+}
+
+function closeModal() {
+    console.log("closeModal function called");
+    var modal = document.getElementById("workoutDetailsModal");
+    if (modal) {
+        modal.style.display = "none";
+         isModalOpen = false;
+    } 
+}
+
+
+
+</script>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
 </html>

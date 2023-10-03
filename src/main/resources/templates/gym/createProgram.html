@@ -71,6 +71,8 @@
 	 	<h3>Select a Date</h3>
         <input type="Date" name="date"><br/><br/>
         <button onclick="window.location.href='http://localhost:8080/gym/addClass'" type="button">Add a new Class for Schedule</button><br/><br/>
+    	<label for="weeks">Repeat for how many weeks?</label>
+    	<input type="number" name="weeks" id="weeks" value="1"><br/><br/> <!-- Default to 1 week -->
     	<button type="submit">Create Schedule</button> 
     	<span th:utext="${successMessage}"></span>
     	<div th:if="${bindingResult!=null && bindingResult.getAllErrors()!=null}">

@@ -7,15 +7,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import dipl.danai.app.model.AthleteClassScheduleReservation;
 import dipl.danai.app.model.Athletes;
 import dipl.danai.app.model.ClassOfSchedule;
 import dipl.danai.app.repository.AthleteRepository;
+import dipl.danai.app.repository.WeeksReservedRepository;
 
 @Service
 public class AthleteService {
 
 	@Autowired
 	private AthleteRepository athleteRepository;
+	
+	@Autowired
+	private WeeksReservedRepository weekReservedRepo;
 
 	public Athletes getAthlete(String Email) {
 		 Athletes athlete = athleteRepository.findByEmail(Email);
@@ -60,5 +65,14 @@ public class AthleteService {
 			e.printStackTrace();
 		}
 		athleteRepository.save(a);
+	}
+
+	public Integer findWeeks(Athletes athlete, ClassOfSchedule classOfSchedule) {
+		return weekReservedRepo.findReservedWeekByClassOfScheduleAndAthlete(classOfSchedule, athlete);
+	}
+
+	public void saveReservetions(AthleteClassScheduleReservation reserve) {
+		weekReservedRepo.save(reserve);
+		
 	}
 }

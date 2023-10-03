@@ -1,6 +1,7 @@
 package dipl.danai.app.service;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -19,6 +20,7 @@ import dipl.danai.app.model.Instructor;
 import dipl.danai.app.model.Membership;
 import dipl.danai.app.model.MembershipType;
 import dipl.danai.app.model.Room;
+import dipl.danai.app.model.Schedule;
 import dipl.danai.app.model.Workout;
 import dipl.danai.app.repository.AthleteRepository;
 import dipl.danai.app.repository.GymRepository;
@@ -276,4 +278,9 @@ public class GymService {
 		gym.setUseMembershipTypesAsOffers(gym.isUseMembershipTypesAsOffers());		
 		gymRepository.save(gym);
 	}
+	
+	public Schedule getScheduleFromGymForDateAndGymId(Date workOutDate, Gym gym) {
+        return gymRepository.findScheduleFromGymForDateAndGymId(workOutDate, gym);
+    }
+	
 }

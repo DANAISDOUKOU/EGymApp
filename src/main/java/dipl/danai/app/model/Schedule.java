@@ -34,7 +34,9 @@ public class Schedule {
 	@JoinTable(name="schedule_classes",joinColumns=@JoinColumn(name="schedule_id"),inverseJoinColumns=@JoinColumn(name="classOfSchedule_id"))
 	private List<ClassOfSchedule> ScheduleClasses=new ArrayList<>();
 
-
+	@Column
+	private int weeks=1;
+	
 	public Date getWork_out_date() {
 		return work_out_date;
 	}
@@ -67,6 +69,15 @@ public class Schedule {
 		ScheduleClasses = scheduleClasses;
 	}
 
+	public int getWeeks() {
+		return weeks;
+	}
+
+	public void setWeeks(int weeks) {
+		this.weeks = weeks;
+	}
+	 
+	
 
 
 

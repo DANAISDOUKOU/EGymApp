@@ -54,6 +54,18 @@ public class ClassOfSchedule {
 	@ManyToMany(mappedBy = "ScheduleClasses")
 	private List<Schedule> schedules;
 
+	public ClassOfSchedule(Workout workout2, Time time_start2, Time time_end2, Instructor instructor2, Room room2,
+			int capacity2, boolean b) {
+		this.workout=workout2;
+		this.time_start=time_start2;
+		this.time_end=time_end2;
+		this.instructor=instructor2;
+		this.room=room2;
+		this.capacity=capacity2;
+		this.is_canceled=b;
+	}
+
+	public ClassOfSchedule() {}
 	public Workout getWorkout() {
 		return workout;
 	}

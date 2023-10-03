@@ -46,50 +46,55 @@ public class AthelteController {
 	@Autowired
 	private ClassRatingService classRatingService;
 
-    @GetMapping(value = {"/athlete/dashboard"})
-    public String athletePage(Model model, Authentication authentication){
-    	 List<Gym> gyms=gymService.getGyms();
-	 		for (Gym gym : gyms) {
-	 			byte[] pictureBytes = gym.getPicture(); 
-	 			String pictureBase64 = Base64.getEncoder().encodeToString(pictureBytes);
-	 			gym.setProfilePictureBase64(pictureBase64); 
-	 		}
-	 		model.addAttribute("gyms",gyms);
-    	 Athletes athlete = athleteService.getAthlete(authentication.getName());
-    	    List<Gym> gymsInCity = gymService.getGymsByCity(athlete.getCity());
-    	    int numRandomGymsToShow = 3;
-    	    Collections.shuffle(gymsInCity);
-    	    List<Gym> randomGyms = gymsInCity.stream().limit(numRandomGymsToShow).collect(Collectors.toList());
-    	    List<Map<String, Object>> gymInfoList = new ArrayList<>();
-    	    Random random = new Random();
-    	    for (Gym gym : randomGyms) {
-    	    	if(gym.isUseMembershipTypesAsOffers()) {
-	    	        Map<String, Object> gymInfo = new HashMap<>();
-	    	        gymInfo.put("gymName", gym.getGym_name());
-	    	        gymInfo.put("gymId", gym.getGym_id());
-	    	        gymInfo.put("gymPicture", gym.getProfilePictureBase64());
-	    	        List<Map<String, Object>> membershipInfoList = new ArrayList<>();
-	    	        for (MembershipType membershipType : gym.getGym_memberships()) {
-	    	            int randomDiscount = random.nextInt(21); // Random discount between 0 and 20
-	    	            float discountedAmount = membershipType.getMembership_amount() * (1 - randomDiscount / 100.0f);
-	
-	    	            Map<String, Object> membershipInfo = new HashMap<>();
-	    	            membershipInfo.put("membershipType", membershipType.getMembership_type_name());
-	    	            membershipInfo.put("discount", randomDiscount);
-	    	            membershipInfo.put("amount", membershipType.getMembership_amount());
-	    	            membershipInfo.put("discountedAmount", discountedAmount);
-	    	            membershipInfo.put("membershipId", membershipType.getMembership_type_id());
-	    	            membershipInfoList.add(membershipInfo);
-	    	        }
-	    	        gymInfo.put("memberships", membershipInfoList);
-	    	        gymInfoList.add(gymInfo);
-	    	    }
+	@GetMapping(value = { "/athlete/dashboard" })
+	public String athletePage(Model model, Authentication authentication) {
+	    List<Gym> gyms = gymService.getGyms();
+	    for (Gym gym : gyms) {
+	        byte[] pictureBytes = gym.getPicture();
+	        String pictureBase64 = Base64.getEncoder().encodeToString(pictureBytes);
+	        gym.setProfilePictureBase64(pictureBase64);
+	    }
+	    model.addAttribute("gyms", gyms);
+	    Athletes athlete = athleteService.getAthlete(authentication.getName());
+	    List<Gym> gymsInCity = gymService.getGymsByCity(athlete.getCity());
+	    int numRandomGymsToShow = 3;
+	    Collections.shuffle(gymsInCity);
+	    List<Gym> randomGyms = gymsInCity.stream().limit(numRandomGymsToShow).collect(Collectors.toList());
+	    List<Map<String, Object>> gymInfoList = new ArrayList<>();
+	    Random random = new Random();
+	    for (Gym gym : randomGyms) {
+	        if (gym.isUseMembershipTypesAsOffers()) {
+	            Map<String, Object> gymInfo = new HashMap<>();
+	            gymInfo.put("gymName", gym.getGym_name());
+	            gymInfo.put("gymId", gym.getGym_id());
+	            gymInfo.put("gymPicture", gym.getProfilePictureBase64());
 
-    	    }
-    	    model.addAttribute("gymInfoList", gymInfoList);
-    	  
-    	    return "athlete/dashboard";
-    }
+	            // Randomly select one membership type
+	            List<MembershipType> memberships = gym.getGym_memberships();
+	            if (!memberships.isEmpty()) {
+	                int randomMembershipIndex = random.nextInt(memberships.size());
+	                MembershipType randomMembership = memberships.get(randomMembershipIndex);
+
+	                int randomDiscount = random.nextInt(21); // Random discount between 0 and 20
+	                float discountedAmount = randomMembership.getMembership_amount() * (1 - randomDiscount / 100.0f);
+
+	                Map<String, Object> membershipInfo = new HashMap<>();
+	                membershipInfo.put("membershipType", randomMembership.getMembership_type_name());
+	                membershipInfo.put("discount", randomDiscount);
+	                membershipInfo.put("amount", randomMembership.getMembership_amount());
+	                membershipInfo.put("discountedAmount", discountedAmount);
+	                membershipInfo.put("membershipId", randomMembership.getMembership_type_id());
+	                gymInfo.put("membership", membershipInfo);
+	            }
+
+	            gymInfoList.add(gymInfo);
+	        }
+	    }
+	    model.addAttribute("gymInfoList", gymInfoList);
+
+	    return "athlete/dashboard";
+	}
+
 
 
 	@GetMapping(value={"/athlete/seeAllGyms"})

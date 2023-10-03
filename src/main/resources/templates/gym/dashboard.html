@@ -3,7 +3,9 @@
 
 <head>
     <title>GYM Dashboard</title>
-    <style>
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">  
+</head>
+<style>
         body {
             font-family: Arial, sans-serif;
             background: linear-gradient(to bottom, #87CEFA, #EFEFEF); 
@@ -74,8 +76,24 @@
             color: #333;
             margin-bottom: 20px;
         }
+        .logout-button {
+		    background-color: #d9534f; 
+		    color: white;
+		    border: none;
+		    border-radius: 5px;
+		    padding: 10px 20px;
+		    text-decoration: none; 
+		    font-size: 16px;
+		    margin-top: 10px;
+		    display: inline-block;
+		}
+		
+		.logout-button:hover {
+		    background-color: #c9302c; 
+		    text-decoration: none; 
+		}
+
     </style>
-</head>
 
 <body>
 <div class="top-buttons-container">
@@ -84,68 +102,82 @@
     <button onclick="window.location.href='http://localhost:8080/gym/membershipTypes'" type="button">My Memberships</button>
     <button onclick="window.location.href='http://localhost:8080/gym/typeOfWorkouts'" type="button">My Workout Types</button>
     <button onclick="window.location.href='http://localhost:8080/gym/MeetTheInstructors'" type="button">My Instructors</button>
+
+
+	<div class="dropdown d-inline-block">
+	    <button class="btn btn-primary dropdown-toggle" type="button" id="gymniataDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+	        Gymniata
+	    </button>
+	    <div class="dropdown-menu" aria-labelledby="gymniataDropdown">
+	        <form th:action="@{/gym/updateUseMembershipTypes}" method="post">
+	            <button class="dropdown-item" type="submit" name="useMembershipTypes" value="true"
+	                th:classappend="${gym.useMembershipTypesAsOffers ? 'active' : ''}">Enabled</button>
+	            <button class="dropdown-item" type="submit" name="useMembershipTypes" value="false"
+	                th:classappend="${!gym.useMembershipTypesAsOffers ? 'active' : ''}">Disabled</button>
+	        </form>
+	    </div>
+	</div>
+
 </div>
 
-<label for="useMembershipTypes">Do you want to use you memberships as offers:</label>
-<form th:action="@{/gym/updateUseMembershipTypes}" method="post">
-    <input type="radio" id="yes" name="useMembershipTypes" value="true" th:checked="${gym.useMembershipTypesAsOffers}" />
-    <label for="yes">Yes</label>
-    
-    <input type="radio" id="no" name="useMembershipTypes" value="false" th:checked="${!gym.useMembershipTypesAsOffers}" />
-    <label for="no">No</label>
-    
-    <button type="submit">Save Changes</button>
-</form>
 
+  <form th:action="@{/program}" method="get">
+        <div>
+            <label for="programDate">Select a Date:</label>
+            <input type="date" id="programDate" name="programDate">
+            <button type="submit">Show Program</button>
+        </div>
+    </form>
 
-<h1>This is the Program:</h1>
-
-<form th:action="@{program}" th:object="${gym}" method="post">
     <div th:if="${rooms.isEmpty()}">
         <p>Rooms are empty</p>
         <button onclick="window.location.href='http://localhost:8080/gym/createRoom'" type="button">Create Room</button>
     </div>
 
     <div th:if="${not #lists.isEmpty(programList) and not rooms.isEmpty()}">
-        <ul>
-            <li th:each="program: ${programList}">
-                <div>
-                    <span th:text="${program.work_out_date}" class="date"></span>
-                     <span th:text="${#dates.format(program.work_out_date, 'EEEE')}" class="date"></span>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>Workout</th>
-                            <th>Room</th>
-                            <th>Instructor</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <th:block th:each="classOfSchedule: ${workoutList.get(program.work_out_date)}">
-                            <tr>
-                                <td th:text="${classOfSchedule.time_start}+' - '+${classOfSchedule.time_end}"></td>
-                                <td>
-                                    <a th:href="@{'/gym/class-schedule-details/' + ${classOfSchedule.classOfScheduleId}}"
-                                       th:text="${classOfSchedule.workout.getName()}"></a>
-                                    <span th:if="${classOfSchedule.is_canceled}" class="canceled-text">(CANCELED)</span>
-                                </td>
-                                <td th:text="${classOfSchedule.room.getRoomName()}"></td>
-                                <td th:text="${classOfSchedule.instructor.getInstructor_name()}"></td>
-                            </tr>
-                        </th:block>
-                    </tbody>
-                </table>
-            </li>
-        </ul>
-        <button onclick="window.location.href='http://localhost:8080/gym/updateProgram'" type="button">Update the Existing Program</button>
-        <button onclick="window.location.href='http://localhost:8080/gym/deleteProgram'" type="button">Delete the Existing Program</button>
+        <p>Date: <span th:text="${programList.work_out_date}"></span></p>
+         <input type="hidden" id="scheduleId" name="scheduleId" th:value="${programList.schedule_id}" />
+       <table>
+         <thead>
+           <tr>
+               <th>Time</th>
+               <th>Workout</th>
+               <th>Room</th>
+               <th>Instructor</th>
+            </tr>
+          </thead>
+            <tbody>
+               <tr th:each="classOfSchedule : ${workoutList}">
+                   <td th:text="${classOfSchedule.time_start} + ' - ' + ${classOfSchedule.time_end}"></td>
+                   <td>
+                    <a th:href="@{'/gym/class-schedule-details/' + ${classOfSchedule.classOfScheduleId}}"
+                         th:text="${classOfSchedule.workout.getName()}"></a>
+                     <span th:if="${classOfSchedule.is_canceled}" class="canceled-text">(CANCELED)</span>
+                    </td>
+                    <td th:text="${classOfSchedule.room.getRoomName()}"></td>
+                    <td th:text="${classOfSchedule.instructor.getInstructor_name()}"></td>
+                   </tr>
+                  </tbody>
+            </table>
+          
+		<a th:href="@{'/gym/updateProgram?programId=' + ${programList.schedule_id}}" class="btn btn-primary" role="button">Update the Existing Program</a>
+		<a th:href="@{'/gym/deleteProgram?programId=' + ${programList.schedule_id}}" class="btn btn-primary" role="button">Delete the Existing Program</a>
     </div>
-    <button onclick="window.location.href='http://localhost:8080/gym/createProgram'" type="button">Create a new Program</button>
     
-    <p><a th:href="@{/logout}">Log out</a></p>
+    
+      <div th:if="${#lists.isEmpty(programList)}">
+    	<p>Program not available for this date.</p>
+	</div>    
+    <button onclick="window.location.href='http://localhost:8080/gym/createProgram'" type="button">Create a new Program</button>
+
+<p><a th:href="@{/logout}" class="logout-button">Log out</a></p>
 </form>
 </body>
-
+<script>
+    function setGymniataStatus(status) {
+        document.getElementById("gymniataStatus").value = status;
+    }
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 </html>

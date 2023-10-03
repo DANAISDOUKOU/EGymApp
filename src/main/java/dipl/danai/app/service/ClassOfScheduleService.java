@@ -115,4 +115,8 @@ public class ClassOfScheduleService {
 		 waitingListEntryRepository.save(entry);
 
 	}
+
+	public boolean checkIfSame(ClassOfSchedule classOfSchedule, ClassOfSchedule c) {
+		return (classOfSchedule.getTime_start().equals(c.getTime_start())&&classOfSchedule.getTime_end().equals(c.getTime_end())&&classOfSchedule.getWorkout().getName().equals(c.getWorkout().getName()));
+	}
 }

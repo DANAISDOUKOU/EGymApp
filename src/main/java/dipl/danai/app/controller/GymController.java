@@ -1,6 +1,10 @@
 package dipl.danai.app.controller;
 import java.sql.Date;
+import java.sql.Time;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -80,25 +84,46 @@ public class GymController {
 		model.addAttribute("rooms", gym.getRooms());
 		Collection<Schedule> programList=gym.getGymSchedules();
 		model.addAttribute("gym",gym);
-		model.addAttribute("programList", programList);
-		if(programList!=null) {
-			Map<Date,List<ClassOfSchedule>> classesByDate = new HashMap<>();
-			for (Schedule p:programList) {
-				Schedule program=scheduleService.getScheduleById(p.getSchedule_id());
-				Collection<ClassOfSchedule> classes= program.getScheduleClasses();
-				Date date=program.getWork_out_date();
-				List<ClassOfSchedule> classesOnDate=new ArrayList<>();
-				for(ClassOfSchedule classOfSchedule:classes) {
-					classOfScheduleService.checkIfCanceled(p, classOfSchedule);
-					classesOnDate.add(classOfSchedule);
-				}
-				Collections.sort(classesOnDate, (c1, c2) -> c1.getTime_start().compareTo(c2.getTime_start()));
-				classesByDate.put(date, classesOnDate);
+		LocalDate currentDate = LocalDate.now();
+		Schedule s=scheduleService.getScheduleByDateAndGym(Date.valueOf(currentDate), gym);
+		if(s!=null) {
+			model.addAttribute("programList",s);
+			Collection<ClassOfSchedule> classes= s.getScheduleClasses();
+			Date date1=s.getWork_out_date();
+			List<ClassOfSchedule> classesOnDate=new ArrayList<>();
+			for(ClassOfSchedule classOfSchedule:classes) {
+				classOfScheduleService.checkIfCanceled(s, classOfSchedule);
+				classesOnDate.add(classOfSchedule);
 			}
-			model.addAttribute("workoutList", classesByDate);
+			Collections.sort(classesOnDate, (c1, c2) -> c1.getTime_start().compareTo(c2.getTime_start()));
+			model.addAttribute("workoutList", classesOnDate);
+
 		}
         return "gym/dashboard";
     }
+	
+	@GetMapping("/program")
+	public String showProgram(@RequestParam("programDate") Date date,Authentication authentication,Model model) {
+		Gym gym=gymService.getGymByEmail(authentication.getName());
+		Collection<Schedule> schedules=gym.getGymSchedules();
+		Schedule s=scheduleService.getScheduleByDateAndGym(date, gym);
+		if(s!=null) {
+			model.addAttribute("programList",s);
+			Collection<ClassOfSchedule> classes= s.getScheduleClasses();
+			Date date1=s.getWork_out_date();
+			List<ClassOfSchedule> classesOnDate=new ArrayList<>();
+			for(ClassOfSchedule classOfSchedule:classes) {
+				classOfScheduleService.checkIfCanceled(s, classOfSchedule);
+				classesOnDate.add(classOfSchedule);
+			}
+			Collections.sort(classesOnDate, (c1, c2) -> c1.getTime_start().compareTo(c2.getTime_start()));
+			model.addAttribute("workoutList", classesOnDate);
+
+		}
+		model.addAttribute("rooms", gym.getRooms());
+		model.addAttribute("gym",gym);
+		return "gym/dashboard";
+	}
 	
 	@PostMapping("/gym/updateUseMembershipTypes")
 	public String updateUseMembershipTypes(@RequestParam("useMembershipTypes") boolean useMembershipTypes, Model model,Authentication authentication) {
@@ -149,28 +174,24 @@ public class GymController {
         return "gym/program";
     }
 
-	@GetMapping(value = {"/gym/updateProgram"})
-    public String updateFitnessProgram(Authentication authentication,Model model){
+    @GetMapping(value = {"/gym/updateProgram"})
+    public String updateFitnessProgram(Authentication authentication,Model model,@RequestParam(name="programId") Long scheduleId){
     	String email=authentication.getName();
 		Gym gym=gymService.getGymByEmail(email);
-		Collection<Schedule> programList=gym.getGymSchedules();
+		Schedule schedule=scheduleService.getScheduleById(scheduleId);
 		model.addAttribute("gym",gym);
-		model.addAttribute("programList", programList);
-		Map<Date,List<ClassOfSchedule>> classesByDate = new HashMap<>();
-		for(Schedule p:programList) {
-			Schedule program=scheduleService.getScheduleById(p.getSchedule_id());
-			Collection<ClassOfSchedule> classes= program.getScheduleClasses();
-			Date date=program.getWork_out_date();
+		model.addAttribute("programList", schedule);
+		if(schedule!=null) {
+			Collection<ClassOfSchedule> classes= schedule.getScheduleClasses();
+			Date date1=schedule.getWork_out_date();
 			List<ClassOfSchedule> classesOnDate=new ArrayList<>();
 			for(ClassOfSchedule classOfSchedule:classes) {
-				classOfScheduleService.checkIfCanceled(p, classOfSchedule);
+				classOfScheduleService.checkIfCanceled(schedule, classOfSchedule);
 				classesOnDate.add(classOfSchedule);
 			}
 			Collections.sort(classesOnDate, (c1, c2) -> c1.getTime_start().compareTo(c2.getTime_start()));
-			classesByDate.put(date, classesOnDate);
+			model.addAttribute("workoutList", classesOnDate);
 		}
-
-		model.addAttribute("workoutList", classesByDate);
     	return "gym/updateProgram";
     }
 
@@ -183,11 +204,30 @@ public class GymController {
 		 model.addAttribute("alreadyMember",alreadyMember);		 
 		 Athletes athlete=athleteService.getAthlete(authentication.getName());
 		 model.addAttribute("memberships",gym.getGym_memberships());
-		 Collection<Schedule> programList=gym.getGymSchedules();
-	     model.addAttribute("programList", gym.getGymSchedules());
+		 LocalDate currentDate = LocalDate.now();
+
+		 LocalDate now = LocalDate.now();
+		    LocalDate startOfWeek = now.with(DayOfWeek.MONDAY);
+		    LocalDate endOfWeek = now.with(DayOfWeek.SUNDAY);
+
+		    Comparator<Schedule> scheduleComparator = Comparator.comparing(Schedule::getWork_out_date)
+		            .thenComparing((schedule1, schedule2) -> {
+		                Time time1 = schedule1.getScheduleClasses().get(0).getTime_start();
+		                Time time2 = schedule2.getScheduleClasses().get(0).getTime_start();
+		                return time1.compareTo(time2);
+		            });
+
+		    List<Schedule> programList = gym.getGymSchedules().stream()
+		            .filter(schedule -> schedule.getWork_out_date().toLocalDate().isAfter(startOfWeek.minusDays(1))
+		                    && schedule.getWork_out_date().toLocalDate().isBefore(endOfWeek.plusDays(1)))
+		            .sorted(scheduleComparator)
+		            .collect(Collectors.toList());
+
+		    model.addAttribute("programList", programList);
 	     popylarityCalculationService.setScheduledGym(gym);
 	     popylarityCalculationService.updatePopularityScoresForGym();
 	     List<WorkoutPopularity> popularWorkouts = popylarityCalculationService.getTopPopularWorkoutsForGym(gym, 3);
+	     System.out.println("ahahhahahahaha "+popularWorkouts.size());
 	     model.addAttribute("popularWorkouts", popularWorkouts);
 
 	     if(programList!=null) {
@@ -222,7 +262,8 @@ public class GymController {
 		 model.addAttribute("hasAlreadyMembershipType",hasAlreadyMembershipType);
 		 model.addAttribute("memberships", gym.getGym_memberships());
 		 Athletes athlete=athleteService.getAthlete(authentication.getName());
-
+		 List<WorkoutPopularity> popularWorkouts = popylarityCalculationService.getTopPopularWorkoutsForGym(gym, 3);
+	     model.addAttribute("popularWorkouts", popularWorkouts);
 		 if(hasAlreadyMembershipType) {
 			 MembershipType existingMembership=gymService.findExistingMembership(gym.getGym_id(),athlete.getAthlete_id());
 			 model.addAttribute("existingMembership", existingMembership);
@@ -249,8 +290,26 @@ public class GymController {
 		 }else {
 			 model.addAttribute("existingMembership", null);
 		 }
-		 Collection<Schedule> programList=gym.getGymSchedules();
-	     model.addAttribute("programList", gym.getGymSchedules());
+
+		 LocalDate now = LocalDate.now();
+		    LocalDate startOfWeek = now.with(DayOfWeek.MONDAY);
+		    LocalDate endOfWeek = now.with(DayOfWeek.SUNDAY);
+
+		    Comparator<Schedule> scheduleComparator = Comparator.comparing(Schedule::getWork_out_date)
+		            .thenComparing((schedule1, schedule2) -> {
+		                Time time1 = schedule1.getScheduleClasses().get(0).getTime_start();
+		                Time time2 = schedule2.getScheduleClasses().get(0).getTime_start();
+		                return time1.compareTo(time2);
+		            });
+
+		    List<Schedule> programList = gym.getGymSchedules().stream()
+		            .filter(schedule -> schedule.getWork_out_date().toLocalDate().isAfter(startOfWeek.minusDays(1))
+		                    && schedule.getWork_out_date().toLocalDate().isBefore(endOfWeek.plusDays(1)))
+		            .sorted(scheduleComparator)
+		            .collect(Collectors.toList());
+
+		    model.addAttribute("programList", programList);
+		    model.addAttribute("gym",gym);
 	     if(programList!=null) {
 				Map<Schedule,List<ClassOfSchedule>> classesByDate = new HashMap<>();
 				for (Schedule p:programList) {
@@ -298,7 +357,15 @@ public class GymController {
 	    }
 	    return "gym/detailsGym";
 	}
-
+	
+	@GetMapping("/gym/seeMembershipTypes/{gymId}")
+	public String seeMembershipTypes(Model model, Authentication authentication, @PathVariable Long gymId) {
+	    Gym gym = gymService.getGymById(gymId);
+	    List<MembershipType> membershipsList = gym.getGym_memberships();
+	    model.addAttribute("membershipList", membershipsList);
+	    return "gym/seeMembershipTypes";
+	}
+	
 	@GetMapping("/gym/search")
 	public String searchGyms(
 	    @RequestParam(required = false) String searchBy,
@@ -328,11 +395,27 @@ public class GymController {
 	}
 
 	@GetMapping("/gym/membershipTypes")
-	public String MembershipTypes(Model model,Authentication authentication) {
-		Gym gym=gymService.getGymByEmail(authentication.getName());
-		List<MembershipType> membershipsList=gym.getGym_memberships();
-		model.addAttribute("membershipList", membershipsList);
-		return "gym/membershipTypes";
+	public String membershipTypes(Model model, Authentication authentication) {
+	    Gym gym = gymService.getGymByEmail(authentication.getName());
+	    List<MembershipType> membershipsList = gym.getGym_memberships();
+
+	    Collections.sort(membershipsList, new Comparator<MembershipType>() {
+	        @Override
+	        public int compare(MembershipType m1, MembershipType m2) {
+	            if ("lessons".equalsIgnoreCase(m1.getMembership_type_name()) &&
+	                !"lessons".equalsIgnoreCase(m2.getMembership_type_name())) {
+	                return -1; 
+	            } else if (!"lessons".equalsIgnoreCase(m1.getMembership_type_name()) &&
+	                       "lessons".equalsIgnoreCase(m2.getMembership_type_name())) {
+	                return 1;
+	            } else {
+	                return m1.getMembership_type_name().compareToIgnoreCase(m2.getMembership_type_name());
+	            }
+	        }
+	    });
+
+	    model.addAttribute("membershipList", membershipsList);
+	    return "gym/membershipTypes";
 	}
 
 	@PostMapping("gym/subscribe")
@@ -397,36 +480,70 @@ public class GymController {
 	}
 
 	
-
 	@GetMapping("/gym/instructor{id}")
 	public String viewGymDetailsInstructor(Authentication authentication, @PathVariable Long id, Model model) {
-		Gym gym=gymService.getGymById(id);
+	    Gym gym = gymService.getGymById(id);
 	    model.addAttribute("gym", gym);
-	    model.addAttribute("gymId",id);
+	    model.addAttribute("gymId", id);
 	    Instructor instructor = instructorService.getByEmail(authentication.getName());
 	    Long instructorId = instructor.getInstructor_id();
 	    model.addAttribute("instructorId", instructorId);
 	    Collection<Schedule> schedules = gym.getGymSchedules();
 	    Map<Schedule, List<ClassOfSchedule>> scheduleClassesMap = new HashMap<>();
+
+	    // Calculate the start and end dates for the current week
+	    LocalDate now = LocalDate.now();
+	    LocalDate startOfWeek = now.with(DayOfWeek.MONDAY);
+	    LocalDate endOfWeek = now.with(DayOfWeek.SUNDAY);
+
+	    // Custom comparator for sorting by date and time
+	    Comparator<Schedule> scheduleComparator = (schedule1, schedule2) -> {
+	        LocalDate date1 = schedule1.getWork_out_date().toLocalDate();
+	        LocalDate date2 = schedule2.getWork_out_date().toLocalDate();
+	        int dateComparison = date2.compareTo(date1);
+
+	        if (dateComparison != 0) {
+	            return dateComparison;
+	        }
+
+	        Time time1 = schedule1.getScheduleClasses().get(0).getTime_start();
+	        Time time2 = schedule2.getScheduleClasses().get(0).getTime_start();
+	        return time1.compareTo(time2);
+	    };
 	    for (Schedule schedule : schedules) {
 	        if (schedule.getWork_out_date() != null) {
 	            List<ClassOfSchedule> classesForInstructor = new ArrayList<>();
-	            for (ClassOfSchedule classOfSchedule : schedule.getScheduleClasses()) {
-					classOfScheduleService.checkIfCanceled(schedule, classOfSchedule);
 
-	            	if (classOfSchedule.getInstructor().getInstructor_id().equals(instructorId)) {
+	            for (ClassOfSchedule classOfSchedule : schedule.getScheduleClasses()) {
+	                classOfScheduleService.checkIfCanceled(schedule, classOfSchedule);
+
+	                if (classOfSchedule.getInstructor().getInstructor_id().equals(instructorId)) {
 	                    classesForInstructor.add(classOfSchedule);
 	                }
-	            	  classesForInstructor.sort(Comparator.comparing(ClassOfSchedule::getTime_start));
 	            }
-	            if (!classesForInstructor.isEmpty()) {
+
+	            // Filter classes for the current week
+	            if (!classesForInstructor.isEmpty() && schedule.getWork_out_date().toLocalDate().isAfter(startOfWeek.minusDays(1))
+	                    && schedule.getWork_out_date().toLocalDate().isBefore(endOfWeek.plusDays(1))) {
+	                classesForInstructor.sort(Comparator.comparing(ClassOfSchedule::getTime_start));
 	                scheduleClassesMap.put(schedule, classesForInstructor);
 	            }
 	        }
 	    }
+	    List<Schedule> sortedSchedules = gym.getGymSchedules().stream()
+	            .filter(schedule -> schedule.getWork_out_date().toLocalDate().isAfter(startOfWeek.minusDays(1))
+	                    && schedule.getWork_out_date().toLocalDate().isBefore(endOfWeek.plusDays(1)))
+	            .collect(Collectors.toList());
+
+	    Collections.sort(sortedSchedules, scheduleComparator);
+	    
 	    model.addAttribute("scheduleClassesMap", scheduleClassesMap);
+	    model.addAttribute("sortedSchedules", sortedSchedules);
 	    return "gym/instructor-classes-details";
 	}
+
+
+
 
 	@GetMapping("/gym/instructor-classes-details")
 	public String viewGymInstructorDetails(Model model, @ModelAttribute("gym") Gym gym, @ModelAttribute("instructorId") Long instructorId, @ModelAttribute("gymId") Long gymId) {
@@ -453,6 +570,8 @@ public class GymController {
 		Workout workout=workoutService.findById(workoutId);
 		Athletes athlete=athleteService.getAthlete(authentication.getName());
 		ClassOfSchedule classOfSchedule=classOfScheduleService.getClassOfScheduleById(classOfScheduleId);
+		Schedule schedule=scheduleService.getScheduleById(scheduleId);
+		List<Integer> weeksAlreadyReserved=new ArrayList();
 		Gym gym=gymService.getGymById(gymId);
 		int position=-1;
 		if (classOfSchedule != null) {
@@ -476,6 +595,37 @@ public class GymController {
 		}else {
 			model.addAttribute("allPositionsReserved", false);
 		}
+		if(schedule.getWeeks()>1) {
+			Integer weeksReserved=athleteService.findWeeks(athlete, classOfSchedule);
+			if(weeksReserved==null) {
+				weeksReserved=0;
+			}
+			if(weeksReserved!=0) {
+				for(int i=1;i<=weeksReserved;i++) {
+					weeksAlreadyReserved.add(i);
+				}
+			}
+			model.addAttribute("reservedWeeks",weeksAlreadyReserved);
+			model.addAttribute("alreadySelectedForAllTheWeeks",false);
+
+			for(int i=1;i<schedule.getWeeks();i++) {
+				LocalDate newDate=schedule.getWork_out_date().toLocalDate().plusWeeks(i);
+				Schedule news=scheduleService.getScheduleByDateAndGym(Date.valueOf(newDate), gym);
+				for(ClassOfSchedule c:news.getScheduleClasses()) {
+					if(classOfScheduleService.checkIfSame(classOfSchedule,c)) {
+						if (c.getParticipants().contains(athlete)){
+							model.addAttribute("alreadySelectedForAllTheWeeks",true);
+						}
+						else {
+							model.addAttribute("alreadySelectedForAllTheWeeks",false);
+						}
+					}
+				}
+				
+			}
+		}
+		
+		model.addAttribute("schedule", schedule);
 		model.addAttribute("gym",gym);
 		model.addAttribute("workout",workout);
 		model.addAttribute("classOfSchedule",classOfSchedule);
@@ -485,24 +635,15 @@ public class GymController {
 
 
 	 @GetMapping("/gym/deleteProgram")
-	 public String showDeleteProgramPage(Model model,Authentication authentication) {
+	 public String showDeleteProgramPage(Model model,Authentication authentication,@RequestParam(name="programId") Long scheduleId) {
 		 Gym gym=gymService.getGymByEmail(authentication.getName());
-		 Collection<Schedule> deletableSchedules = gym.getGymSchedules();
-		  List<Schedule> filteredSchedules = new ArrayList<>();
-		    for (Schedule schedule : deletableSchedules) {
-		        if (schedule != null) {
-		            List<ClassOfSchedule> classes = schedule.getScheduleClasses();
-		            if (classes != null) {
-		                classes.sort(Comparator.comparing(ClassOfSchedule::getTime_start));
-		            }
-		            filteredSchedules.add(schedule);
-		        }
-		    }
-
-		    model.addAttribute("deletableSchedules", filteredSchedules);
+		 Schedule schedule=scheduleService.getScheduleById(scheduleId);
+			model.addAttribute("gym",gym);
+			model.addAttribute("deletableSchedule", schedule);
+		   
 	     return "gym/deleteProgram";
 	  }
-
+	 
 	 @PostMapping("/gym/deleteSchedule")
 	 public String deleteSchedule(@RequestParam Long scheduleId,Authentication authentication) {
 	    Gym gym=gymService.getGymByEmail(authentication.getName());
@@ -517,10 +658,27 @@ public class GymController {
 	 @GetMapping("/visitor/{id}")
 	 public String watchDetailsOfGym(@PathVariable Long id, Model model) {
 		 Gym gym = gymService.getGymById(id);
+
+		 LocalDate now = LocalDate.now();
+		    LocalDate startOfWeek = now.with(DayOfWeek.MONDAY);
+		    LocalDate endOfWeek = now.with(DayOfWeek.SUNDAY);
+
+		    Comparator<Schedule> scheduleComparator = Comparator.comparing(Schedule::getWork_out_date)
+		            .thenComparing((schedule1, schedule2) -> {
+		                Time time1 = schedule1.getScheduleClasses().get(0).getTime_start();
+		                Time time2 = schedule2.getScheduleClasses().get(0).getTime_start();
+		                return time1.compareTo(time2);
+		            });
+
+		    List<Schedule> programList = gym.getGymSchedules().stream()
+		            .filter(schedule -> schedule.getWork_out_date().toLocalDate().isAfter(startOfWeek.minusDays(1))
+		                    && schedule.getWork_out_date().toLocalDate().isBefore(endOfWeek.plusDays(1)))
+		            .sorted(scheduleComparator)
+		            .collect(Collectors.toList());
+
+		    model.addAttribute("programList", programList);
 		 model.addAttribute("gym", gym);
 		 model.addAttribute("memberships",gym.getGym_memberships());
-		 Collection<Schedule> programList=gym.getGymSchedules();
-	     model.addAttribute("programList", gym.getGymSchedules());
 	     if(programList!=null) {
 				Map<Schedule,List<ClassOfSchedule>> classesByDate = new HashMap<>();
 				for (Schedule p:programList) {

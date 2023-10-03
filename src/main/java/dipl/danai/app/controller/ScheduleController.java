@@ -4,7 +4,9 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +26,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import dipl.danai.app.model.AthleteClassScheduleReservation;
 import dipl.danai.app.model.Athletes;
 import dipl.danai.app.model.ClassOccurrence;
 import dipl.danai.app.model.ClassOfSchedule;
@@ -67,6 +72,8 @@ public class ScheduleController {
 	EmailService emailService;
 	@Autowired
 	PopularityCalculationService workoutPopularityService;
+	
+	
 
 	@GetMapping(value = {"/addClass"})
 	public String addClass(HttpServletRequest request,HttpSession session,@RequestParam(value = "programId", required = false) Long programId,
@@ -155,23 +162,49 @@ Model model,Authentication authentication) {
 
 	@PostMapping(value = {"/createProgram"})
 	public String getProgram(Model model, @Valid Schedule schedule,
-			Authentication authentication,
-			BindingResult bindingResult,
-			@RequestParam(value="date") String date)throws SQLException, ParseException {
-		Gym gym=gymService.getGymByEmail(authentication.getName());
-		Date startDate=Date.valueOf(date);
-		schedule.setWork_out_date(startDate);
-		scheduleService.saveSchedule(schedule);
-		gym.getGymSchedules().add(schedule);
-		gymService.saveGym(gym);
-		return "redirect:/gym/createProgram";
+	        Authentication authentication,
+	        BindingResult bindingResult,
+	        @RequestParam(value="date") String date,
+	        @RequestParam(value = "weeks") int weeks) throws SQLException, ParseException {
+	    Gym gym = gymService.getGymByEmail(authentication.getName());
+	    Date startDate = Date.valueOf(date);
+	    schedule.setWork_out_date(startDate);
+	    schedule.setWeeks(weeks);
+	    scheduleService.saveSchedule(schedule);
+	    gym.getGymSchedules().add(schedule);
+	    gymService.saveGym(gym);
+
+	    for (int i = 1; i <= weeks - 1; i++) {
+	        LocalDate newDate = startDate.toLocalDate().plusWeeks(i);
+	        Schedule newSchedule = new Schedule();
+	        newSchedule.setWeeks(weeks - i);
+	        newSchedule.setWork_out_date(Date.valueOf(newDate));
+	        List<ClassOfSchedule> classes = schedule.getScheduleClasses();
+	        for (ClassOfSchedule c : classes) {
+	            ClassOfSchedule newClass = new ClassOfSchedule(c.getWorkout(), c.getTime_start(), c.getTime_end(), c.getInstructor(), c.getRoom(), c.getCapacity(), false);
+	            newSchedule.getScheduleClasses().add(newClass);
+	        }
+	        scheduleService.saveSchedule(newSchedule);
+	        gym.getGymSchedules().add(newSchedule);
+	        gymService.saveGym(gym);
+	    }
+	    return "redirect:/gym/createProgram";
 	}
 
 
 	@PostMapping("/participate")
 	@Transactional
-	public String participateteInClass(@RequestParam("gymId") Long gymId,@RequestParam("classOfScheduleId") Long classOfScheduleId,Authentication authentication,HttpServletRequest request,Model model) {
+	public String participateteInClass(@RequestParam("workoutId") Long workoutId,
+	        @RequestParam("scheduleId") Long scheduleId,
+	        @RequestParam("gymId") Long gymId,
+	        @RequestParam("classOfScheduleId") Long classOfScheduleId
+	        ,Authentication authentication,HttpServletRequest request,Model model) {
 		String previousPageUrl = request.getHeader("Referer");
+		if(previousPageUrl.contains("?isModalOpen=true")) {
+			previousPageUrl=previousPageUrl;
+		}else {
+			previousPageUrl = request.getHeader("Referer") + "?isModalOpen=true&workoutId=" + workoutId + "&scheduleId=" + scheduleId + "&gymId=" + gymId + "&classOfScheduleId=" + classOfScheduleId;
+		}
 		Athletes a=athleteService.getAthlete(authentication.getName());
 		ClassOfSchedule classOfSchedule=classOfScheduleService.getClassOfScheduleById(classOfScheduleId);
 		Gym gym=gymService.getGymById(gymId);
@@ -189,11 +222,58 @@ Model model,Authentication authentication) {
 		classOfScheduleService.save(classOfSchedule);
 		return "redirect:"+previousPageUrl;
 	}
+	
+	@PostMapping("/participateNextWeeks")
+	@Transactional
+	public String participateteInClassNextWeeks(@RequestParam("workoutId") Long workoutId,
+	        @RequestParam("scheduleId") Long scheduleId,
+	        @RequestParam("gymId") Long gymId,
+	        @RequestParam("classOfScheduleId") Long classOfScheduleId,
+	        @RequestParam("weeksToReserve") Integer weeksToReserve, // Capture the selected number of weeks
+	        Authentication authentication,
+	        HttpServletRequest request,
+	        Model model,
+	        RedirectAttributes redirectAttributes) {
+		String previousPageUrl=request.getHeader("Referer");
+		if(previousPageUrl.contains("?isModalOpen=true")) {
+			previousPageUrl=previousPageUrl;
+		}else {
+			previousPageUrl = request.getHeader("Referer") + "?isModalOpen=true&workoutId=" + workoutId + "&scheduleId=" + scheduleId + "&gymId=" + gymId + "&classOfScheduleId=" + classOfScheduleId;
+		}
+		Athletes a=athleteService.getAthlete(authentication.getName());
+		ClassOfSchedule classOfSchedule=classOfScheduleService.getClassOfScheduleById(classOfScheduleId);
+		Gym gym=gymService.getGymById(gymId);
+		Schedule schedule=scheduleService.getScheduleById(scheduleId);
+		Date date=schedule.getWork_out_date();
+		for(int i=1;i<=weeksToReserve;i++) {
+			LocalDate newDate =date.toLocalDate().plusWeeks(i);
+			Schedule s=scheduleService.getScheduleByDateAndGym(Date.valueOf(newDate), gym);
+			List<ClassOfSchedule> classes =s.getScheduleClasses();
+			for(ClassOfSchedule c:classes) {
+				if(classOfScheduleService.checkIfSame(classOfSchedule,c)) {
+					c.getParticipants().add(a);
+					classOfScheduleService.save(c);
+				}
+			}
+		}
+		AthleteClassScheduleReservation reserve=new AthleteClassScheduleReservation(a,classOfSchedule,weeksToReserve);
+		athleteService.saveReservetions(reserve);
+		model.addAttribute("isModalOpen", true);
+		return "redirect:"+previousPageUrl;
+	}
 
 	 @PostMapping("/cancelPosition")
 	 @Transactional
-	 public String cancelPosition(@RequestParam("classOfScheduleId") Long classOfScheduleId, Authentication authentication, Model model,HttpServletRequest request) {
+	 public String cancelPosition(@RequestParam("workoutId") Long workoutId,
+		        @RequestParam("scheduleId") Long scheduleId,
+		        @RequestParam("gymId") Long gymId,
+		        @RequestParam("classOfScheduleId") Long classOfScheduleId, Authentication authentication, Model model,HttpServletRequest request) {
 		String previousPageUrl = request.getHeader("Referer");
+		if(previousPageUrl.contains("?isModalOpen=true")) {
+			previousPageUrl=previousPageUrl;
+		}else {
+			previousPageUrl = request.getHeader("Referer") + "?isModalOpen=true&workoutId=" + workoutId + "&scheduleId=" + scheduleId + "&gymId=" + gymId + "&classOfScheduleId=" + classOfScheduleId;
+		}
 		Athletes a=athleteService.getAthlete(authentication.getName());
 		ClassOfSchedule classOfSchedule=classOfScheduleService.getClassOfScheduleById(classOfScheduleId);
 		if (authentication.getAuthorities().stream()
@@ -343,7 +423,7 @@ Model model,Authentication authentication) {
 
 	 @GetMapping("/modifyClass")
 	 public String modifyClass(@RequestParam("classId") Long classId, Model model,Authentication authentication,@RequestParam(value="gymId",required=false) Long gymId,@RequestParam(value="roomError",required=false) String roomError,@RequestParam(value="instructorError",required=false) String instructorError,@RequestParam(value="scheduleId",required=false) Long scheduleId, HttpSession session ) {
-		ClassOfSchedule classOfSchedule=classOfScheduleService.getClassOfScheduleById(classId);
+		 ClassOfSchedule classOfSchedule=classOfScheduleService.getClassOfScheduleById(classId);
 	    Gym gym=gymService.getGymById(gymId);
 	    Schedule schedule=scheduleService.getScheduleById(scheduleId);
 	    model.addAttribute("classOfSchedule", classOfSchedule);
@@ -353,6 +433,11 @@ Model model,Authentication authentication) {
 	    ClassOccurrence classOccurrence=classOfScheduleService.getClassOccurrence(scheduleId, classId);
 	    model.addAttribute("classOccurrence",classOccurrence);
 	    model.addAttribute("schedule",schedule);
+	    String userRole= authentication.getAuthorities().stream()
+                .findFirst()
+                .map(GrantedAuthority::getAuthority)
+                .orElse("");
+	    model.addAttribute("userRole", userRole);
 	    if (instructorError != null && !instructorError.isEmpty()) {
 	        model.addAttribute("instructorError", instructorError);
 	    }
